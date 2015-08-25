@@ -1,0 +1,19 @@
+{
+	"cmd": "./waf",
+	"name": "Build",
+	"sh": "true",
+	"targets": {
+		"Clean" : {
+			"cmd": "./waf clean",
+			"sh": "true"
+		},
+		"Configure": {
+			"cmd": "./waf configure",
+			"sh": "true"
+		},
+		"Test": {
+			"cmd": "build/tests/all",
+			"sh": "true"
+		}
+	}
+}
