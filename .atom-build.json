@@ -12,7 +12,11 @@
 			"sh": "true"
 		},
 		"Test": {
-			"cmd": "build/tests/all",
+			"cmd": "./waf test",
+			"sh": "true"
+		},
+		"Build & Test": {
+			"cmd": "./waf build test",
 			"sh": "true"
 		}
 	}
