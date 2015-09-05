@@ -15,7 +15,13 @@ Watch this space.
 *	python >= 2.7.x
 *	libboost-system1.55.0, libboost-system1.55.0-dev
 *	gtest 1.7 (Google Test)
+
+## Required tools
+In order to verify the quality of this code, we use the following tools, so if
+you want to contribute, it is worth having them, because PRs that don't pass these
+checks will be rejected without any further examination.
 *	cppcheck (the build runs this each time you compile)
+*	valgrind
 
 Note that we assume that the dependencies can be found one of two ways:
 1.	For those that use `pkg-config`, you must have `pkg-config` installed.

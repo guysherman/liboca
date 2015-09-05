@@ -49,6 +49,7 @@ static void* clientRun(void* arg)
 {
 	if (arg == NULL)
 	{
+		pthread_detach(pthread_self());
 		return NULL;
 	}
 
@@ -79,6 +80,7 @@ static void* clientRun(void* arg)
 	  std::cout.write(buf.data(), len);
 	}
 
+	pthread_detach(pthread_self());
 	return NULL;
 
 }
@@ -90,6 +92,7 @@ static void* serverRun(void* arg)
 
 	if (arg == NULL)
 	{
+		pthread_detach(pthread_self());
 		return NULL;
 	}
 
@@ -104,6 +107,7 @@ static void* serverRun(void* arg)
 
 	svc.run();
 
+	pthread_detach(pthread_self());
 	return NULL;
 }
 
