@@ -27,16 +27,54 @@
 
 
 // 3rd Party Headers
-#include <gtest/gtest.h>
+
 
 // GTK Headers
 
+#include "OcpMessageProcessor.hxx"
 
-#include <oca/OcaNetwork.hxx>
-
-
-TEST(Suite_OcaNetwork, Instantiate)
+namespace oca
 {
-	oca::OcaNetwork network;
-	EXPECT_EQ(1, network.Dummy());
+	OcpMessageProcessor::OcpMessageProcessor()
+	{
+
+	}
+
+	OcpMessageProcessor::~OcpMessageProcessor()
+	{
+
+	}
+
+
+	void OcpMessageProcessor::SyncValueReceived(uint8_t* bufferData,
+		const boost::system::error_code& error,
+		size_t bytesTransferred,
+		boost::function<void(void)> getHeader )
+	{
+		if (error.value() != boost::system::errc::success)
+		{
+			// TODO: consider an exception here
+			return;
+		}
+
+
+		if (bytesTransferred != 1)
+		{
+			// TODO: consider an exception here
+			return;
+		}
+
+
+		// TODO: logging
+
+
+		if (bufferData != 0)
+		{
+			if (bufferData[0] == 0x3B)
+			{
+				getHeader();
+			}
+		}
+	}
+
 }

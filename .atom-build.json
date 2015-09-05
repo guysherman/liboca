@@ -16,7 +16,7 @@
 			"sh": "true"
 		},
 		"Build & Test": {
-			"cmd": "./waf build test",
+			"cmd": "./waf build test --cppcheck",
 			"sh": "true"
 		}
 	}

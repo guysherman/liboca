@@ -27,16 +27,8 @@
 
 
 // 3rd Party Headers
-#include <gtest/gtest.h>
+
 
 // GTK Headers
 
-
-#include <oca/OcaNetwork.hxx>
-
-
-TEST(Suite_OcaNetwork, Instantiate)
-{
-	oca::OcaNetwork network;
-	EXPECT_EQ(1, network.Dummy());
-}
+#include "TcpServer.hxx"
