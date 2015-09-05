@@ -37,7 +37,7 @@
 class localScaffold
 {
 public:
-	void handleAccept(oca::net::TcpConnection::pointer conn, const boost::system::error_code& error)
+	static void handleAccept(oca::net::TcpConnection::pointer conn, const boost::system::error_code& error)
 	{
 		conn->Start();
 	}
@@ -87,7 +87,7 @@ static void* clientRun(void* arg)
 
 static void* serverRun(void* arg)
 {
-	localScaffold l;
+	//localScaffold l;
 	boost::asio::io_service svc;
 
 	if (arg == NULL)
@@ -103,7 +103,7 @@ static void* serverRun(void* arg)
 	oca::net::TcpConnection::pointer con = oca::net::TcpConnection::Create(acc.get_io_service(), proc);
 
 	acc.async_accept(con->GetSocket(),
-        boost::bind(&localScaffold::handleAccept, l, con, boost::asio::placeholders::error));
+        boost::bind(&localScaffold::handleAccept, con, boost::asio::placeholders::error));
 
 	svc.run();
 

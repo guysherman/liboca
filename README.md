@@ -37,7 +37,13 @@ checks will be rejected without any further examination.
 
 ## Testing
 Assuming you're in the root folder, and you've had a successful build:
-	$ build/tests/all
+	$ ./waf test
+
+Before you commit your changes:
+	$ ./waf clean build verify --cppcheck --cppcheck-bin-enable=all --cppcheck-lib-enable=all
+
+In theory this should fail if any tests fail, anything is thrown up by cppcheck, or if any
+errors are found by valgrind.
 
 
 ## Coding Standards

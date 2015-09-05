@@ -66,3 +66,7 @@ def build(bld):
 
 def test(bld):
     subprocess.check_call("./run_tests.sh")
+
+
+def verify(bld):
+    subprocess.check_call("./grind_tests.sh")
