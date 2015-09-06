@@ -61,6 +61,7 @@ namespace oca
             boost::shared_ptr<TcpConnectionFactory> connectionFactory;
             boost::shared_ptr<boost::asio::io_service> ioService;
             uint16_t port;
+            bool isRunning;
 
 		};
 	}

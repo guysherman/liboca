@@ -43,7 +43,7 @@ namespace oca
     namespace net
     {
         TcpServer::TcpServer(boost::shared_ptr<TcpConnectionFactory> connectionFactory, boost::shared_ptr<boost::asio::io_service> ioService, uint16_t port)
-            : acceptor(*ioService, boost::asio::ip::tcp::endpoint(boost::asio::ip::tcp::v4(), port)), connectionFactory(connectionFactory), ioService(ioService), port(port)
+            : acceptor(*ioService, boost::asio::ip::tcp::endpoint(boost::asio::ip::tcp::v4(), port)), connectionFactory(connectionFactory), ioService(ioService), port(port), isRunning(false)
         {
             accept();
         }
@@ -79,12 +79,20 @@ namespace oca
 
         void TcpServer::Start()
         {
+            isRunning = true;
             ioService->run();
+            isRunning = false;
         }
 
         void TcpServer::Stop()
         {
+            acceptor.cancel();
+            acceptor.close();
             ioService->stop();
+            while (isRunning)
+            {
+                usleep(32000);
+            }
         }
 
         TcpServer::~TcpServer()

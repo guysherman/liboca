@@ -45,6 +45,7 @@ namespace oca
     // NB: port is explicitly not initialized here so that we can range check it
     // because OCP.1 Only supports ports in the dynamic range: 49152..65535
     OcaNetwork::OcaNetwork(uint16_t port)
+        : isRunning(false)
     {
         // Only have to check the lower bound, because uint16_t won't let us
         // exceed the upper bound. Any overflow will cause us to fall below
@@ -63,12 +64,18 @@ namespace oca
 
     void OcaNetwork::Start()
     {
+        isRunning = true;
         tcpServer->Start();
+        isRunning = false;
     }
 
     void OcaNetwork::Stop()
     {
         tcpServer->Stop();
+        while (isRunning)
+        {
+            usleep(32000);
+        }
     }
 
     OcaNetwork::~OcaNetwork()

@@ -39,7 +39,11 @@ class localScaffold
 public:
 	static void handleAccept(oca::net::TcpConnection::pointer conn, const boost::system::error_code& error)
 	{
-		conn->Start();
+		if (conn != NULL)
+		{
+			conn->Start();
+		}
+
 	}
 
 
@@ -70,14 +74,12 @@ static void* clientRun(void* arg)
 
 	  boost::asio::write(socket, boost::asio::buffer(buffer, 1), error);
 
-	  size_t len = socket.read_some(boost::asio::buffer(buf), error);
+	  socket.read_some(boost::asio::buffer(buf), error);
 
 	  if (error == boost::asio::error::eof)
 		break; // Connection closed cleanly by peer.
 	  else if (error)
 		throw boost::system::system_error(error); // Some other error.
-
-	  std::cout.write(buf.data(), len);
 	}
 
 	pthread_detach(pthread_self());
@@ -114,8 +116,7 @@ static void* serverRun(void* arg)
 
 TEST(Suite_TcpConnection, ReadSyncValue_CorrectValue)
 {
-	oca_test::MockMessageProcessor* proc = new oca_test::MockMessageProcessor();
-	oca_test::MockMessageProcessor::pointer sproc(proc);
+	boost::shared_ptr<oca_test::MockMessageProcessor> sproc(new oca_test::MockMessageProcessor());
 
 	uint8_t sv = 0x3B;
 
@@ -125,14 +126,13 @@ TEST(Suite_TcpConnection, ReadSyncValue_CorrectValue)
 	pthread_create(&t, NULL, &clientRun, &sv);
 	pthread_join(t, NULL);
 
-	EXPECT_EQ(true, proc->gotCorrectValue);
-	EXPECT_EQ(0x3B, proc->bufferData[0]);
+	EXPECT_EQ(true, sproc->gotCorrectValue);
+	EXPECT_EQ(0x3B, sproc->bufferData[0]);
 }
 
 TEST(Suite_TcpConnection, ReadSyncValue_IncorrectValue)
 {
-	oca_test::MockMessageProcessor* proc = new oca_test::MockMessageProcessor();
-	oca_test::MockMessageProcessor::pointer sproc(proc);
+	boost::shared_ptr<oca_test::MockMessageProcessor> sproc(new oca_test::MockMessageProcessor());
 
 	uint8_t sv = 0xDE;
 
@@ -142,6 +142,6 @@ TEST(Suite_TcpConnection, ReadSyncValue_IncorrectValue)
 	pthread_create(&t, NULL, &clientRun, &sv);
 	pthread_join(t, NULL);
 
-	EXPECT_EQ(false, proc->gotCorrectValue);
-	EXPECT_EQ(0xDE, proc->bufferData[0]);
+	EXPECT_EQ(false, sproc->gotCorrectValue);
+	EXPECT_EQ(0xDE, sproc->bufferData[0]);
 }

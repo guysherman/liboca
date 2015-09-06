@@ -54,6 +54,7 @@ namespace oca
         OcaNetwork& operator=(const OcaNetwork& rhs);
 
         boost::shared_ptr<oca::net::TcpServer> tcpServer;
+        bool isRunning;
     };
 }
 
