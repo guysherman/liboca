@@ -13,14 +13,21 @@ Watch this space.
 
 ## Dependencies
 *	python >= 2.7.x
-*	boost (headers only)
+*	libboost-system1.55.0, libboost-system1.55.0-dev
 *	gtest 1.7 (Google Test)
 
 Note that we assume that the dependencies can be found one of two ways:
 1.	For those that use `pkg-config`, you must have `pkg-config` installed.
 2.	Any other dependencies (eg the two above), must be installed somewhere that
-	is in your default lib and include paths. ie we don't want to keep any funky
+	is in your lib and include paths when you run waf. ie we don't want to keep any funky
 	`-I` or `-L` lines in our build files.
+
+## Required tools
+In order to verify the quality of this code, we use the following tools, so if
+you want to contribute, it is worth having them, because PRs that don't pass these
+checks will be rejected without any further examination.
+*	cppcheck (the build runs this each time you compile)
+*	valgrind
 
 ## Building
 	$ git clone https://github.com/guysherman/liboca
@@ -30,7 +37,13 @@ Note that we assume that the dependencies can be found one of two ways:
 
 ## Testing
 Assuming you're in the root folder, and you've had a successful build:
-	$ build/tests/all
+	$ ./waf test
+
+Before you commit your changes:
+	$ ./waf clean build verify --cppcheck --cppcheck-bin-enable=all --cppcheck-lib-enable=all
+
+In theory this should fail if any tests fail, anything is thrown up by cppcheck, or if any
+errors are found by valgrind.
 
 
 ## Coding Standards

@@ -16,6 +16,8 @@
   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 */
+#ifndef __ITCPCONNECTION_HXX__
+#define __ITCPCONNECTION_HXX__
 
 // C++ Standard Headers
 
@@ -24,13 +26,29 @@
 
 
 // Boost Headers
-
+#include <boost/shared_ptr.hpp>
+#include <boost/asio.hpp>
 
 // 3rd Party Headers
-#include <gtest/gtest.h>
+
 
 // GTK Headers
 
-TEST(HelloTest, SayHello) {
-    EXPECT_EQ(1, 1);
+
+namespace oca
+{
+	namespace net
+	{
+		class ITcpConnection
+		{
+		public:
+			typedef boost::shared_ptr<ITcpConnection> pointer;
+			virtual void Start() = 0;
+			virtual boost::asio::ip::tcp::socket& GetSocket() = 0;
+		};
+	}
 }
+
+
+
+#endif // __ITCPCONNECTION_HXX__
