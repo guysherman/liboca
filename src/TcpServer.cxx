@@ -24,7 +24,9 @@
 
 
 // Boost Headers
-
+#include <boost/shared_ptr.hpp>
+#include <boost/bind.hpp>
+#include <boost/asio.hpp>
 
 // 3rd Party Headers
 
@@ -32,3 +34,52 @@
 // GTK Headers
 
 #include "TcpServer.hxx"
+#include "TcpConnectionFactory.hxx"
+#include "ITcpConnection.hxx"
+
+
+namespace oca
+{
+    namespace net
+    {
+        TcpServer::TcpServer(boost::shared_ptr<TcpConnectionFactory> connectionFactory, boost::asio::io_service& ioService, uint16_t port)
+            : acceptor(ioService, boost::asio::ip::tcp::endpoint(boost::asio::ip::tcp::v4(), port)), connectionFactory(connectionFactory), port(port)
+        {
+            accept();
+        }
+
+        void TcpServer::accept()
+        {
+            ITcpConnection::pointer connection = connectionFactory->CreateConnection();
+            if (connection == NULL)
+            {
+                return;
+            }
+
+            acceptor.async_accept(
+                connection->GetSocket(),
+                boost::bind(
+                    &TcpServer::accepted,
+                    this,
+                    connection,
+                    boost::asio::placeholders::error
+                )
+            );
+        }
+
+        void TcpServer::accepted(boost::shared_ptr<ITcpConnection> connection, const boost::system::error_code &error)
+        {
+            if (!error)
+            {
+                connection->Start();
+            }
+
+            accept();
+        }
+
+        TcpServer::~TcpServer()
+        {
+
+        }
+    }
+}

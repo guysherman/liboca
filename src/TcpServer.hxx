@@ -40,23 +40,26 @@ namespace oca
 {
 	namespace net
 	{
-		class TcpConnection;
+		class ITcpConnection;
+        class TcpConnectionFactory;
 
 		class TcpServer
 		{
 		public:
-			TcpServer();
-			TcpServer(uint16_t port);
+			TcpServer(boost::shared_ptr<TcpConnectionFactory> connectionFactory, boost::asio::io_service& ioService, uint16_t port);
 
 			virtual ~TcpServer();
 
 
 		private:
 			void accept();
-			void accepted(boost::shared_ptr<TcpConnection> connection, const boost::system::error_code& error);
+			void accepted(boost::shared_ptr<ITcpConnection> connection, const boost::system::error_code& error);
 
 
 			boost::asio::ip::tcp::acceptor acceptor;
+            boost::shared_ptr<TcpConnectionFactory> connectionFactory;
+            uint16_t port;
+
 		};
 	}
 }

@@ -1,43 +1,43 @@
-  /*
-      Copyright (C) 2015 Guy Sherman, Shermann Innovations Limited
+/*
+  Copyright (C) 2015 Guy Sherman, Shermann Innovations Limited
 
-      This program is free software; you can redistribute it and/or modify
-      it under the terms of the GNU General Public License as published by
-      the Free Software Foundation; either version 2 of the License, or
-      (at your option) any later version.
+  This program is free software; you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation; either version 2 of the License, or
+  (at your option) any later version.
 
-      This program is distributed in the hope that it will be useful,
-      but WITHOUT ANY WARRANTY; without even the implied warranty of
-      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-      GNU General Public License for more details.
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
 
-      You should have received a copy of the GNU General Public License
-      along with this program; if not, write to the Free Software
-      Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+  You should have received a copy of the GNU General Public License
+  along with this program; if not, write to the Free Software
+  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
-    */
-  #ifndef __TCPCONNECTION_HXX__
-  #define __TCPCONNECTION_HXX__
+*/
+#ifndef __TCPCONNECTION_HXX__
+#define __TCPCONNECTION_HXX__
 
-    // C++ Standard Headers
-
-
-    // C Standard Headers
+// C++ Standard Headers
 
 
-    // Boost Headers
-    #include <boost/bind.hpp>
-	#include <boost/shared_ptr.hpp>
-	#include <boost/enable_shared_from_this.hpp>
-	#include <boost/asio.hpp>
-
-    // 3rd Party Headers
+// C Standard Headers
 
 
-    // GTK Headers
+// Boost Headers
+#include <boost/bind.hpp>
+#include <boost/shared_ptr.hpp>
+#include <boost/enable_shared_from_this.hpp>
+#include <boost/asio.hpp>
+
+// 3rd Party Headers
 
 
-    #define OCP1_DATA_BUFFER_SIZE 1024
+// GTK Headers
+#include "ITcpConnection.hxx"
+
+#define OCP1_DATA_BUFFER_SIZE 1024
 
 namespace oca
 {
@@ -46,12 +46,11 @@ namespace oca
     namespace net
 	{
 
-        class TcpConnection : public boost::enable_shared_from_this<TcpConnection>
+        class TcpConnection : public ITcpConnection, public boost::enable_shared_from_this<TcpConnection>
 		{
 		public:
-			typedef boost::shared_ptr<TcpConnection> pointer;
-
-			static pointer Create(boost::asio::io_service& ioService, boost::shared_ptr<OcpMessageProcessor> processor);
+			
+			static ITcpConnection::pointer Create(boost::asio::io_service& ioService, boost::shared_ptr<OcpMessageProcessor> processor);
 			boost::asio::ip::tcp::socket& GetSocket();
 
 			void Start();
@@ -87,4 +86,4 @@ namespace oca
 }
 
 
-  #endif // __TCPCONNECTION_HXX__
+#endif // __TCPCONNECTION_HXX__
