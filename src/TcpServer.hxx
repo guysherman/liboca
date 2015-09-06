@@ -46,8 +46,9 @@ namespace oca
 		class TcpServer
 		{
 		public:
-			TcpServer(boost::shared_ptr<TcpConnectionFactory> connectionFactory, boost::asio::io_service& ioService, uint16_t port);
-
+			TcpServer(boost::shared_ptr<TcpConnectionFactory> connectionFactory, boost::shared_ptr<boost::asio::io_service> ioService, uint16_t port);
+            void Start();
+            void Stop();
 			virtual ~TcpServer();
 
 
@@ -58,6 +59,7 @@ namespace oca
 
 			boost::asio::ip::tcp::acceptor acceptor;
             boost::shared_ptr<TcpConnectionFactory> connectionFactory;
+            boost::shared_ptr<boost::asio::io_service> ioService;
             uint16_t port;
 
 		};

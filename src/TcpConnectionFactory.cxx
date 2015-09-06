@@ -41,7 +41,7 @@ namespace oca
 {
 	namespace net
 	{
-		TcpConnectionFactory::TcpConnectionFactory(boost::asio::io_service& ioService, boost::shared_ptr<OcpMessageProcessor> processor)
+		TcpConnectionFactory::TcpConnectionFactory(boost::shared_ptr<boost::asio::io_service> ioService, boost::shared_ptr<OcpMessageProcessor> processor)
 			:	ioService(ioService), processor(processor)
 		{
 
@@ -54,7 +54,7 @@ namespace oca
 
 		boost::shared_ptr<ITcpConnection> TcpConnectionFactory::CreateConnection()
 		{
-			return TcpConnection::Create(ioService, processor);
+			return TcpConnection::Create(*ioService, processor);
 		}
 	}
 }

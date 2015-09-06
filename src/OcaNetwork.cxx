@@ -18,27 +18,57 @@
 */
 
 // C++ Standard Headers
-
+#include <exception>
 
 // C Standard Headers
-
+#include <stdint.h>
 
 // Boost Headers
-
+#include <boost/shared_ptr.hpp>
+#include <boost/asio.hpp>
 
 // 3rd Party Headers
 
 
 // GTK Headers
 
+#include <oca/OcaException.hxx>
 #include <oca/OcaNetwork.hxx>
+
+#include "TcpServer.hxx"
+#include "TcpConnectionFactory.hxx"
+#include "OcpMessageProcessor.hxx"
+
 
 namespace oca
 {
-    OcaNetwork::OcaNetwork()
-        :   dummyCount(0)
+    // NB: port is explicitly not initialized here so that we can range check it
+    // because OCP.1 Only supports ports in the dynamic range: 49152..65535
+    OcaNetwork::OcaNetwork(uint16_t port)
     {
+        // Only have to check the lower bound, because uint16_t won't let us
+        // exceed the upper bound. Any overflow will cause us to fall below
+        // the lower bound
+        if (port < 49152)
+        {
+            oca::Exception e(__func__, __LINE__, __FILE__, "Port was out of allowed range.");
+            throw e;
+        }
 
+        boost::shared_ptr<boost::asio::io_service> ioService(new boost::asio::io_service());
+        boost::shared_ptr<oca::OcpMessageProcessor> processor(new oca::OcpMessageProcessor());
+        boost::shared_ptr<oca::net::TcpConnectionFactory> factory(new oca::net::TcpConnectionFactory(ioService, processor));
+        tcpServer = boost::shared_ptr<oca::net::TcpServer>(new oca::net::TcpServer(factory, ioService, port));
+    }
+
+    void OcaNetwork::Start()
+    {
+        tcpServer->Start();
+    }
+
+    void OcaNetwork::Stop()
+    {
+        tcpServer->Stop();
     }
 
     OcaNetwork::~OcaNetwork()
@@ -46,8 +76,4 @@ namespace oca
 
     }
 
-    int OcaNetwork::Dummy()
-    {
-        return ++dummyCount;
-    }
 }

@@ -21,7 +21,7 @@
 
 
 // C Standard Headers
-
+#include <pthread.h>
 
 // Boost Headers
 
@@ -34,9 +34,33 @@
 
 #include <oca/OcaNetwork.hxx>
 
-
-TEST(Suite_OcaNetwork, Instantiate)
+static void* worker(void* arg)
 {
-	oca::OcaNetwork network;
-	EXPECT_EQ(1, network.Dummy());
+	if (arg == 0)
+	{
+		return NULL;
+	}
+	oca::OcaNetwork* net = reinterpret_cast<oca::OcaNetwork*>(arg);
+
+	net->Start();
+
+	return NULL;
+}
+
+
+
+
+TEST(Suite_OcaNetwork, StartStop)
+{
+	oca::OcaNetwork network(60000);
+
+	pthread_t t;
+
+	pthread_create(&t, NULL, &worker, &network);
+	usleep(1000000);
+
+	network.Stop();
+	pthread_join(t, NULL);
+
+	//EXPECT_EQ(1, network.Dummy());
 }

@@ -49,7 +49,7 @@ namespace oca
 		class MockTcpConnectionFactory : public TcpConnectionFactory
 		{
 		public:
-			MockTcpConnectionFactory(boost::asio::io_service& ioService, int maxConns)
+			MockTcpConnectionFactory(boost::shared_ptr<boost::asio::io_service> ioService, int maxConns)
                 :   TcpConnectionFactory(ioService, boost::shared_ptr<OcpMessageProcessor>()), countConns(0), maxConns(maxConns)
             {
 
@@ -66,7 +66,7 @@ namespace oca
 				{
 					return boost::shared_ptr<ITcpConnection>();
 				}
-				boost::shared_ptr<MockTcpConnection> conn = MockTcpConnection::Create(ioService);
+				boost::shared_ptr<MockTcpConnection> conn = MockTcpConnection::Create(*ioService);
 				connections.push_back(conn);
 				return conn;
 

@@ -130,11 +130,12 @@ static void* serverRun(void* arg)
 
 TEST(Suite_TcpServer, TcpServer_AcceptsCorrectPort)
 {
-	boost::asio::io_service svc;
-	boost::shared_ptr<oca::net::MockTcpConnectionFactory> cf(new oca::net::MockTcpConnectionFactory(svc, 1));
-	oca::net::TcpServer srv(cf, svc, 60000);
+	boost::shared_ptr<boost::asio::io_service> svcp(new boost::asio::io_service);
+	boost::shared_ptr<oca::net::MockTcpConnectionFactory> cf(new oca::net::MockTcpConnectionFactory(svcp, 1));
+	oca::net::TcpServer srv(cf, svcp, 60000);
 
-	ThreadArgWrapper wrp(svc, cf, srv);
+	ThreadArgWrapper wrp(*svcp, cf, srv);
+
 
 	pthread_t s, t;
 	pthread_create(&s, NULL, &serverRun, &wrp);
@@ -152,11 +153,11 @@ TEST(Suite_TcpServer, TcpServer_AcceptsCorrectPort)
 
 TEST(Suite_TcpServer, TcpServer_RefusesOtherPorts)
 {
-	boost::asio::io_service svc;
-	boost::shared_ptr<oca::net::MockTcpConnectionFactory> cf(new oca::net::MockTcpConnectionFactory(svc, 1));
-	oca::net::TcpServer srv(cf, svc, 60000);
+	boost::shared_ptr<boost::asio::io_service> svcp(new boost::asio::io_service);
+	boost::shared_ptr<oca::net::MockTcpConnectionFactory> cf(new oca::net::MockTcpConnectionFactory(svcp, 1));
+	oca::net::TcpServer srv(cf, svcp, 60000);
 
-	ThreadArgWrapper wrp(svc, cf, srv);
+	ThreadArgWrapper wrp(*svcp, cf, srv);
 
 	pthread_t s, t;
 	pthread_create(&s, NULL, &serverRun, &wrp);
@@ -180,11 +181,11 @@ TEST(Suite_TcpServer, TcpServer_RefusesOtherPorts)
 
 TEST(Suite_TcpServer, TcpServer_AcceptsMultiple)
 {
-	boost::asio::io_service svc;
-	boost::shared_ptr<oca::net::MockTcpConnectionFactory> cf(new oca::net::MockTcpConnectionFactory(svc, 2));
-	oca::net::TcpServer srv(cf, svc, 60000);
+	boost::shared_ptr<boost::asio::io_service> svcp(new boost::asio::io_service);
+	boost::shared_ptr<oca::net::MockTcpConnectionFactory> cf(new oca::net::MockTcpConnectionFactory(svcp, 2));
+	oca::net::TcpServer srv(cf, svcp, 60000);
 
-	ThreadArgWrapper wrp(svc, cf, srv);
+	ThreadArgWrapper wrp(*svcp, cf, srv);
 
 	pthread_t s, t;
 	pthread_create(&s, NULL, &serverRun, &wrp);

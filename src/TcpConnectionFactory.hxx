@@ -47,13 +47,13 @@ namespace oca
 		class TcpConnectionFactory
 		{
 		public:
-			TcpConnectionFactory(boost::asio::io_service& ioService, boost::shared_ptr<OcpMessageProcessor> processor);
+			TcpConnectionFactory(boost::shared_ptr<boost::asio::io_service> ioService, boost::shared_ptr<OcpMessageProcessor> processor);
 			virtual ~TcpConnectionFactory();
 
 			virtual boost::shared_ptr<ITcpConnection> CreateConnection();
 
 		protected:
-			boost::asio::io_service& ioService;
+			boost::shared_ptr<boost::asio::io_service> ioService;
 			boost::shared_ptr<OcpMessageProcessor> processor;
 		};
 	}
