@@ -36,15 +36,15 @@ def configure(conf):
     conf.setenv('liboca', env)
     conf.load('compiler_cxx')
     conf.load('cppcheck')
-    conf.env.CXXFLAGS = ['-Wall', '-ansi', '-ggdb', '-Werror', '-pedantic-errors']
+    conf.env.CXXFLAGS = ['-Wall', '-ansi', '-ggdb']
 
 
 def buildLibShared(bld):
-    bld.shlib(source = bld.path.ant_glob('src/*.cxx'), target="oca", includes = ['./include'], install_path='${LIBDIR}', lib=libs, defines=defines)
+    bld.shlib(source = bld.path.ant_glob('src/*.cxx'), target="oca", includes = ['./include'], cxxflags=['-Werror', '-pedantic-errors'], install_path='${LIBDIR}', lib=libs, defines=defines)
 
 
 def buildLibStatic(bld):
-    bld.stlib(source = bld.path.ant_glob('src/*.cxx'), target="oca", includes = ['./include'], install_path='${LIBDIR}', lib=libs, defines=defines)
+    bld.stlib(source = bld.path.ant_glob('src/*.cxx'), target="oca", includes = ['./include'], cxxflags=['-Werror', '-pedantic-errors'], install_path='${LIBDIR}', lib=libs, defines=defines)
 
 
 def build(bld):
@@ -59,17 +59,21 @@ def build(bld):
 
     bld.program(source = bld.path.ant_glob('examples/hello/*.cxx'),
                 includes = ['./include'],
+                cxxflags=['-Werror', '-pedantic-errors'],
                 lib = libs,
                 target = 'examples/example-hello',
                 install_path = '${BINDIR}',
                 defines = defines)
+
     bld.program(source = bld.path.ant_glob('tests/**/*.cxx'),
                 includes = ['./include', './src'],
+                cxxflags=['-w'],
                 lib = ['pthread', 'boost_system'],
                 target = 'tests/all',
                 install_path = '${BINDIR}',
                 defines = defines,
-                use=['oca', 'gtest', 'gtest_main'])
+                use=['oca', 'gtest', 'gtest_main'],
+            	cppcheck_skip=True)
 
 
 def test(bld):

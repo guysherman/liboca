@@ -15,10 +15,13 @@ def build(bld):
 	source = bld.path.ant_glob('src/gtest-all.cc'),
 	target="gtest",
 	includes = ['./', './include', './src'],
-	install_path='${LIBDIR}')
+	export_includes=['./include'],
+	install_path='${LIBDIR}',
+	cppcheck_skip=True)
 
 	bld.stlib(
 	source = bld.path.ant_glob('src/gtest_main.cc'),
 	target="gtest_main",
 	includes = ['./', './include', './src'],
-	install_path='${LIBDIR}')
+	install_path='${LIBDIR}',
+	cppcheck_skip=True)

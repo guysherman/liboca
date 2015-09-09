@@ -522,9 +522,10 @@
 #  define GTEST_ENV_HAS_TR1_TUPLE_ 1
 # endif
 
-// C++11 specifies that <tuple> provides std::tuple.
-// Always use that if gtest is used in C++11 mode.
-# if GTEST_LANG_CXX11
+// C++11 specifies that <tuple> provides std::tuple. Use that if gtest is used
+// in C++11 mode and libstdc++ isn't very old (binaries targeting OS X 10.6
+// can build with clang but need to use gcc4.2's libstdc++).
+# if GTEST_LANG_CXX11 && (!defined(__GLIBCXX__) || __GLIBCXX__ > 20110325)
 #  define GTEST_ENV_HAS_STD_TUPLE_ 1
 # endif
 
@@ -1386,7 +1387,7 @@ class MutexBase {
 // This allows initialization to work whether pthread_t is a scalar or struct.
 // The flag -Wmissing-field-initializers must not be specified for this to work.
 # define GTEST_DEFINE_STATIC_MUTEX_(mutex) \
-    ::testing::internal::MutexBase mutex = { PTHREAD_MUTEX_INITIALIZER,false,0 }
+    ::testing::internal::MutexBase mutex = { PTHREAD_MUTEX_INITIALIZER, false }
 
 // The Mutex class can only be used for mutexes created at runtime. It
 // shares its API with MutexBase otherwise.
