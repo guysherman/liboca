@@ -16,7 +16,7 @@ def inspectFile(filePath):
 
 
 def processLocation(location):
-	files = [location+'/'+x for x in os.listdir(location) if path.splitext(x)[1]=='.xml']
+	files = [location+'/'+x for x in os.listdir(location) if path.splitext(x)[1]=='.xml' and not 'dep/gtest' in x ]
 	errs = [inspectFile(f) for f in files]
 	print ''
 	print 'Done scanning files'

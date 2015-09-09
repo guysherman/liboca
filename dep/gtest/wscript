@@ -1,0 +1,24 @@
+def options(opt):
+	return
+
+def configure(conf):
+	conf.setenv('gtest')
+	conf.load('compiler_cxx')
+	conf.load('cppcheck')
+	conf.env.CXXFLAGS = ['-Wall', '-ansi', '-ggdb']
+	return
+
+
+def build(bld):
+	bld.env = bld.all_envs['gtest']
+	bld.stlib(
+	source = bld.path.ant_glob('src/gtest-all.cc'),
+	target="gtest",
+	includes = ['./', './include', './src'],
+	install_path='${LIBDIR}')
+
+	bld.stlib(
+	source = bld.path.ant_glob('src/gtest_main.cc'),
+	target="gtest_main",
+	includes = ['./', './include', './src'],
+	install_path='${LIBDIR}')

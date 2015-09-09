@@ -19,7 +19,11 @@ libs = ['boost_system']
 defines = ''
 
 
+SUBFOLDERS = ['dep']
+
 def options(opt):
+    opt.recurse(SUBFOLDERS)
+
     opt.load('compiler_cxx')
     opt.load('cppcheck', tooldir=waftools.location)
     opt.add_option("--shared", action="store_true", help="build shared library")
@@ -27,10 +31,12 @@ def options(opt):
 
 
 def configure(conf):
+    env = conf.env
+    conf.recurse(SUBFOLDERS)
+    conf.setenv('liboca', env)
     conf.load('compiler_cxx')
     conf.load('cppcheck')
     conf.env.CXXFLAGS = ['-Wall', '-ansi', '-ggdb', '-Werror', '-pedantic-errors']
-    conf.env.LINKFLAGS
 
 
 def buildLibShared(bld):
@@ -42,6 +48,8 @@ def buildLibStatic(bld):
 
 
 def build(bld):
+    bld.recurse(SUBFOLDERS)
+    bld.env = bld.all_envs['liboca']
     if bld.options.shared:
         buildLibShared(bld)
     elif bld.options.static:
@@ -57,11 +65,11 @@ def build(bld):
                 defines = defines)
     bld.program(source = bld.path.ant_glob('tests/**/*.cxx'),
                 includes = ['./include', './src'],
-                lib = ['gtest', 'gtest_main', 'pthread', 'boost_system'],
+                lib = ['pthread', 'boost_system'],
                 target = 'tests/all',
                 install_path = '${BINDIR}',
                 defines = defines,
-                use=['oca'])
+                use=['oca', 'gtest', 'gtest_main'])
 
 
 def test(bld):

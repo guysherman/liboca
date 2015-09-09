@@ -1,0 +1,10 @@
+def options(opt):
+	opt.recurse(['gtest'])
+
+
+def configure(conf):
+	conf.recurse(['gtest'])
+
+
+def build(bld):
+	bld.recurse(['gtest'])
