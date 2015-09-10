@@ -21,7 +21,7 @@
 
 
 // C Standard Headers
-
+#include <arpa/inet.h>
 
 // Boost Headers
 #include <boost/asio.hpp>
@@ -82,18 +82,18 @@ namespace oca
 		{
 			// Cast the buffer to the type we want, and dereference the pointer
 			// so that we can read the data.
-			header.protocolVersion = *(boost::asio::buffer_cast<const uint16_t*>(buffer));
+			header.protocolVersion = ntohs(*(boost::asio::buffer_cast<const uint16_t*>(buffer)));
 
 			// Create a new buffer offset from the previous one so that we can
 			// do the same as above but for the next field
 			boost::asio::const_buffer ms = buffer+sizeof(uint16_t);
-			header.messageSize = *(boost::asio::buffer_cast<const uint32_t*>(ms));
+			header.messageSize = ntohl(*(boost::asio::buffer_cast<const uint32_t*>(ms)));
 
 			boost::asio::const_buffer mt = ms+sizeof(uint32_t);
 			header.messageType = (OcaMessageType) *(boost::asio::buffer_cast<const uint8_t*>(mt));
 
 			boost::asio::const_buffer mc = mt+sizeof(uint8_t);
-			header.messageCount = *(boost::asio::buffer_cast<const uint16_t*>(mc));
+			header.messageCount = ntohs(*(boost::asio::buffer_cast<const uint16_t*>(mc)));
 		}
 
 		void Ocp1Header::WriteToBuffer(boost::asio::mutable_buffer& buffer) const
@@ -101,13 +101,13 @@ namespace oca
 			// We cast the buffer to a pointer to the type we want, so that we
 			// can write our data there.
 			uint16_t* pv = boost::asio::buffer_cast<uint16_t*>(buffer);
-			*pv = protocolVersion;
+			*pv = htons(protocolVersion);
 
 			// Again, we get a new buffer (over the same raw data) that is
 			// offset by the correct amount to give us the next field
 			boost::asio::mutable_buffer bms = buffer+sizeof(uint16_t);
 			uint32_t* ms = boost::asio::buffer_cast<uint32_t*>(bms);
-			*ms = messageSize;
+			*ms = htonl(messageSize);
 
 			boost::asio::mutable_buffer bmt = bms+sizeof(uint32_t);
 			uint8_t* mt = boost::asio::buffer_cast<uint8_t*>(bmt);
@@ -115,7 +115,7 @@ namespace oca
 
 			boost::asio::mutable_buffer bmc = bmt+sizeof(uint8_t);
 			uint16_t* mc = boost::asio::buffer_cast<uint16_t*>(bmc);
-			*mc = messageCount;
+			*mc = htons(messageCount);
 
 
 		}
