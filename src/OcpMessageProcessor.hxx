@@ -36,7 +36,7 @@
 
 
     // GTK Headers
-
+    #include "Ocp1Header.hxx"
 
 	namespace oca
 	{
@@ -49,10 +49,25 @@
             virtual ~OcpMessageProcessor();
 
 
-            virtual void SyncValueReceived(uint8_t* bufferData, const boost::system::error_code& error, size_t bytesTransferred, boost::function<void(void)> getHeader );
+            virtual void SyncValueReceived(uint8_t* bufferData, const boost::system::error_code& error, size_t bytesTransferred, boost::function<void(void)> getHeader);
 
-			// void Ocp1HeaderReceived(const boost::system::error_code& error, size_t bytesTransferred);
-			// void Ocp1DataReceived(/* header, */const boost::system::error_code& error, size_t bytesTransferred);
+			virtual void Ocp1HeaderReceived(uint8_t* bufferData, const boost::system::error_code& error, size_t bytesTransferred, boost::function<void(uint32_t)> getData);
+
+            virtual void Ocp1DataReceived(uint8_t* bufferData, const boost::system::error_code& error, size_t bytesTransferred);
+
+        private:
+            // TODO: it goes against my better judgement to have this here.
+            // Since there is currently only one OcpMessageProcessor per OcaNetwork
+            // this is actually a bug if there is more than one TcpConnection, ie
+            // this class was supposed to be stateless, but I don't really want the
+            // TcpConnection to be concerned with the details of the Ocp1Header and I need
+            // to keep the header around between Ocp1HeaderReceived and Ocp1DataReceived
+            // The solution could be to make a factory for this as well, so that we can
+            // have one per connection, without tightly coupling the connection and this
+            // class; or, I could make this a map of <TcpConnection*, Ocp1Header> so that the state
+            // is stored per connection. I like the latter more. The third option is to pass a callback
+            // when calling the callback, but that just feels like the code would be hard to read.
+            oca::net::Ocp1Header header;
 		};
 	}
 

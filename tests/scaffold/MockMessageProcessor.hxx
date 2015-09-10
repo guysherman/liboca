@@ -50,19 +50,19 @@
 		  MockMessageProcessor()
 		  {
 			  gotCorrectValue = false;
-              bufferData = 0;
+              dataSize = 0;
+              memset(&bufferData[0], 0, 1024);
+              memset(&bufferData2[0], 0, 1024);
+              memset(&bufferData3[0], 0, 1024);
 		  }
 
 		  virtual ~MockMessageProcessor()
 		  {
-              if (bufferData != 0)
-              {
-                  free(bufferData);
-              }
+
 		  }
 
 
-		  virtual void SyncValueReceived(uint8_t* bufferData, const boost::system::error_code& error, size_t bytesTransferred, boost::function<void(void)> )
+		  virtual void SyncValueReceived(uint8_t* bufferData, const boost::system::error_code& error, size_t bytesTransferred, boost::function<void(void)> getHeader)
 		  {
 			  if (bufferData == 0)
               {
@@ -70,21 +70,61 @@
                   return;
               }
 
-              gotCorrectValue = (bufferData[0] == 0x3B);
-              this->bufferData = (uint8_t*)malloc(sizeof(uint8_t) * (bytesTransferred * 2));
 
-              memcpy(this->bufferData, bufferData, bytesTransferred);
-              this->error = error;
 
+              if (!gotCorrectValue)
+              {
+                gotCorrectValue = (bufferData[0] == 0x3B);
+                memcpy(&this->bufferData[0], bufferData, bytesTransferred);
+                this->error = error;
+                this->bytesTransferred = bytesTransferred;
+              }
+
+
+
+              // We're second time through, time to bail out for our unit test
+              // Might have to think of how we facilitate quitting for other tests
+
+              if (bufferData[0] == 0x3B)
+              {
+                    getHeader();
+              }
 
 		  }
 
-		  // void Ocp1HeaderReceived(const boost::system::error_code& error, size_t bytesTransferred);
-		  // void Ocp1DataReceived(/* header, */const boost::system::error_code& error, size_t bytesTransferred);
+		  virtual void Ocp1HeaderReceived(uint8_t* bufferData, const boost::system::error_code& error, size_t bytesTransferred, boost::function<void(uint32_t)> getData)
+          {
+              memcpy(&this->bufferData2[0], bufferData, bytesTransferred);
+              this->error = error2;
+              this->bytesTransferred2 = bytesTransferred;
+
+              getData(2);
+          }
+
+		  virtual void Ocp1DataReceived(uint8_t* bufferData, const boost::system::error_code& error, size_t bytesTransferred)
+          {
+              memcpy(&this->bufferData3[0], bufferData, bytesTransferred);
+              this->error = error3;
+              this->bytesTransferred3 = bytesTransferred;
+
+
+          }
 
 		  bool gotCorrectValue;
-          uint8_t* bufferData;
+
+          uint32_t dataSize;
+
+          uint8_t bufferData[1024];
+          uint8_t bufferData2[1024];
+          uint8_t bufferData3[1024];
+
           boost::system::error_code error;
+          boost::system::error_code error2;
+          boost::system::error_code error3;
+
+          size_t bytesTransferred;
+          size_t bytesTransferred2;
+          size_t bytesTransferred3;
 
 	  };
   }

@@ -73,6 +73,13 @@ namespace oca
 		{
 			Ocp1Header header;
 
+			FromBuffer(buffer, header);
+
+			return header;
+		}
+
+		void Ocp1Header::FromBuffer(boost::asio::const_buffer& buffer, Ocp1Header& header)
+		{
 			// Cast the buffer to the type we want, and dereference the pointer
 			// so that we can read the data.
 			header.protocolVersion = *(boost::asio::buffer_cast<const uint16_t*>(buffer));
@@ -87,8 +94,6 @@ namespace oca
 
 			boost::asio::const_buffer mc = mt+sizeof(uint8_t);
 			header.messageCount = *(boost::asio::buffer_cast<const uint16_t*>(mc));
-
-			return header;
 		}
 
 		void Ocp1Header::WriteToBuffer(boost::asio::mutable_buffer& buffer) const

@@ -57,7 +57,7 @@ static void* clientRun(void* arg)
 		return NULL;
 	}
 
-	uint8_t value = *(uint8_t*)arg;
+	uint8_t* value = (uint8_t*)arg;
 
 	boost::asio::io_service svc2;
 	boost::asio::ip::tcp::socket socket(svc2);
@@ -65,22 +65,21 @@ static void* clientRun(void* arg)
 		boost::asio::ip::address::from_string("127.0.0.1"), 60000);
 	socket.connect(endpoint);
 
-	for (;;)
-	{
-	  uint8_t buffer[1];
-	  buffer[0] = value;
+	//for (;;)
+	//{
+	  uint8_t buffer[1024];
+	  memset(&buffer[0], 0, 1024);
+	  memcpy(&buffer[0], value, 13);
 	  boost::array<char, 128> buf;
 	  boost::system::error_code error;
 
-	  boost::asio::write(socket, boost::asio::buffer(buffer, 1), error);
+	  boost::asio::write(socket, boost::asio::buffer(buffer, 13), error);
 
-	  socket.read_some(boost::asio::buffer(buf), error);
+	  //socket.read_some(boost::asio::buffer(buf), error);
 
-	  if (error == boost::asio::error::eof)
-		break; // Connection closed cleanly by peer.
-	  else if (error)
+	  if (error != boost::asio::error::eof && error != 0)
 		throw boost::system::system_error(error); // Some other error.
-	}
+	//}
 
 	pthread_detach(pthread_self());
 	return NULL;
@@ -113,18 +112,18 @@ static void* serverRun(void* arg)
 	return NULL;
 }
 
-
 TEST(Suite_TcpConnection, ReadSyncValue_CorrectValue)
 {
 	boost::shared_ptr<oca_test::MockMessageProcessor> sproc(new oca_test::MockMessageProcessor());
 
-	uint8_t sv = 0x3B;
+	//					  SV,    PV,        MS,						MT,	  MC			D            SV
+	uint8_t testData[16] = {0x3B, 0x01, 0x00, 0x02, 0x00, 0x00, 0x00, 0x01, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
 
 	pthread_t s, t;
 	pthread_create(&s, NULL, &serverRun, &sproc);
 	usleep(500000);
-	pthread_create(&t, NULL, &clientRun, &sv);
-	pthread_join(t, NULL);
+	pthread_create(&t, NULL, &clientRun, &testData[0]);
+	pthread_join(s, NULL);
 
 	EXPECT_EQ(true, sproc->gotCorrectValue);
 	EXPECT_EQ(0x3B, sproc->bufferData[0]);
@@ -134,14 +133,52 @@ TEST(Suite_TcpConnection, ReadSyncValue_IncorrectValue)
 {
 	boost::shared_ptr<oca_test::MockMessageProcessor> sproc(new oca_test::MockMessageProcessor());
 
-	uint8_t sv = 0xDE;
+	uint8_t testData[16] = {0xDE, 0xAD, 0xBE, 0xEF, 0xDE, 0xAD, 0xBE, 0xEF,0xDE, 0xAD, 0xBE, 0xEF, 0xDE, 0xAD, 0xBE, 0xEF };
 
 	pthread_t s, t;
 	pthread_create(&s, NULL, &serverRun, &sproc);
 	usleep(500000);
-	pthread_create(&t, NULL, &clientRun, &sv);
-	pthread_join(t, NULL);
+	pthread_create(&t, NULL, &clientRun, &testData[0]);
+	pthread_join(s, NULL);
 
 	EXPECT_EQ(false, sproc->gotCorrectValue);
 	EXPECT_EQ(0xDE, sproc->bufferData[0]);
 }
+
+// static void* clientRun(void* arg)
+// {
+// 	if (arg == NULL)
+// 	{
+// 		pthread_detach(pthread_self());
+// 		return NULL;
+// 	}
+//
+// 	uint8_t value = *(uint8_t*)arg;
+//
+// 	boost::asio::io_service svc2;
+// 	boost::asio::ip::tcp::socket socket(svc2);
+// 	boost::asio::ip::tcp::endpoint endpoint(
+// 		boost::asio::ip::address::from_string("127.0.0.1"), 60000);
+// 	socket.connect(endpoint);
+//
+// 	for (;;)
+// 	{
+// 	  uint8_t buffer[1];
+// 	  buffer[0] = value;
+// 	  boost::array<char, 128> buf;
+// 	  boost::system::error_code error;
+//
+// 	  boost::asio::write(socket, boost::asio::buffer(buffer, 1), error);
+//
+// 	  socket.read_some(boost::asio::buffer(buf), error);
+//
+// 	  if (error == boost::asio::error::eof)
+// 		break; // Connection closed cleanly by peer.
+// 	  else if (error)
+// 		throw boost::system::system_error(error); // Some other error.
+// 	}
+//
+// 	pthread_detach(pthread_self());
+// 	return NULL;
+//
+// }

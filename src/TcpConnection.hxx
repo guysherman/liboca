@@ -26,6 +26,7 @@
 
 
 // Boost Headers
+#include <boost/function.hpp>
 #include <boost/bind.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/enable_shared_from_this.hpp>
@@ -49,7 +50,7 @@ namespace oca
         class TcpConnection : public ITcpConnection, public boost::enable_shared_from_this<TcpConnection>
 		{
 		public:
-			
+
 			static ITcpConnection::pointer Create(boost::asio::io_service& ioService, boost::shared_ptr<OcpMessageProcessor> processor);
 			boost::asio::ip::tcp::socket& GetSocket();
 
@@ -71,12 +72,17 @@ namespace oca
 
 			// The header is a fixed size and tells us how much data to expect
 			void readOcp1Header();
+			void ocp1HeaderRead(const boost::system::error_code& error, size_t bytesTransferred);
 
 			// // The data could be 1 or more messages (commands, responses, notifications)
 			// // The header tells us what to expect, and how many. It seems you don't
 			// // mix message types in a single sync unit.
-			// void readOcp1Data();
+			void readOcp1Data(uint32_t dataSize);
+			void ocp1DataRead(const boost::system::error_code& error, size_t bytesTransferred);
 
+
+			boost::function<void(void)> readOcp1HeaderDelegate;
+			boost::function<void(uint32_t)> readOcp1DataDelegate;
 
 			uint8_t dataBuffer[OCP1_DATA_BUFFER_SIZE];
 			boost::asio::ip::tcp::socket socket;

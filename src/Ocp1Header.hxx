@@ -33,6 +33,7 @@
 
 // GTK Headers
 
+#define OCP1_HEADER_SIZE 9
 
 namespace oca
 {
@@ -56,6 +57,7 @@ namespace oca
 			Ocp1Header& operator=(const Ocp1Header& rhs);
 
 			static const Ocp1Header FromBuffer(boost::asio::const_buffer& buffer);	// TODO: should the parameter be const? I don't think so, but I don't know for sure.
+			static void FromBuffer(boost::asio::const_buffer& buffer, Ocp1Header& header);
 			void WriteToBuffer(boost::asio::mutable_buffer& buffer) const;
 
 			~Ocp1Header();

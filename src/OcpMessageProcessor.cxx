@@ -77,4 +77,28 @@ namespace oca
 		}
 	}
 
+	void OcpMessageProcessor::Ocp1HeaderReceived(uint8_t* bufferData,
+		const boost::system::error_code& error,
+		size_t bytesTransferred,
+		boost::function<void(uint32_t)> getData)
+	{
+		boost::asio::const_buffer headerBuffer(bufferData, bytesTransferred);
+		// By convetion we should be zeroing out the header object once we're done
+		// so if this assert throws we've either forgotten, or we've got a concurrency
+		// issue.
+		assert(header.protocolVersion == 0);
+		header = oca::net::Ocp1Header::FromBuffer(headerBuffer);
+
+		// The messageSize property includes the header, but we've
+		// already got it so we ask for fewer bytes.
+		getData(header.messageSize - OCP1_HEADER_SIZE);
+
+	}
+
+	void OcpMessageProcessor::Ocp1DataReceived(uint8_t* bufferData, const boost::system::error_code& error, size_t bytesTransferred)
+	{
+		// Don't really have anything to do here yet...
+		return;
+	}
+
 }

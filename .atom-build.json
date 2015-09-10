@@ -1,5 +1,5 @@
 {
-	"cmd": "./waf --cppcheck  --cppcheck-bin-enable=all --cppcheck-lib-enable=all",
+	"cmd": "./waf",
 	"name": "Build",
 	"sh": "true",
 	"targets": {

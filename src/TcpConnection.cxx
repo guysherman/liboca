@@ -33,6 +33,7 @@
 
 #include "TcpConnection.hxx"
 #include "OcpMessageProcessor.hxx"
+#include "Ocp1Header.hxx"
 
 namespace oca
 {
@@ -45,13 +46,15 @@ namespace oca
 
 		void TcpConnection::Start()
 		{
-				readSyncValue();
+			readSyncValue();
+
 		}
 
 		TcpConnection::TcpConnection(boost::asio::io_service &ioService, OcpMessageProcessor::pointer processor)
 			:	socket(ioService), processor(processor)
 		{
 			memset(&dataBuffer[0], 0, OCP1_DATA_BUFFER_SIZE);
+
 		}
 
 		TcpConnection::~TcpConnection()
@@ -81,10 +84,7 @@ namespace oca
 				processor->SyncValueReceived(&dataBuffer[0],
 					error,
 					bytesTransferred,
-					boost::bind(
-						&TcpConnection::readOcp1Header,
-						shared_from_this()
-					)
+					boost::bind(&TcpConnection::readOcp1Header, shared_from_this())
 				);
 
 		}
@@ -92,7 +92,46 @@ namespace oca
 
 		void TcpConnection::readOcp1Header()
 		{
-			return;
+			boost::asio::async_read(socket, boost::asio::buffer(&dataBuffer[0], OCP1_HEADER_SIZE),
+				boost::bind(
+					&TcpConnection::ocp1HeaderRead,
+					shared_from_this(),
+					boost::asio::placeholders::error,
+					boost::asio::placeholders::bytes_transferred
+				)
+			);
+		}
+
+		void TcpConnection::ocp1HeaderRead(const boost::system::error_code& error, size_t bytesTransferred)
+		{
+			processor->Ocp1HeaderReceived(
+				&dataBuffer[0],
+				error,
+				bytesTransferred,
+				boost::bind(&TcpConnection::readOcp1Data, shared_from_this(), _1)
+			);
+		}
+
+		void TcpConnection::readOcp1Data(uint32_t dataSize)
+		{
+			boost::asio::async_read(socket, boost::asio::buffer(&dataBuffer[0], (size_t)dataSize),
+				boost::bind(
+					&TcpConnection::ocp1DataRead,
+					shared_from_this(),
+					boost::asio::placeholders::error,
+					boost::asio::placeholders::bytes_transferred
+				)
+			);
+		}
+
+		void TcpConnection::ocp1DataRead(const boost::system::error_code& error, size_t bytesTransferred)
+		{
+			processor->Ocp1DataReceived(&dataBuffer[0], error, bytesTransferred);
+
+
+			// Now that we've read all the way through the message, we go wait
+			// for the next one.
+			readSyncValue();
 		}
 
 	}
