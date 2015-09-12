@@ -37,7 +37,7 @@
 
 #include "TcpServer.hxx"
 #include "TcpConnectionFactory.hxx"
-#include "OcpMessageProcessor.hxx"
+#include "OcpMessageReader.hxx"
 
 
 namespace oca
@@ -57,7 +57,7 @@ namespace oca
         }
 
         boost::shared_ptr<boost::asio::io_service> ioService(new boost::asio::io_service());
-        boost::shared_ptr<oca::OcpMessageProcessor> processor(new oca::OcpMessageProcessor());
+        boost::shared_ptr<oca::OcpMessageReader> processor(new oca::OcpMessageReader());
         boost::shared_ptr<oca::net::TcpConnectionFactory> factory(new oca::net::TcpConnectionFactory(ioService, processor));
         tcpServer = boost::shared_ptr<oca::net::TcpServer>(new oca::net::TcpServer(factory, ioService, port));
     }

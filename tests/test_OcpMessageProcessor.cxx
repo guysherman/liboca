@@ -31,7 +31,7 @@
 
 // GTK Headers
 
-#include <OcpMessageProcessor.hxx>
+#include <OcpMessageReader.hxx>
 
 class CallbackCheck
 {
@@ -49,9 +49,9 @@ public:
 };
 
 
-TEST(Suite_OcpMessageProcessor, SyncValueReceived_GetHeaderCalledForCorrectSyncValue)
+TEST(Suite_OcpMessageReader, SyncValueReceived_GetHeaderCalledForCorrectSyncValue)
 {
-	oca::OcpMessageProcessor processor;
+	oca::OcpMessageReader processor;
 	CallbackCheck cbc;
 
 	uint8_t buffer[1024];
@@ -65,9 +65,9 @@ TEST(Suite_OcpMessageProcessor, SyncValueReceived_GetHeaderCalledForCorrectSyncV
 	EXPECT_EQ(true, cbc.fired);
 }
 
-TEST(Suite_OcpMessageProcessor, SyncValueReceived_GetHeaderNotCalledForIncorrectSyncValue)
+TEST(Suite_OcpMessageReader, SyncValueReceived_GetHeaderNotCalledForIncorrectSyncValue)
 {
-	oca::OcpMessageProcessor processor;
+	oca::OcpMessageReader processor;
 	CallbackCheck cbc;
 
 	uint8_t buffer[1024];
@@ -85,9 +85,9 @@ TEST(Suite_OcpMessageProcessor, SyncValueReceived_GetHeaderNotCalledForIncorrect
 	EXPECT_EQ(false, cbc.fired);
 }
 
-TEST(Suite_OcpMessageProcessor, SyncValueReceived_GetHeaderNotCalledForNullData)
+TEST(Suite_OcpMessageReader, SyncValueReceived_GetHeaderNotCalledForNullData)
 {
-	oca::OcpMessageProcessor processor;
+	oca::OcpMessageReader processor;
 	CallbackCheck cbc;
 
 	boost::system::error_code ec = boost::system::errc::make_error_code(boost::system::errc::success);
@@ -98,9 +98,9 @@ TEST(Suite_OcpMessageProcessor, SyncValueReceived_GetHeaderNotCalledForNullData)
 }
 
 
-TEST(Suite_OcpMessageProcessor, SyncValueReceived_GetHeaderNotCalledForLtOneByte)
+TEST(Suite_OcpMessageReader, SyncValueReceived_GetHeaderNotCalledForLtOneByte)
 {
-	oca::OcpMessageProcessor processor;
+	oca::OcpMessageReader processor;
 	CallbackCheck cbc;
 
 	uint8_t buffer[1024];
@@ -117,9 +117,9 @@ TEST(Suite_OcpMessageProcessor, SyncValueReceived_GetHeaderNotCalledForLtOneByte
 	EXPECT_EQ(false, cbc.fired);
 }
 
-TEST(Suite_OcpMessageProcessor, SyncValueReceived_GetHeaderNotCalledForGtOneByte)
+TEST(Suite_OcpMessageReader, SyncValueReceived_GetHeaderNotCalledForGtOneByte)
 {
-	oca::OcpMessageProcessor processor;
+	oca::OcpMessageReader processor;
 	CallbackCheck cbc;
 
 	uint8_t buffer[1024];
@@ -136,9 +136,9 @@ TEST(Suite_OcpMessageProcessor, SyncValueReceived_GetHeaderNotCalledForGtOneByte
 	EXPECT_EQ(false, cbc.fired);
 }
 
-TEST(Suite_OcpMessageProcessor, SyncValueReceived_GetHeaderNotCalledForErrCode)
+TEST(Suite_OcpMessageReader, SyncValueReceived_GetHeaderNotCalledForErrCode)
 {
-	oca::OcpMessageProcessor processor;
+	oca::OcpMessageReader processor;
 	CallbackCheck cbc;
 
 	uint8_t buffer[1024];

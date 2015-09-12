@@ -37,15 +37,15 @@
 
   // GTK Headers
 
-  #include <OcpMessageProcessor.hxx>
+  #include <OcpMessageReader.hxx>
 
 
   namespace oca_test
   {
-	  class MockMessageProcessor : public oca::OcpMessageProcessor
+	  class MockMessageProcessor : public oca::OcpMessageReader
 	  {
 	  public:
-		  typedef boost::shared_ptr<oca::OcpMessageProcessor> pointer;
+		  typedef boost::shared_ptr<oca::OcpMessageReader> pointer;
 
 		  MockMessageProcessor()
 		  {

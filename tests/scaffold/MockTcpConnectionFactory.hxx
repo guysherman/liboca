@@ -40,7 +40,7 @@
 
 namespace oca
 {
-	class OcpMessageProcessor;
+	class OcpMessageReader;
 
 	namespace net
 	{
@@ -50,7 +50,7 @@ namespace oca
 		{
 		public:
 			MockTcpConnectionFactory(boost::shared_ptr<boost::asio::io_service> ioService, int maxConns)
-                :   TcpConnectionFactory(ioService, boost::shared_ptr<OcpMessageProcessor>()), countConns(0), maxConns(maxConns)
+                :   TcpConnectionFactory(ioService, boost::shared_ptr<OcpMessageReader>()), countConns(0), maxConns(maxConns)
             {
 
             }

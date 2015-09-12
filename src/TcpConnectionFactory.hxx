@@ -38,7 +38,7 @@
 
 namespace oca
 {
-	class OcpMessageProcessor;
+	class OcpMessageReader;
 
 	namespace net
 	{
@@ -47,14 +47,14 @@ namespace oca
 		class TcpConnectionFactory
 		{
 		public:
-			TcpConnectionFactory(boost::shared_ptr<boost::asio::io_service> ioService, boost::shared_ptr<OcpMessageProcessor> processor);
+			TcpConnectionFactory(boost::shared_ptr<boost::asio::io_service> ioService, boost::shared_ptr<OcpMessageReader> processor);
 			virtual ~TcpConnectionFactory();
 
 			virtual boost::shared_ptr<ITcpConnection> CreateConnection();
 
 		protected:
 			boost::shared_ptr<boost::asio::io_service> ioService;
-			boost::shared_ptr<OcpMessageProcessor> processor;
+			boost::shared_ptr<OcpMessageReader> processor;
 		};
 	}
 }

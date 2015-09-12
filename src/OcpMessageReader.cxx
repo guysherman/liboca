@@ -31,22 +31,22 @@
 
 // GTK Headers
 
-#include "OcpMessageProcessor.hxx"
+#include "OcpMessageReader.hxx"
 
 namespace oca
 {
-	OcpMessageProcessor::OcpMessageProcessor()
+	OcpMessageReader::OcpMessageReader()
 	{
 
 	}
 
-	OcpMessageProcessor::~OcpMessageProcessor()
+	OcpMessageReader::~OcpMessageReader()
 	{
 
 	}
 
 
-	void OcpMessageProcessor::SyncValueReceived(uint8_t* bufferData,
+	void OcpMessageReader::SyncValueReceived(uint8_t* bufferData,
 		const boost::system::error_code& error,
 		size_t bytesTransferred,
 		boost::function<void(void)> getHeader )
@@ -77,7 +77,7 @@ namespace oca
 		}
 	}
 
-	void OcpMessageProcessor::Ocp1HeaderReceived(uint8_t* bufferData,
+	void OcpMessageReader::Ocp1HeaderReceived(uint8_t* bufferData,
 		const boost::system::error_code& error,
 		size_t bytesTransferred,
 		boost::function<void(uint32_t)> getData)
@@ -95,7 +95,7 @@ namespace oca
 
 	}
 
-	void OcpMessageProcessor::Ocp1DataReceived(uint8_t* bufferData, const boost::system::error_code& error, size_t bytesTransferred)
+	void OcpMessageReader::Ocp1DataReceived(uint8_t* bufferData, const boost::system::error_code& error, size_t bytesTransferred)
 	{
 		// Don't really have anything to do here yet...
 		return;

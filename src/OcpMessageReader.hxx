@@ -16,8 +16,8 @@
       Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
     */
-  #ifndef __OCPMESSAGEPROCESSOR_HXX__
-  #define __OCPMESSAGEPROCESSOR_HXX__
+  #ifndef __OCPMESSAGEREADER_HXX__
+  #define __OCPMESSAGEREADER_HXX__
 
     // C++ Standard Headers
 
@@ -40,13 +40,13 @@
 
 	namespace oca
 	{
-		class OcpMessageProcessor : public boost::enable_shared_from_this<OcpMessageProcessor>
+		class OcpMessageReader : public boost::enable_shared_from_this<OcpMessageReader>
 		{
 		public:
-			typedef boost::shared_ptr<OcpMessageProcessor> pointer;
+			typedef boost::shared_ptr<OcpMessageReader> pointer;
 
-            OcpMessageProcessor();
-            virtual ~OcpMessageProcessor();
+            OcpMessageReader();
+            virtual ~OcpMessageReader();
 
 
             virtual void SyncValueReceived(uint8_t* bufferData, const boost::system::error_code& error, size_t bytesTransferred, boost::function<void(void)> getHeader);
@@ -57,7 +57,7 @@
 
         private:
             // TODO: it goes against my better judgement to have this here.
-            // Since there is currently only one OcpMessageProcessor per OcaNetwork
+            // Since there is currently only one OcpMessageReader per OcaNetwork
             // this is actually a bug if there is more than one TcpConnection, ie
             // this class was supposed to be stateless, but I don't really want the
             // TcpConnection to be concerned with the details of the Ocp1Header and I need
@@ -71,4 +71,4 @@
 		};
 	}
 
-  #endif // __OCPMESSAGEPROCESSOR_HXX__
+  #endif // __OCPMESSAGEREADER_HXX__

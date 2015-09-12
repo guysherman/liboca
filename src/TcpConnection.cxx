@@ -32,14 +32,14 @@
 // GTK Headers
 
 #include "TcpConnection.hxx"
-#include "OcpMessageProcessor.hxx"
+#include "OcpMessageReader.hxx"
 #include "Ocp1Header.hxx"
 
 namespace oca
 {
 	namespace net
 	{
-		TcpConnection::pointer TcpConnection::Create(boost::asio::io_service &ioService, OcpMessageProcessor::pointer processor)
+		TcpConnection::pointer TcpConnection::Create(boost::asio::io_service &ioService, OcpMessageReader::pointer processor)
 		{
 			return pointer(new TcpConnection(ioService, processor));
 		}
@@ -50,7 +50,7 @@ namespace oca
 
 		}
 
-		TcpConnection::TcpConnection(boost::asio::io_service &ioService, OcpMessageProcessor::pointer processor)
+		TcpConnection::TcpConnection(boost::asio::io_service &ioService, OcpMessageReader::pointer processor)
 			:	socket(ioService), processor(processor)
 		{
 			memset(&dataBuffer[0], 0, OCP1_DATA_BUFFER_SIZE);

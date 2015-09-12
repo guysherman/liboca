@@ -42,7 +42,7 @@
 
 namespace oca
 {
-	class OcpMessageProcessor;
+	class OcpMessageReader;
 
     namespace net
 	{
@@ -51,7 +51,7 @@ namespace oca
 		{
 		public:
 
-			static ITcpConnection::pointer Create(boost::asio::io_service& ioService, boost::shared_ptr<OcpMessageProcessor> processor);
+			static ITcpConnection::pointer Create(boost::asio::io_service& ioService, boost::shared_ptr<OcpMessageReader> processor);
 			boost::asio::ip::tcp::socket& GetSocket();
 
 			void Start();
@@ -61,7 +61,7 @@ namespace oca
 			// We make it non-constructible, and non-copyable so that the
 			// only way to get an instance is through the Create member function
 			// which forces the consumer to get a shared_ptr. Nice encapsulation!
-			TcpConnection(boost::asio::io_service& ioService, boost::shared_ptr<OcpMessageProcessor> processor);
+			TcpConnection(boost::asio::io_service& ioService, boost::shared_ptr<OcpMessageReader> processor);
 			TcpConnection(const TcpConnection& rhs);
             TcpConnection& operator=(const TcpConnection& rhs);
 
@@ -86,7 +86,7 @@ namespace oca
 
 			uint8_t dataBuffer[OCP1_DATA_BUFFER_SIZE];
 			boost::asio::ip::tcp::socket socket;
-            boost::shared_ptr<OcpMessageProcessor> processor;
+            boost::shared_ptr<OcpMessageReader> processor;
 		};
 	}
 }

@@ -40,7 +40,7 @@
 
 namespace oca
 {
-	class OcpMessageProcessor;
+	class OcpMessageReader;
 
   namespace net
 	{
