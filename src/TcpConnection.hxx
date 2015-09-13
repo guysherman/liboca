@@ -87,6 +87,7 @@ namespace oca
 			uint8_t dataBuffer[OCP1_DATA_BUFFER_SIZE];
 			boost::asio::ip::tcp::socket socket;
             boost::shared_ptr<OcpMessageReader> processor;
+			uint64_t identifier;
 		};
 	}
 }

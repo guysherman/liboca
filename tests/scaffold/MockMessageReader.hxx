@@ -16,8 +16,8 @@
 	Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
   */
-#ifndef __MOCKMESSAGEPROCESSOR_HXX__
-#define __MOCKMESSAGEPROCESSOR_HXX__
+#ifndef __MOCKMESSAGEREADER_HXX__
+#define __MOCKMESSAGEREADER_HXX__
 
   // C++ Standard Headers
 
@@ -42,12 +42,12 @@
 
   namespace oca_test
   {
-	  class MockMessageProcessor : public oca::OcpMessageReader
+	  class MockMessageReader : public oca::OcpMessageReader
 	  {
 	  public:
 		  typedef boost::shared_ptr<oca::OcpMessageReader> pointer;
 
-		  MockMessageProcessor()
+		  MockMessageReader()
 		  {
 			  gotCorrectValue = false;
               dataSize = 0;
@@ -56,7 +56,7 @@
               memset(&bufferData3[0], 0, 1024);
 		  }
 
-		  virtual ~MockMessageProcessor()
+		  virtual ~MockMessageReader()
 		  {
 
 		  }
@@ -92,7 +92,7 @@
 
 		  }
 
-		  virtual void Ocp1HeaderReceived(uint8_t* bufferData, const boost::system::error_code& error, size_t bytesTransferred, boost::function<void(uint32_t)> getData)
+		  virtual void Ocp1HeaderReceived(uint8_t* bufferData, uint64_t identifier, const boost::system::error_code& error, size_t bytesTransferred, boost::function<void(uint32_t)> getData)
           {
               memcpy(&this->bufferData2[0], bufferData, bytesTransferred);
               this->error = error2;
@@ -101,7 +101,7 @@
               getData(2);
           }
 
-		  virtual void Ocp1DataReceived(uint8_t* bufferData, const boost::system::error_code& error, size_t bytesTransferred)
+		  virtual void Ocp1DataReceived(uint8_t* bufferData, uint64_t identifier, const boost::system::error_code& error, size_t bytesTransferred)
           {
               memcpy(&this->bufferData3[0], bufferData, bytesTransferred);
               this->error = error3;
@@ -129,4 +129,4 @@
 	  };
   }
 
-#endif // __MOCKMESSAGEPROCESSOR_HXX__
+#endif // __MOCKMESSAGEREADER_HXX__

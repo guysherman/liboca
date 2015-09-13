@@ -25,7 +25,6 @@
 
 // Boost Headers
 
-
 // 3rd Party Headers
 
 
@@ -78,16 +77,27 @@ namespace oca
 	}
 
 	void OcpMessageReader::Ocp1HeaderReceived(uint8_t* bufferData,
+		uint64_t connectionIdentifier,
 		const boost::system::error_code& error,
 		size_t bytesTransferred,
 		boost::function<void(uint32_t)> getData)
 	{
 		boost::asio::const_buffer headerBuffer(bufferData, bytesTransferred);
-		// By convetion we should be zeroing out the header object once we're done
+
+
+
+		// By convetion we should be removing the per connection header object once we're done
 		// so if this assert throws we've either forgotten, or we've got a concurrency
 		// issue.
-		assert(header.protocolVersion == 0);
-		header = oca::net::Ocp1Header::FromBuffer(headerBuffer);
+		ConnectionStateMap::iterator it = perConnectionState.find(connectionIdentifier);
+		assert(it == perConnectionState.end());
+
+
+
+
+		oca::net::Ocp1Header header = oca::net::Ocp1Header::FromBuffer(headerBuffer);
+
+		perConnectionState.insert(ConnectionStateMap::value_type(connectionIdentifier, header));
 
 		// The messageSize property includes the header, but we've
 		// already got it so we ask for fewer bytes.
@@ -95,9 +105,21 @@ namespace oca
 
 	}
 
-	void OcpMessageReader::Ocp1DataReceived(uint8_t* bufferData, const boost::system::error_code& error, size_t bytesTransferred)
+	void OcpMessageReader::Ocp1DataReceived(uint8_t* bufferData,
+		uint64_t connectionIdentifier,
+		const boost::system::error_code& error,
+		size_t bytesTransferred)
 	{
 		// Don't really have anything to do here yet...
+
+
+
+		// ...but before we go, lets clean up
+		ConnectionStateMap::iterator it = perConnectionState.find(connectionIdentifier);
+		if (it != perConnectionState.end())
+		{
+			perConnectionState.erase(it);
+		}
 		return;
 	}
 

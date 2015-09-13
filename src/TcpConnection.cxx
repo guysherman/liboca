@@ -22,12 +22,11 @@
 
 // C Standard Headers
 
-
 // Boost Headers
 #include <boost/bind/protect.hpp>
 
-// 3rd Party Headers
 
+// 3rd Party Headers
 
 // GTK Headers
 
@@ -51,10 +50,9 @@ namespace oca
 		}
 
 		TcpConnection::TcpConnection(boost::asio::io_service &ioService, OcpMessageReader::pointer processor)
-			:	socket(ioService), processor(processor)
+			:	socket(ioService), processor(processor), identifier((uint64_t)this)
 		{
 			memset(&dataBuffer[0], 0, OCP1_DATA_BUFFER_SIZE);
-
 		}
 
 		TcpConnection::~TcpConnection()
@@ -106,10 +104,11 @@ namespace oca
 		{
 			processor->Ocp1HeaderReceived(
 				&dataBuffer[0],
+				identifier,
 				error,
 				bytesTransferred,
 				boost::bind(&TcpConnection::readOcp1Data, shared_from_this(), _1)
-			);
+		    );
 		}
 
 		void TcpConnection::readOcp1Data(uint32_t dataSize)
@@ -126,7 +125,7 @@ namespace oca
 
 		void TcpConnection::ocp1DataRead(const boost::system::error_code& error, size_t bytesTransferred)
 		{
-			processor->Ocp1DataReceived(&dataBuffer[0], error, bytesTransferred);
+			processor->Ocp1DataReceived(&dataBuffer[0], identifier, error, bytesTransferred);
 
 
 			// Now that we've read all the way through the message, we go wait

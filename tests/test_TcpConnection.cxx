@@ -32,7 +32,7 @@
 // GTK Headers
 
 #include <TcpConnection.hxx>
-#include "scaffold/MockMessageProcessor.hxx"
+#include "scaffold/MockMessageReader.hxx"
 
 class localScaffold
 {
@@ -97,7 +97,7 @@ static void* serverRun(void* arg)
 		return NULL;
 	}
 
-	oca_test::MockMessageProcessor::pointer proc = *(reinterpret_cast<oca_test::MockMessageProcessor::pointer*>(arg));
+	oca_test::MockMessageReader::pointer proc = *(reinterpret_cast<oca_test::MockMessageReader::pointer*>(arg));
 
 	boost::asio::ip::tcp::acceptor acc(svc, boost::asio::ip::tcp::endpoint(boost::asio::ip::tcp::v4(), 60000) );
 
@@ -114,7 +114,7 @@ static void* serverRun(void* arg)
 
 TEST(Suite_TcpConnection, ReadSyncValue_CorrectValue)
 {
-	boost::shared_ptr<oca_test::MockMessageProcessor> sproc(new oca_test::MockMessageProcessor());
+	boost::shared_ptr<oca_test::MockMessageReader> sproc(new oca_test::MockMessageReader());
 
 	//					  SV,    PV,        MS,						MT,	  MC			D            SV
 	uint8_t testData[16] = {0x3B, 0x01, 0x00, 0x02, 0x00, 0x00, 0x00, 0x01, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
@@ -131,7 +131,7 @@ TEST(Suite_TcpConnection, ReadSyncValue_CorrectValue)
 
 TEST(Suite_TcpConnection, ReadSyncValue_IncorrectValue)
 {
-	boost::shared_ptr<oca_test::MockMessageProcessor> sproc(new oca_test::MockMessageProcessor());
+	boost::shared_ptr<oca_test::MockMessageReader> sproc(new oca_test::MockMessageReader());
 
 	uint8_t testData[16] = {0xDE, 0xAD, 0xBE, 0xEF, 0xDE, 0xAD, 0xBE, 0xEF,0xDE, 0xAD, 0xBE, 0xEF, 0xDE, 0xAD, 0xBE, 0xEF };
 

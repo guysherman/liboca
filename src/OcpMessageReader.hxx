@@ -20,7 +20,7 @@
   #define __OCPMESSAGEREADER_HXX__
 
     // C++ Standard Headers
-
+    #include <map>
 
     // C Standard Headers
 
@@ -51,9 +51,9 @@
 
             virtual void SyncValueReceived(uint8_t* bufferData, const boost::system::error_code& error, size_t bytesTransferred, boost::function<void(void)> getHeader);
 
-			virtual void Ocp1HeaderReceived(uint8_t* bufferData, const boost::system::error_code& error, size_t bytesTransferred, boost::function<void(uint32_t)> getData);
+			virtual void Ocp1HeaderReceived(uint8_t* bufferData, uint64_t connectionIdentifier, const boost::system::error_code& error, size_t bytesTransferred, boost::function<void(uint32_t)> getData);
 
-            virtual void Ocp1DataReceived(uint8_t* bufferData, const boost::system::error_code& error, size_t bytesTransferred);
+            virtual void Ocp1DataReceived(uint8_t* bufferData, uint64_t connectionIdentifier, const boost::system::error_code& error, size_t bytesTransferred);
 
         private:
             // TODO: it goes against my better judgement to have this here.
@@ -67,7 +67,9 @@
             // class; or, I could make this a map of <TcpConnection*, Ocp1Header> so that the state
             // is stored per connection. I like the latter more. The third option is to pass a callback
             // when calling the callback, but that just feels like the code would be hard to read.
-            oca::net::Ocp1Header header;
+            //oca::net::Ocp1Header header;
+            typedef std::map<uint64_t, oca::net::Ocp1Header> ConnectionStateMap;
+            ConnectionStateMap perConnectionState;
 		};
 	}
 
