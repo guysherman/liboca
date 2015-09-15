@@ -21,6 +21,7 @@
 
     // C++ Standard Headers
     #include <map>
+    #include <vector>
 
     // C Standard Headers
 
@@ -38,6 +39,7 @@
     // GTK Headers
     #include "Ocp1Header.hxx"
     #include "Ocp1Parameters.hxx"
+    #include "Ocp1Command.hxx"
 
 	namespace oca
 	{
@@ -53,6 +55,11 @@
 			static void HeaderFromBuffer(boost::asio::const_buffer& buffer, net::Ocp1Header& header);
 
             static void ParametersFromBuffer(boost::asio::const_buffer& buffer, size_t remainingCommandBytes, net::Ocp1Parameters& parameters);
+
+            static void MethodIdFromBuffer(boost::asio::const_buffer& buffer, OcaMethodId& methodId);
+
+            static void CommandFromBuffer(boost::asio::const_buffer& buffer, net::Ocp1Command& cmd);
+            static void CommandListFromBuffer(boost::asio::const_buffer& buffer, net::Ocp1Header header, std::vector<net::Ocp1Command>& commands);
 
             virtual void SyncValueReceived(uint8_t* bufferData, const boost::system::error_code& error, size_t bytesTransferred, boost::function<void(void)> getHeader);
 

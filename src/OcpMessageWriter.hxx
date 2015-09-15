@@ -20,7 +20,7 @@
 #define __OCP1MESSAGEWRITER_HXX__
 
 // C++ Standard Headers
-
+#include <vector>
 
 // C Standard Headers
 
@@ -36,15 +36,26 @@
 
 #include "Ocp1Header.hxx"
 #include "Ocp1Parameters.hxx"
+#include "Ocp1Command.hxx"
 
 namespace oca
 {
+
 		class OcpMessageWriter : public boost::enable_shared_from_this<OcpMessageWriter>
 		{
 		public:
+
 			static void WriteHeaderToBuffer(const net::Ocp1Header& header, boost::asio::mutable_buffer& buffer);
 
 			static void WriteParametersToBuffer(const net::Ocp1Parameters& parameters, boost::asio::mutable_buffer& buffer);
+
+			static void WriteMethodIdToBuffer(const OcaMethodId& id, boost::asio::mutable_buffer& buffer);
+
+			static void WriteCommandToBuffer(const net::Ocp1Command& command, boost::asio::mutable_buffer& buffer);
+
+			static OcaUint32 ComputeCommandDataSize(net::Ocp1Command& command);
+			static OcaUint32 ComputeCommandListDataSize(net::CommandList& commands);
+
 		};
 }
 

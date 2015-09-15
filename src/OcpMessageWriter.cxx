@@ -35,7 +35,7 @@
 #include <oca/OcaTypes.hxx>
 #include "Ocp1Header.hxx"
 #include "Ocp1Parameters.hxx"
-
+#include "Ocp1Command.hxx"
 #include "OcpMessageWriter.hxx"
 
 
@@ -74,5 +74,56 @@ namespace oca
 			OcaUint8* destination = boost::asio::buffer_cast<OcaUint8*>(paramBuffer);
 			memcpy(destination, &parameters.parameters[0], parameters.parameters.size());
 
+		}
+
+		void OcpMessageWriter::WriteMethodIdToBuffer(const OcaMethodId& id, boost::asio::mutable_buffer& buffer)
+		{
+			OcaUint16* tl = boost::asio::buffer_cast<OcaUint16*>(buffer);
+			*tl = htons(id.treeLevel);
+
+			// TODO: there's a bit of a security issue here: we trust that the buffer has enough space #security
+			boost::asio::mutable_buffer methodIndexBuffer = buffer + sizeof(OcaUint16);
+			OcaUint16* mi = boost::asio::buffer_cast<OcaUint16*>(methodIndexBuffer);
+			*mi = htons(id.methodIndex);
+		}
+
+		void OcpMessageWriter::WriteCommandToBuffer(const net::Ocp1Command& command, boost::asio::mutable_buffer& buffer)
+		{
+			OcaUint32* cs = boost::asio::buffer_cast<OcaUint32*>(buffer);
+			*cs = htonl(command.commandSize);
+
+			boost::asio::mutable_buffer handleBuffer = buffer + sizeof(OcaUint32);
+			OcaUint32* hdl = boost::asio::buffer_cast<OcaUint32*>(handleBuffer);
+			*hdl = htonl(command.handle);
+
+			boost::asio::mutable_buffer oNoBuffer = handleBuffer + sizeof(OcaUint32);
+			OcaUint32* oNo = boost::asio::buffer_cast<OcaUint32*>(oNoBuffer);
+			*oNo = htonl(command.targetONo);
+
+			boost::asio::mutable_buffer methodBuffer = oNoBuffer + sizeof(OcaONo);
+			WriteMethodIdToBuffer(command.methodId, methodBuffer);
+
+			boost::asio::mutable_buffer paramBuffer = methodBuffer + sizeof(OcaMethodId);
+			WriteParametersToBuffer(command.parameters, paramBuffer);
+		}
+
+		OcaUint32 OcpMessageWriter::ComputeCommandDataSize(net::Ocp1Command& command)
+		{
+			OcaUint32 paramsSizeBytes = command.parameters.parameters.size() + sizeof(OcaUint8);
+			OcaUint32 commandSize = paramsSizeBytes + (2*sizeof(OcaUint32) + sizeof(OcaONo) + sizeof(OcaMethodId));
+			command.commandSize = commandSize;
+			return commandSize;
+		}
+
+		OcaUint32 OcpMessageWriter::ComputeCommandListDataSize(net::CommandList& commands)
+		{
+			OcaUint32 commandListDataSize = 0;
+			for (net::CommandList::size_type i = 0; i < commands.size(); ++i)
+			{
+				commandListDataSize += ComputeCommandDataSize(commands[i]);
+			}
+
+
+			return commandListDataSize;
 		}
 }

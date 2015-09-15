@@ -20,7 +20,7 @@
 #define __OCP1COMMAND_HXX__
 
 // C++ Standard Headers
-
+#include <vector>
 
 // C Standard Headers
 
@@ -54,6 +54,8 @@ namespace oca
 			OcaMethodId 	methodId;
 			Ocp1Parameters	parameters;
 		};
+
+		typedef std::vector<Ocp1Command> CommandList;
 	}
 }
 

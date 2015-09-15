@@ -33,6 +33,8 @@
 
 #include <OcpMessageReader.hxx>
 #include <Ocp1Header.hxx>
+#include <Ocp1Parameters.hxx>
+#include <Ocp1Command.hxx>
 
 class CallbackCheck
 {
@@ -191,7 +193,65 @@ TEST(Suite_OcpMessageReader, ParametersFromBuffer)
 	EXPECT_EQ(2, params.parameters.at(2));
 	EXPECT_EQ(3, params.parameters.at(6));
 	EXPECT_EQ(4, params.parameters.at(14));
+}
 
+TEST(Suite_OcpMessageReader, MethodIdFromBuffer)
+{
+	const uint8_t testData[16] = {0x04, 0x01, 0x00, 0x02, 0x00, 0x00, 0x00, 0x03, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x04 };
+	boost::asio::const_buffer buf(testData, 16);
 
+	oca::OcaMethodId id;
+	memset(&id, 0, sizeof(oca::OcaMethodId));
+	oca::OcpMessageReader::MethodIdFromBuffer(buf, id);
+
+	EXPECT_EQ(0x0401, id.treeLevel);
+	EXPECT_EQ(0x0002, id.methodIndex);
+}
+
+TEST(Suite_OcpMessageReader, CommandFromBuffer)
+{
+	const uint8_t testData[32] = {	0x00, 0x00, 0x00, 0x20, 0xDE, 0xAD, 0xF0, 0x0D, 0xC0, 0x1D, 0xBE, 0xEF, 0x01, 0x02, 0x03, 0x04,
+									0x04, 0x01, 0x00, 0x02, 0x00, 0x00, 0x00, 0x03, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x04 };
+	boost::asio::const_buffer buf(testData, 32);
+
+	oca::net::Ocp1Command cmd;
+	oca::OcpMessageReader::CommandFromBuffer(buf, cmd);
+
+	EXPECT_EQ(32, cmd.commandSize);
+	EXPECT_EQ(0xDEADF00D, cmd.handle);
+	EXPECT_EQ(0xC01DBEEF, cmd.targetONo);
+	EXPECT_EQ(0x0102, cmd.methodId.treeLevel);
+	EXPECT_EQ(0x0304, cmd.methodId.methodIndex);
+	EXPECT_EQ(15, cmd.parameters.parameters.size());
+
+}
+
+TEST(Suite_OcpMessageReader, CommandListFromBuffer)
+{
+	const uint8_t testData[64] = {	0x00, 0x00, 0x00, 0x20, 0xDE, 0xAD, 0xF0, 0x0D, 0xC0, 0x1D, 0xBE, 0xEF, 0x01, 0x02, 0x03, 0x04,
+									0x04, 0x01, 0x00, 0x02, 0x00, 0x00, 0x00, 0x03, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x04,
+									0x00, 0x00, 0x00, 0x20, 0xDE, 0xAD, 0xF0, 0x0D, 0xC0, 0x1D, 0xBE, 0xEF, 0x01, 0x02, 0x03, 0x04,
+									0x04, 0x01, 0x00, 0x02, 0x00, 0x00, 0x00, 0x03, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x04 };
+	boost::asio::const_buffer buf(testData, 64);
+
+	oca::net::Ocp1Header header;
+	header.protocolVersion = 1;
+	header.messageSize = 74;
+	header.messageType = oca::net::OcaCmdRrq;
+	header.messageCount = 2;
+
+	std::vector<oca::net::Ocp1Command> commands;
+	oca::OcpMessageReader::CommandListFromBuffer(buf, header, commands);
+
+	EXPECT_EQ(2, commands.size());
+
+	oca::net::Ocp1Command cmd = commands[0];
+
+	EXPECT_EQ(32, cmd.commandSize);
+	EXPECT_EQ(0xDEADF00D, cmd.handle);
+	EXPECT_EQ(0xC01DBEEF, cmd.targetONo);
+	EXPECT_EQ(0x0102, cmd.methodId.treeLevel);
+	EXPECT_EQ(0x0304, cmd.methodId.methodIndex);
+	EXPECT_EQ(15, cmd.parameters.parameters.size());
 
 }

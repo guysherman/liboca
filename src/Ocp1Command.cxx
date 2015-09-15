@@ -21,7 +21,7 @@
 
 
 // C Standard Headers
-
+#include <cstring>
 
 // Boost Headers
 
@@ -42,7 +42,7 @@ namespace oca
 	{
 		Ocp1Command::Ocp1Command() : commandSize(0), handle(0), targetONo(0)
 		{
-
+			memset(&methodId, 0, sizeof(OcaMethodId));
 		}
 
 		Ocp1Command::Ocp1Command(const Ocp1Command& rhs)

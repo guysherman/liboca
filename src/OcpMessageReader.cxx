@@ -18,7 +18,8 @@
 */
 
 // C++ Standard Headers
-
+#include <map>
+#include <vector>
 
 // C Standard Headers
 #include <arpa/inet.h>
@@ -30,6 +31,7 @@
 
 // GTK Headers
 
+#include <oca/OcaTypes.hxx>
 #include "OcpMessageReader.hxx"
 #include "Ocp1Header.hxx"
 
@@ -92,6 +94,46 @@ namespace oca
 		// TODO: security issue: we trust that the buffer actually has the right number of bytes #security
 		memcpy(&parameters.parameters[0], params, parameterBufferBytes);
 
+	}
+
+	void OcpMessageReader::MethodIdFromBuffer(boost::asio::const_buffer& buffer, OcaMethodId& methodId)
+	{
+		methodId.treeLevel = ntohs(*(boost::asio::buffer_cast<const OcaUint16*>(buffer)));
+
+		boost::asio::const_buffer mi = buffer + sizeof(OcaUint16);
+		methodId.methodIndex = ntohs(*(boost::asio::buffer_cast<const OcaUint16*>(mi)));
+	}
+
+	void OcpMessageReader::CommandFromBuffer(boost::asio::const_buffer& buffer, net::Ocp1Command& cmd)
+	{
+		cmd.commandSize = ntohl(*(boost::asio::buffer_cast<const OcaUint32*>(buffer)));
+
+		boost::asio::const_buffer handleBuf = buffer + sizeof(OcaUint32);
+		cmd.handle = ntohl(*(boost::asio::buffer_cast<const OcaUint32*>(handleBuf)));
+
+		boost::asio::const_buffer targetONoBuffer = handleBuf + sizeof(OcaUint32);
+		cmd.targetONo = ntohl(*(boost::asio::buffer_cast<const OcaONo*>(targetONoBuffer)));
+
+		boost::asio::const_buffer methodIdBuffer = targetONoBuffer + sizeof(OcaONo);
+		MethodIdFromBuffer(methodIdBuffer, cmd.methodId);
+
+		size_t remainingBytes = cmd.commandSize - (2*sizeof(OcaUint32) + sizeof(OcaONo) + sizeof(OcaMethodId));
+		boost::asio::const_buffer parametersBuffer = methodIdBuffer + sizeof(OcaMethodId);
+
+		ParametersFromBuffer(parametersBuffer, remainingBytes, cmd.parameters);
+	}
+
+	void OcpMessageReader::CommandListFromBuffer(boost::asio::const_buffer& buffer, net::Ocp1Header header, std::vector<net::Ocp1Command>& commands)
+	{
+		boost::asio::const_buffer message = buffer;
+
+		for (uint16_t i = 0; i < header.messageCount; ++i )
+		{
+			net::Ocp1Command cmd;
+			CommandFromBuffer(message, cmd);
+			commands.push_back(cmd);
+			message = message + cmd.commandSize;
+		}
 	}
 
 	void OcpMessageReader::SyncValueReceived(uint8_t* bufferData,
