@@ -21,54 +21,51 @@
 
 
 // C Standard Headers
-#include <arpa/inet.h>
+
 
 // Boost Headers
-#include <boost/asio.hpp>
+
 
 // 3rd Party Headers
 
 
 // GTK Headers
 
-#include "Ocp1Header.hxx"
+#include <oca/OcaTypes.hxx>
+#include "Ocp1Parameters.hxx"
 
+#include "Ocp1Command.hxx"
 
 namespace oca
 {
 	namespace net
 	{
-		Ocp1Header::Ocp1Header()
-			:	protocolVersion(0), messageSize(0), messageType(OcaCmd), messageCount(0)
+		Ocp1Command::Ocp1Command() : commandSize(0), handle(0), targetONo(0)
 		{
 
 		}
 
-		Ocp1Header::Ocp1Header(uint16_t protocolVersion, uint32_t messageSize, OcaMessageType messageType, uint16_t messageCount)
-			:	protocolVersion(protocolVersion), messageSize(messageSize), messageType(messageType), messageCount(messageCount)
+		Ocp1Command::Ocp1Command(const Ocp1Command& rhs)
+		 : 	commandSize(rhs.commandSize),
+		 	handle(rhs.handle),
+		 	targetONo(rhs.targetONo),
+			methodId(rhs.methodId),
+			parameters(rhs.parameters)
 		{
 
 		}
 
-		Ocp1Header::Ocp1Header(const Ocp1Header& rhs)
-			:	protocolVersion(rhs.protocolVersion), messageSize(rhs.messageSize), messageType(rhs.messageType), messageCount(rhs.messageCount)
+		Ocp1Command& Ocp1Command::operator=(const Ocp1Command& rhs)
 		{
-
-		}
-
-		Ocp1Header& Ocp1Header::operator=(const Ocp1Header& rhs)
-		{
-			if (this != &rhs)
-			{
-				protocolVersion = rhs.protocolVersion;
-				messageSize = rhs.messageSize;
-				messageType = rhs.messageType;
-				messageCount = rhs.messageCount;
-			}
+			commandSize = rhs.commandSize;
+			handle = rhs.handle;
+			targetONo = rhs.targetONo;
+			methodId = rhs.methodId;
+			parameters = rhs.parameters;
 
 			return *this;
 		}
 
-		Ocp1Header::~Ocp1Header() {}
+		Ocp1Command::~Ocp1Command() {}
 	}
 }

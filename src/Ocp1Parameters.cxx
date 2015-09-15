@@ -21,54 +21,39 @@
 
 
 // C Standard Headers
-#include <arpa/inet.h>
+
 
 // Boost Headers
-#include <boost/asio.hpp>
+
 
 // 3rd Party Headers
 
 
 // GTK Headers
 
-#include "Ocp1Header.hxx"
+#include <oca/OcaTypes.hxx>
 
+#include "Ocp1Parameters.hxx"
 
 namespace oca
 {
 	namespace net
 	{
-		Ocp1Header::Ocp1Header()
-			:	protocolVersion(0), messageSize(0), messageType(OcaCmd), messageCount(0)
+		Ocp1Parameters::Ocp1Parameters() : parameterCount(0) {}
+
+		Ocp1Parameters::Ocp1Parameters(const Ocp1Parameters& rhs) : parameterCount(rhs.parameterCount), parameters(rhs.parameters)	{}
+
+		Ocp1Parameters& Ocp1Parameters::operator=(const Ocp1Parameters& rhs)
 		{
-
-		}
-
-		Ocp1Header::Ocp1Header(uint16_t protocolVersion, uint32_t messageSize, OcaMessageType messageType, uint16_t messageCount)
-			:	protocolVersion(protocolVersion), messageSize(messageSize), messageType(messageType), messageCount(messageCount)
-		{
-
-		}
-
-		Ocp1Header::Ocp1Header(const Ocp1Header& rhs)
-			:	protocolVersion(rhs.protocolVersion), messageSize(rhs.messageSize), messageType(rhs.messageType), messageCount(rhs.messageCount)
-		{
-
-		}
-
-		Ocp1Header& Ocp1Header::operator=(const Ocp1Header& rhs)
-		{
-			if (this != &rhs)
-			{
-				protocolVersion = rhs.protocolVersion;
-				messageSize = rhs.messageSize;
-				messageType = rhs.messageType;
-				messageCount = rhs.messageCount;
-			}
+			this->parameterCount = rhs.parameterCount;
+			this->parameters = rhs.parameters;
 
 			return *this;
 		}
 
-		Ocp1Header::~Ocp1Header() {}
+		Ocp1Parameters::~Ocp1Parameters()
+		{
+
+		}
 	}
 }
