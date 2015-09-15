@@ -46,16 +46,16 @@ namespace oca
 	}
 
 
-	const net::Ocp1Header OcpMessageReader::FromBuffer(boost::asio::const_buffer& buffer)
+	const net::Ocp1Header OcpMessageReader::HeaderFromBuffer(boost::asio::const_buffer& buffer)
 	{
 		net::Ocp1Header header;
 
-		FromBuffer(buffer, header);
+		HeaderFromBuffer(buffer, header);
 
 		return header;
 	}
 
-	void OcpMessageReader::FromBuffer(boost::asio::const_buffer& buffer, net::Ocp1Header& header)
+	void OcpMessageReader::HeaderFromBuffer(boost::asio::const_buffer& buffer, net::Ocp1Header& header)
 	{
 		// Cast the buffer to the type we want, and dereference the pointer
 		// so that we can read the data.
@@ -71,6 +71,27 @@ namespace oca
 
 		boost::asio::const_buffer mc = mt+sizeof(uint8_t);
 		header.messageCount = ntohs(*(boost::asio::buffer_cast<const uint16_t*>(mc)));
+	}
+
+	void OcpMessageReader::ParametersFromBuffer(boost::asio::const_buffer& buffer, size_t remainingCommandBytes, net::Ocp1Parameters& parameters)
+	{
+		parameters.parameterCount = *(boost::asio::buffer_cast<const uint8_t*>(buffer));
+
+		size_t parameterBufferBytes = (remainingCommandBytes - sizeof(uint8_t));
+		boost::asio::const_buffer paramBuffer = buffer+sizeof(uint8_t);
+		const uint8_t* params = boost::asio::buffer_cast<const uint8_t*>(paramBuffer);
+
+		assert (parameters.parameters.size() == 0);
+		// We ask the vector to grow in one hit, so we can memcpy straight after into it
+		// We reserve then resize, rather than just resizing, so that we only get one
+		// allocation, rather than log(n) allocations;
+		// We resize so that the size()  value is up to date, and so that the
+		// memory gets initialized to 0.
+		parameters.parameters.reserve(parameterBufferBytes);
+		parameters.parameters.resize(parameterBufferBytes, 0);
+		// TODO: security issue: we trust that the buffer actually has the right number of bytes #security
+		memcpy(&parameters.parameters[0], params, parameterBufferBytes);
+
 	}
 
 	void OcpMessageReader::SyncValueReceived(uint8_t* bufferData,
@@ -123,7 +144,7 @@ namespace oca
 
 
 
-		oca::net::Ocp1Header header = FromBuffer(headerBuffer);
+		oca::net::Ocp1Header header = HeaderFromBuffer(headerBuffer);
 
 		perConnectionState.insert(ConnectionStateMap::value_type(connectionIdentifier, header));
 

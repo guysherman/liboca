@@ -35,6 +35,7 @@
 
 #include <OcpMessageWriter.hxx>
 #include <Ocp1Header.hxx>
+#include <Ocp1Parameters.hxx>
 
 TEST(Suite_OcpMessageWriter, WriteHeaderToBuffer)
 {
@@ -55,4 +56,25 @@ TEST(Suite_OcpMessageWriter, WriteHeaderToBuffer)
 	EXPECT_EQ(testData[5], 0x02);
 	EXPECT_EQ(testData[6], 0x01);
 	EXPECT_EQ(testData[8], 0x01);
+}
+
+TEST(Suite_OcpMessageWriter, WriteParametersToBuffer)
+{
+	oca::net::Ocp1Parameters params;
+	params.parameterCount = 3;
+	params.parameters.push_back(0);
+	params.parameters.push_back(1);
+	params.parameters.push_back(2);
+
+	uint8_t testData[64];
+	memset(&testData[0], 0, 64);
+
+	boost::asio::mutable_buffer buf(testData, 32);
+
+	oca::OcpMessageWriter::WriteParametersToBuffer(params, buf);
+
+	EXPECT_EQ(testData[0], 0x03);
+	EXPECT_EQ(testData[1], 0x00);
+	EXPECT_EQ(testData[2], 0x01);
+	EXPECT_EQ(testData[3], 0x02);
 }

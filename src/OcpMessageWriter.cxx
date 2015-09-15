@@ -31,7 +31,13 @@
 
 // GTK Headers
 
+
+#include <oca/OcaTypes.hxx>
+#include "Ocp1Header.hxx"
+#include "Ocp1Parameters.hxx"
+
 #include "OcpMessageWriter.hxx"
+
 
 
 namespace oca
@@ -56,5 +62,17 @@ namespace oca
 			boost::asio::mutable_buffer bmc = bmt+sizeof(uint8_t);
 			uint16_t* mc = boost::asio::buffer_cast<uint16_t*>(bmc);
 			*mc = htons(header.messageCount);
+		}
+
+		void OcpMessageWriter::WriteParametersToBuffer(const net::Ocp1Parameters& parameters, boost::asio::mutable_buffer& buffer)
+		{
+			OcaUint8* pc = boost::asio::buffer_cast<OcaUint8*>(buffer);
+			*pc = parameters.parameterCount;
+
+			// TODO: there's a bit of a security issue here: we trust that the buffer has enough space #security
+			boost::asio::mutable_buffer paramBuffer = buffer + sizeof(OcaUint8);
+			OcaUint8* destination = boost::asio::buffer_cast<OcaUint8*>(paramBuffer);
+			memcpy(destination, &parameters.parameters[0], parameters.parameters.size());
+
 		}
 }

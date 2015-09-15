@@ -162,17 +162,36 @@ TEST(Suite_OcpMessageReader, SyncValueReceived_GetHeaderNotCalledForErrCode)
 	EXPECT_EQ(false, cbc.fired);
 }
 
-TEST(Suite_OcpMessageReader, FromBuffer)
+TEST(Suite_OcpMessageReader, HeaderFromBuffer)
 {
 	const uint8_t testData[16] = {0x00, 0x01, 0x00, 0x00, 0x00, 0x02, 0x01, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
 	boost::asio::const_buffer buf(testData, 16);
 
-	const oca::net::Ocp1Header header = oca::OcpMessageReader::FromBuffer(buf);
+	const oca::net::Ocp1Header header = oca::OcpMessageReader::HeaderFromBuffer(buf);
 
 	EXPECT_EQ(1, header.protocolVersion);
 	EXPECT_EQ(2, header.messageSize);
 	EXPECT_EQ(oca::net::OcaCmdRrq, (oca::net::OcaMessageType)header.messageType);
 	EXPECT_EQ(1, header.messageCount);
+
+
+}
+
+TEST(Suite_OcpMessageReader, ParametersFromBuffer)
+{
+	const uint8_t testData[16] = {0x04, 0x01, 0x00, 0x02, 0x00, 0x00, 0x00, 0x03, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x04 };
+	boost::asio::const_buffer buf(testData, 16);
+
+	oca::net::Ocp1Parameters params;
+	oca::OcpMessageReader::ParametersFromBuffer(buf, 16, params);
+
+	EXPECT_EQ(4, params.parameterCount);
+	EXPECT_EQ(15, params.parameters.size());
+	EXPECT_EQ(1, params.parameters.at(0));
+	EXPECT_EQ(2, params.parameters.at(2));
+	EXPECT_EQ(3, params.parameters.at(6));
+	EXPECT_EQ(4, params.parameters.at(14));
+
 
 
 }

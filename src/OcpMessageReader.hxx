@@ -37,6 +37,7 @@
 
     // GTK Headers
     #include "Ocp1Header.hxx"
+    #include "Ocp1Parameters.hxx"
 
 	namespace oca
 	{
@@ -48,8 +49,10 @@
             OcpMessageReader();
             virtual ~OcpMessageReader();
 
-            static const net::Ocp1Header FromBuffer(boost::asio::const_buffer& buffer);	// TODO: should the parameter be const? I don't think so, but I don't know for sure.
-			static void FromBuffer(boost::asio::const_buffer& buffer, net::Ocp1Header& header);
+            static const net::Ocp1Header HeaderFromBuffer(boost::asio::const_buffer& buffer);	// TODO: should the parameter be const? I don't think so, but I don't know for sure.
+			static void HeaderFromBuffer(boost::asio::const_buffer& buffer, net::Ocp1Header& header);
+
+            static void ParametersFromBuffer(boost::asio::const_buffer& buffer, size_t remainingCommandBytes, net::Ocp1Parameters& parameters);
 
             virtual void SyncValueReceived(uint8_t* bufferData, const boost::system::error_code& error, size_t bytesTransferred, boost::function<void(void)> getHeader);
 
@@ -58,18 +61,7 @@
             virtual void Ocp1DataReceived(uint8_t* bufferData, uint64_t connectionIdentifier, const boost::system::error_code& error, size_t bytesTransferred);
 
         private:
-            // TODO: it goes against my better judgement to have this here.
-            // Since there is currently only one OcpMessageReader per OcaNetwork
-            // this is actually a bug if there is more than one TcpConnection, ie
-            // this class was supposed to be stateless, but I don't really want the
-            // TcpConnection to be concerned with the details of the Ocp1Header and I need
-            // to keep the header around between Ocp1HeaderReceived and Ocp1DataReceived
-            // The solution could be to make a factory for this as well, so that we can
-            // have one per connection, without tightly coupling the connection and this
-            // class; or, I could make this a map of <TcpConnection*, Ocp1Header> so that the state
-            // is stored per connection. I like the latter more. The third option is to pass a callback
-            // when calling the callback, but that just feels like the code would be hard to read.
-            //oca::net::Ocp1Header header;
+
             typedef std::map<uint64_t, oca::net::Ocp1Header> ConnectionStateMap;
             ConnectionStateMap perConnectionState;
 		};

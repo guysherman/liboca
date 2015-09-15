@@ -35,6 +35,7 @@
 // GTK Headers
 
 #include "Ocp1Header.hxx"
+#include "Ocp1Parameters.hxx"
 
 namespace oca
 {
@@ -42,6 +43,8 @@ namespace oca
 		{
 		public:
 			static void WriteHeaderToBuffer(const net::Ocp1Header& header, boost::asio::mutable_buffer& buffer);
+
+			static void WriteParametersToBuffer(const net::Ocp1Parameters& parameters, boost::asio::mutable_buffer& buffer);
 		};
 }
 
