@@ -21,10 +21,10 @@
 
 
 // C Standard Headers
-#include <stdint.h>
+
 
 // Boost Headers
-#include <boost/asio.hpp>
+
 
 // 3rd Party Headers
 #include <gtest/gtest.h>
@@ -32,32 +32,27 @@
 // GTK Headers
 
 
+
+#include <OcpMessageWriter.hxx>
 #include <Ocp1Header.hxx>
 
-
-
-TEST(Suite_PDUs, Ocp1Header_ToBufferAndBack)
+TEST(Suite_OcpMessageWriter, WriteHeaderToBuffer)
 {
-	uint8_t data[512];
-	memset(&data[0], 0, 512);
-
 	oca::net::Ocp1Header header;
 	header.protocolVersion = 1;
-	header.messageSize = 128;
-	header.messageCount = 1;
+	header.messageSize = 2;
 	header.messageType = oca::net::OcaCmdRrq;
+	header.messageCount = 1;
 
-	boost::asio::mutable_buffer buffer(data, 512);
+	uint8_t testData[32];
+	memset(&testData[0], 0, 32);
 
-	header.WriteToBuffer(buffer);
+	boost::asio::mutable_buffer buf(testData, 32);
 
+	oca::OcpMessageWriter::WriteHeaderToBuffer(header, buf);
 
-	boost::asio::const_buffer buffer2(data, 512);
-	oca::net::Ocp1Header header2 = oca::net::Ocp1Header::FromBuffer(buffer2);
-
-	EXPECT_EQ(1, header2.protocolVersion);
-	EXPECT_EQ(128, header2.messageSize);
-	EXPECT_EQ(1, header2.messageCount);
-	EXPECT_EQ(oca::net::OcaCmdRrq, header2.messageType);
-
+	EXPECT_EQ(testData[1], 0x01);
+	EXPECT_EQ(testData[5], 0x02);
+	EXPECT_EQ(testData[6], 0x01);
+	EXPECT_EQ(testData[8], 0x01);
 }

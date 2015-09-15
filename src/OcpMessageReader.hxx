@@ -48,6 +48,8 @@
             OcpMessageReader();
             virtual ~OcpMessageReader();
 
+            static const net::Ocp1Header FromBuffer(boost::asio::const_buffer& buffer);	// TODO: should the parameter be const? I don't think so, but I don't know for sure.
+			static void FromBuffer(boost::asio::const_buffer& buffer, net::Ocp1Header& header);
 
             virtual void SyncValueReceived(uint8_t* bufferData, const boost::system::error_code& error, size_t bytesTransferred, boost::function<void(void)> getHeader);
 

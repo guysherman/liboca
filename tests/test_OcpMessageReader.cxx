@@ -32,6 +32,7 @@
 // GTK Headers
 
 #include <OcpMessageReader.hxx>
+#include <Ocp1Header.hxx>
 
 class CallbackCheck
 {
@@ -159,4 +160,19 @@ TEST(Suite_OcpMessageReader, SyncValueReceived_GetHeaderNotCalledForErrCode)
 	processor.SyncValueReceived(&buffer[0], ec, 1, boost::bind(&CallbackCheck::Fire, &cbc));
 
 	EXPECT_EQ(false, cbc.fired);
+}
+
+TEST(Suite_OcpMessageReader, FromBuffer)
+{
+	const uint8_t testData[16] = {0x00, 0x01, 0x00, 0x00, 0x00, 0x02, 0x01, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
+	boost::asio::const_buffer buf(testData, 16);
+
+	const oca::net::Ocp1Header header = oca::OcpMessageReader::FromBuffer(buf);
+
+	EXPECT_EQ(1, header.protocolVersion);
+	EXPECT_EQ(2, header.messageSize);
+	EXPECT_EQ(oca::net::OcaCmdRrq, (oca::net::OcaMessageType)header.messageType);
+	EXPECT_EQ(1, header.messageCount);
+
+
 }

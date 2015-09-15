@@ -16,16 +16,17 @@
   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 */
-#ifndef __OCP1HEADER_HXX__
-#define __OCP1HEADER_HXX__
+#ifndef __OCP1MESSAGEWRITER_HXX__
+#define __OCP1MESSAGEWRITER_HXX__
 
 // C++ Standard Headers
 
 
 // C Standard Headers
-#include <stdint.h>
+
 
 // Boost Headers
+#include <boost/enable_shared_from_this.hpp>
 #include <boost/asio.hpp>
 
 // 3rd Party Headers
@@ -33,39 +34,15 @@
 
 // GTK Headers
 
-#define OCP1_HEADER_SIZE 9
+#include "Ocp1Header.hxx"
 
 namespace oca
 {
-	namespace net
-	{
-		enum OcaMessageType
+		class OcpMessageWriter : public boost::enable_shared_from_this<OcpMessageWriter>
 		{
-			OcaCmd = 0,
-			OcaCmdRrq = 1,
-			OcaNtf = 2,
-			OcaRsp = 3
+		public:
+			static void WriteHeaderToBuffer(const net::Ocp1Header& header, boost::asio::mutable_buffer& buffer);
 		};
-
-		struct Ocp1Header
-		{
-
-			Ocp1Header();
-			Ocp1Header(uint16_t protocolVersion, uint32_t messageSize, OcaMessageType messageType, uint16_t messageCount);
-			Ocp1Header(const Ocp1Header& rhs);
-
-			Ocp1Header& operator=(const Ocp1Header& rhs);
-
-
-			~Ocp1Header();
-
-			uint16_t protocolVersion;
-			uint32_t messageSize;
-			OcaMessageType messageType;
-			uint16_t messageCount;
-		};
-	}
 }
 
-
-#endif // __OCP1HEADER_HXX__
+#endif // __OCP1MESSAGEWRITER_HXX__

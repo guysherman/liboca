@@ -21,7 +21,7 @@
 
 
 // C Standard Headers
-
+#include <arpa/inet.h>
 
 // Boost Headers
 
@@ -31,6 +31,7 @@
 // GTK Headers
 
 #include "OcpMessageReader.hxx"
+#include "Ocp1Header.hxx"
 
 namespace oca
 {
@@ -44,6 +45,33 @@ namespace oca
 
 	}
 
+
+	const net::Ocp1Header OcpMessageReader::FromBuffer(boost::asio::const_buffer& buffer)
+	{
+		net::Ocp1Header header;
+
+		FromBuffer(buffer, header);
+
+		return header;
+	}
+
+	void OcpMessageReader::FromBuffer(boost::asio::const_buffer& buffer, net::Ocp1Header& header)
+	{
+		// Cast the buffer to the type we want, and dereference the pointer
+		// so that we can read the data.
+		header.protocolVersion = ntohs(*(boost::asio::buffer_cast<const uint16_t*>(buffer)));
+
+		// Create a new buffer offset from the previous one so that we can
+		// do the same as above but for the next field
+		boost::asio::const_buffer ms = buffer+sizeof(uint16_t);
+		header.messageSize = ntohl(*(boost::asio::buffer_cast<const uint32_t*>(ms)));
+
+		boost::asio::const_buffer mt = ms+sizeof(uint32_t);
+		header.messageType = (net::OcaMessageType) *(boost::asio::buffer_cast<const uint8_t*>(mt));
+
+		boost::asio::const_buffer mc = mt+sizeof(uint8_t);
+		header.messageCount = ntohs(*(boost::asio::buffer_cast<const uint16_t*>(mc)));
+	}
 
 	void OcpMessageReader::SyncValueReceived(uint8_t* bufferData,
 		const boost::system::error_code& error,
@@ -95,7 +123,7 @@ namespace oca
 
 
 
-		oca::net::Ocp1Header header = oca::net::Ocp1Header::FromBuffer(headerBuffer);
+		oca::net::Ocp1Header header = FromBuffer(headerBuffer);
 
 		perConnectionState.insert(ConnectionStateMap::value_type(connectionIdentifier, header));
 
