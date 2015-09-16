@@ -34,6 +34,7 @@
 #include <oca/OcaTypes.hxx>
 #include "OcpMessageReader.hxx"
 #include "Ocp1Header.hxx"
+#include "Ocp1Response.hxx"
 
 namespace oca
 {
@@ -134,6 +135,33 @@ namespace oca
 			commands.push_back(cmd);
 			message = message + cmd.commandSize;
 		}
+	}
+
+	void OcpMessageReader::ResponseListFromBuffer(boost::asio::const_buffer& buffer, net::Ocp1Header header, std::vector<net::Ocp1Response>& responses)
+	{
+		boost::asio::const_buffer message = buffer;
+		for (uint16_t i = 0; i < header.messageCount; ++i)
+		{
+			net::Ocp1Response resp;
+			ResponseFromBuffer(message, resp);
+			responses.push_back(resp);
+			message = message + resp.responseSize;
+		}
+	}
+
+	void OcpMessageReader::ResponseFromBuffer(boost::asio::const_buffer& buffer, net::Ocp1Response& resp)
+	{
+		resp.responseSize = ntohl(*(boost::asio::buffer_cast<const OcaUint32*>(buffer)));
+
+		boost::asio::const_buffer handleBuf = buffer + sizeof(OcaUint32);
+		resp.handle = ntohl(*(boost::asio::buffer_cast<const OcaUint32*>(handleBuf)));
+
+		boost::asio::const_buffer statusCodeBuf = handleBuf + sizeof(OcaUint32);
+		resp.statusCode = *(boost::asio::buffer_cast<const OcaStatus*>(statusCodeBuf));
+
+		boost::asio::const_buffer paramsBuf = statusCodeBuf + sizeof(OcaStatus);
+		size_t remainingBytes = resp.responseSize - (2*sizeof(OcaUint32) + sizeof(OcaStatus));
+		ParametersFromBuffer(paramsBuf, remainingBytes, resp.parameters);
 	}
 
 	void OcpMessageReader::SyncValueReceived(uint8_t* bufferData,

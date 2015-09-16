@@ -16,14 +16,11 @@
   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 */
-#ifndef __OCATYPES_HXX__
-#define __OCATYPES_HXX__
 
 // C++ Standard Headers
 
-
 // C Standard Headers
-#include <stdint.h>
+
 
 // Boost Headers
 
@@ -33,23 +30,41 @@
 
 // GTK Headers
 
+#include <oca/OcaTypes.hxx>
+#include "Ocp1Parameters.hxx"
+#include "Ocp1Response.hxx"
+
 
 namespace oca
 {
-	typedef uint8_t OcaUint8;
-	typedef uint16_t OcaUint16;
-	typedef uint32_t OcaUint32;
-	typedef uint64_t OcaUint64;
-
-	typedef OcaUint32 	OcaONo;
-	typedef OcaUint8	OcaStatus;
-
-	typedef struct
+	namespace net
 	{
-			OcaUint16 treeLevel;
-			OcaUint16 methodIndex;
-	} OcaMethodId;
+		Ocp1Response::Ocp1Response()
+			: responseSize(0), handle(0), statusCode(0)
+		{
 
+		}
+
+
+		Ocp1Response::Ocp1Response(const Ocp1Response& rhs)
+			: responseSize(rhs.responseSize), handle(rhs.handle), statusCode(rhs.statusCode), parameters(rhs.parameters)
+		{
+
+		}
+
+		Ocp1Response& Ocp1Response::operator=(const Ocp1Response& rhs)
+		{
+			responseSize = rhs.responseSize;
+			handle = rhs.handle;
+			statusCode = rhs.statusCode;
+			parameters = rhs.parameters;
+
+			return *this;
+		}
+
+		Ocp1Response::~Ocp1Response()
+		{
+			
+		}
+	}
 }
-
-#endif // __OCATYPES_HXX__

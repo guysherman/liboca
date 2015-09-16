@@ -44,7 +44,8 @@ namespace oca
 			OcaCmd = 0,
 			OcaCmdRrq = 1,
 			OcaNtf = 2,
-			OcaRsp = 3
+			OcaRsp = 3,
+			OcaKeepAlive = 4
 		};
 
 		struct Ocp1Header

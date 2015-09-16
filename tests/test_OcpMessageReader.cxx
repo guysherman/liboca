@@ -35,6 +35,7 @@
 #include <Ocp1Header.hxx>
 #include <Ocp1Parameters.hxx>
 #include <Ocp1Command.hxx>
+#include <Ocp1Response.hxx>
 
 class CallbackCheck
 {
@@ -253,5 +254,51 @@ TEST(Suite_OcpMessageReader, CommandListFromBuffer)
 	EXPECT_EQ(0x0102, cmd.methodId.treeLevel);
 	EXPECT_EQ(0x0304, cmd.methodId.methodIndex);
 	EXPECT_EQ(15, cmd.parameters.parameters.size());
+
+}
+
+TEST(Suite_OcpMessageReader, ResponseFromBuffer)
+{
+	const uint8_t testData[32] = {	0x00, 0x00, 0x00, 0x20, 0xDE, 0xAD, 0xF0, 0x0D, 0xC0, 0x05, 0x01, 0x00, 0x02, 0x00, 0x00, 0x00,
+									0x03, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x04, 0x1D, 0xBE, 0xEF, 0x01, 0x02, 0x03, 0x04 };
+	boost::asio::const_buffer buf(testData, 32);
+
+	oca::net::Ocp1Response resp;
+	oca::OcpMessageReader::ResponseFromBuffer(buf, resp);
+
+	EXPECT_EQ(32, resp.responseSize);
+	EXPECT_EQ(0xDEADF00D, resp.handle);
+	EXPECT_EQ(0xC0, resp.statusCode);
+	EXPECT_EQ(22, resp.parameters.parameters.size());
+	EXPECT_EQ(0x01, resp.parameters.parameters[0]);
+
+}
+
+TEST(Suite_OcpMessageReader, ResponseListFromBuffer)
+{
+	const uint8_t testData[64] = {	0x00, 0x00, 0x00, 0x20, 0xDE, 0xAD, 0xF0, 0x0D, 0xC0, 0x05, 0x01, 0x00, 0x02, 0x00, 0x00, 0x00,
+									0x03, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x04, 0x1D, 0xBE, 0xEF, 0x01, 0x02, 0x03, 0x04,
+									0x00, 0x00, 0x00, 0x20, 0xDE, 0xAD, 0xF0, 0x0D, 0xC0, 0x05, 0x01, 0x00, 0x02, 0x00, 0x00, 0x00,
+									0x03, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x04, 0x1D, 0xBE, 0xEF, 0x01, 0x02, 0x03, 0x04  };
+	boost::asio::const_buffer buf(testData, 64);
+
+	oca::net::Ocp1Header header;
+	header.protocolVersion = 1;
+	header.messageSize = 74;
+	header.messageType = oca::net::OcaRsp;
+	header.messageCount = 2;
+
+	std::vector<oca::net::Ocp1Response> resps;
+	oca::OcpMessageReader::ResponseListFromBuffer(buf, header, resps);
+
+	EXPECT_EQ(2, resps.size());
+
+	oca::net::Ocp1Response resp = resps[0];
+
+	EXPECT_EQ(32, resp.responseSize);
+	EXPECT_EQ(0xDEADF00D, resp.handle);
+	EXPECT_EQ(0xC0, resp.statusCode);
+	EXPECT_EQ(22, resp.parameters.parameters.size());
+	EXPECT_EQ(0x01, resp.parameters.parameters[0]);
 
 }
