@@ -87,6 +87,17 @@ namespace oca
 			*mi = htons(id.methodIndex);
 		}
 
+		void OcpMessageWriter::WriteCommandListToBuffer(oca::net::CommandList const& commands, boost::asio::mutable_buffer& buffer)
+		{
+			boost::asio::mutable_buffer message = buffer;
+			for (oca::net::CommandList::const_iterator it = commands.begin(); it != commands.end(); ++it)
+			{
+				oca::net::Ocp1Command cmd = *it;
+				WriteCommandToBuffer(cmd, message);
+				message = message + cmd.commandSize;
+			}
+		}
+
 		void OcpMessageWriter::WriteCommandToBuffer(const net::Ocp1Command& command, boost::asio::mutable_buffer& buffer)
 		{
 			OcaUint32* cs = boost::asio::buffer_cast<OcaUint32*>(buffer);
@@ -118,12 +129,59 @@ namespace oca
 		OcaUint32 OcpMessageWriter::ComputeCommandListDataSize(net::CommandList& commands)
 		{
 			OcaUint32 commandListDataSize = 0;
-			for (net::CommandList::size_type i = 0; i < commands.size(); ++i)
+			for (net::CommandList::iterator it = commands.begin(); it != commands.end(); ++it)
 			{
-				commandListDataSize += ComputeCommandDataSize(commands[i]);
+				commandListDataSize += ComputeCommandDataSize(*it);
 			}
 
 
 			return commandListDataSize;
+		}
+
+		void OcpMessageWriter::WriteResponseListToBuffer(oca::net::ResponseList const& responses, boost::asio::mutable_buffer& buffer)
+		{
+			boost::asio::mutable_buffer message = buffer;
+			for (oca::net::ResponseList::const_iterator it = responses.begin(); it != responses.end(); ++it)
+			{
+				oca::net::Ocp1Response resp = *it;
+				WriteResponseToBuffer(resp, message);
+				message = message + resp.responseSize;
+			}
+		}
+
+		void OcpMessageWriter::WriteResponseToBuffer(const net::Ocp1Response& response, boost::asio::mutable_buffer& buffer)
+		{
+			OcaUint32* rs = boost::asio::buffer_cast<OcaUint32*>(buffer);
+			*rs = htonl(response.responseSize);
+
+			boost::asio::mutable_buffer handleBuf = buffer + sizeof(OcaUint32);
+			OcaUint32* handle = boost::asio::buffer_cast<OcaUint32*>(handleBuf);
+			*handle = htonl(response.handle);
+
+			boost::asio::mutable_buffer statusCodeBuf = handleBuf + sizeof(OcaUint32);
+			OcaUint8* statusCode = boost::asio::buffer_cast<OcaUint8*>(statusCodeBuf);
+			*statusCode = response.statusCode;
+
+			boost::asio::mutable_buffer paramsBuf = statusCodeBuf + sizeof(OcaUint8);
+			WriteParametersToBuffer(response.parameters, paramsBuf);
+		}
+
+		OcaUint32 OcpMessageWriter::ComputeResponseDataSize(net::Ocp1Response& response)
+		{
+			OcaUint32 paramsSizeBytes = response.parameters.parameters.size() + sizeof(OcaUint8);
+			OcaUint32 responseSize = paramsSizeBytes + (2*sizeof(OcaUint32) + sizeof(OcaStatus));
+			response.responseSize = responseSize;
+			return responseSize;
+		}
+
+		OcaUint32 OcpMessageWriter::ComputeResponseListDataSize(net::ResponseList& responses)
+		{
+			OcaUint32 responseListDataSize = 0;
+			for (net::ResponseList::iterator it = responses.begin(); it != responses.end(); ++it)
+			{
+				responseListDataSize += ComputeResponseDataSize(*it);
+			}
+
+			return responseListDataSize;
 		}
 }

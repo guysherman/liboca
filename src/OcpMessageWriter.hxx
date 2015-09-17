@@ -37,6 +37,7 @@
 #include "Ocp1Header.hxx"
 #include "Ocp1Parameters.hxx"
 #include "Ocp1Command.hxx"
+#include "Ocp1Response.hxx"
 
 namespace oca
 {
@@ -47,14 +48,21 @@ namespace oca
 
 			static void WriteHeaderToBuffer(const net::Ocp1Header& header, boost::asio::mutable_buffer& buffer);
 
+			static void WriteCommandListToBuffer(oca::net::CommandList const& commands, boost::asio::mutable_buffer& buffer);
+			static void WriteCommandToBuffer(const net::Ocp1Command& command, boost::asio::mutable_buffer& buffer);
+			static void WriteMethodIdToBuffer(const OcaMethodId& id, boost::asio::mutable_buffer& buffer);
 			static void WriteParametersToBuffer(const net::Ocp1Parameters& parameters, boost::asio::mutable_buffer& buffer);
 
-			static void WriteMethodIdToBuffer(const OcaMethodId& id, boost::asio::mutable_buffer& buffer);
+			static void WriteResponseListToBuffer(oca::net::ResponseList const& responses, boost::asio::mutable_buffer& buffer);
+			static void WriteResponseToBuffer(const net::Ocp1Response& response, boost::asio::mutable_buffer& buffer);
 
-			static void WriteCommandToBuffer(const net::Ocp1Command& command, boost::asio::mutable_buffer& buffer);
+
 
 			static OcaUint32 ComputeCommandDataSize(net::Ocp1Command& command);
 			static OcaUint32 ComputeCommandListDataSize(net::CommandList& commands);
+
+			static OcaUint32 ComputeResponseDataSize(net::Ocp1Response& response);
+			static OcaUint32 ComputeResponseListDataSize(net::ResponseList& responses);
 
 		};
 }

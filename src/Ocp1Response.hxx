@@ -20,6 +20,7 @@
 #define __OCP1RESPONSE_HXX__
 
 // C++ Standard Headers
+#include <vector>
 
 // C Standard Headers
 
@@ -54,6 +55,8 @@ namespace oca
 			Ocp1Parameters		parameters;
 
 		};
+
+		typedef std::vector<Ocp1Response> ResponseList;
 	}
 }
 

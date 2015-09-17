@@ -37,6 +37,7 @@
 #include <Ocp1Header.hxx>
 #include <Ocp1Parameters.hxx>
 #include <Ocp1Command.hxx>
+#include <Ocp1Response.hxx>
 
 TEST(Suite_OcpMessageWriter, WriteHeaderToBuffer)
 {
@@ -201,5 +202,176 @@ TEST(Suite_OcpMessageWriter, ComputeCommandListDataSize)
 	oca::OcaUint32 commandListDataSize = oca::OcpMessageWriter::ComputeCommandListDataSize(commands);
 
 	EXPECT_EQ(40, commandListDataSize);
+
+}
+
+TEST(Suite_OcpMessageWriter, WriteCommandListToBuffer)
+{
+	oca::net::Ocp1Parameters params;
+	params.parameterCount = 3;
+	params.parameters.push_back(0);
+	params.parameters.push_back(1);
+	params.parameters.push_back(2);
+
+	oca::OcaMethodId id;
+	memset(&id, 0, sizeof(oca::OcaMethodId));
+	id.treeLevel = 0x0102;
+	id.methodIndex = 0x0304;
+
+	uint8_t testData[1024];
+	memset(&testData[0], 0, 1024);
+
+	boost::asio::mutable_buffer buf(testData, 1024);
+
+	oca::net::Ocp1Command cmd;
+	cmd.commandSize = 20;
+	cmd.handle = 0xDEADF00D;
+	cmd.targetONo = 0xC01DBEEF;
+	cmd.methodId = id;
+	cmd.parameters = params;
+
+	std::vector<oca::net::Ocp1Command> commands;
+	commands.push_back(cmd);
+	commands.push_back(cmd);
+
+	oca::OcpMessageWriter::WriteCommandListToBuffer(commands, buf);
+
+	EXPECT_EQ(0x14, testData[3]);
+	EXPECT_EQ(0x0D, testData[7]);
+	EXPECT_EQ(0xEF, testData[11]);
+	EXPECT_EQ(0x04, testData[15]);
+	EXPECT_EQ(0x03, testData[16]);
+
+	EXPECT_EQ(0x14, testData[23]);
+	EXPECT_EQ(0x0D, testData[27]);
+	EXPECT_EQ(0xEF, testData[31]);
+	EXPECT_EQ(0x04, testData[35]);
+	EXPECT_EQ(0x03, testData[36]);
+
+}
+
+TEST(Suite_OcpMessageWriter, WriteResponseToBuffer)
+{
+	oca::net::Ocp1Parameters params;
+	params.parameterCount = 3;
+	params.parameters.push_back(0);
+	params.parameters.push_back(1);
+	params.parameters.push_back(2);
+
+	uint8_t testData[1024];
+	memset(&testData[0], 0, 1024);
+
+	boost::asio::mutable_buffer buf(testData, 1024);
+
+	oca::net::Ocp1Response resp;
+	resp.responseSize = 13;
+	resp.handle = 0xDEADF00D;
+	resp.statusCode = 0xDE;
+	resp.parameters = params;
+
+	oca::OcpMessageWriter::WriteResponseToBuffer(resp, buf);
+
+	EXPECT_EQ(0x0D, testData[3]);
+	EXPECT_EQ(0x0D, testData[7]);
+	EXPECT_EQ(0xDE, testData[8]);
+	EXPECT_EQ(0x03, testData[9]);
+	EXPECT_EQ(0x02, testData[12]);
+
+}
+
+TEST(Suite_OcpMessageWriter, ComputeResponseDataSize)
+{
+	oca::net::Ocp1Parameters params;
+	params.parameterCount = 3;
+	params.parameters.push_back(0);
+	params.parameters.push_back(1);
+	params.parameters.push_back(2);
+
+	uint8_t testData[1024];
+	memset(&testData[0], 0, 1024);
+
+	boost::asio::mutable_buffer buf(testData, 1024);
+
+	oca::net::Ocp1Response resp;
+	resp.responseSize = 13;
+	resp.handle = 0xDEADF00D;
+	resp.statusCode = 0xDE;
+	resp.parameters = params;
+
+
+	oca::OcaUint32 respDataSize = oca::OcpMessageWriter::ComputeResponseDataSize(resp);
+
+	EXPECT_EQ(13, respDataSize);
+	EXPECT_EQ(13, resp.responseSize);
+
+}
+
+TEST(Suite_OcpMessageWriter, ComputeResponseListDataSize)
+{
+	oca::net::Ocp1Parameters params;
+	params.parameterCount = 3;
+	params.parameters.push_back(0);
+	params.parameters.push_back(1);
+	params.parameters.push_back(2);
+
+	uint8_t testData[1024];
+	memset(&testData[0], 0, 1024);
+
+	boost::asio::mutable_buffer buf(testData, 1024);
+
+	oca::net::Ocp1Response resp;
+	resp.responseSize = 13;
+	resp.handle = 0xDEADF00D;
+	resp.statusCode = 0xDE;
+	resp.parameters = params;
+
+
+	oca::net::ResponseList responses;
+	responses.push_back(resp);
+	responses.push_back(resp);
+
+	oca::OcaUint32 responseListDataSize = oca::OcpMessageWriter::ComputeResponseListDataSize(responses);
+
+	EXPECT_EQ(26, responseListDataSize);
+
+}
+
+TEST(Suite_OcpMessageWriter, WriteResponseListToBuffer)
+{
+	oca::net::Ocp1Parameters params;
+	params.parameterCount = 3;
+	params.parameters.push_back(0);
+	params.parameters.push_back(1);
+	params.parameters.push_back(2);
+
+	uint8_t testData[1024];
+	memset(&testData[0], 0, 1024);
+
+	boost::asio::mutable_buffer buf(testData, 1024);
+
+	oca::net::Ocp1Response resp;
+	resp.responseSize = 13;
+	resp.handle = 0xDEADF00D;
+	resp.statusCode = 0xDE;
+	resp.parameters = params;
+
+
+	oca::net::ResponseList responses;
+	responses.push_back(resp);
+	responses.push_back(resp);
+
+	oca::OcpMessageWriter::WriteResponseListToBuffer(responses, buf);
+
+	EXPECT_EQ(0x0D, testData[3]);
+	EXPECT_EQ(0x0D, testData[7]);
+	EXPECT_EQ(0xDE, testData[8]);
+	EXPECT_EQ(0x03, testData[9]);
+	EXPECT_EQ(0x02, testData[12]);
+
+	EXPECT_EQ(0x0D, testData[16]);
+	EXPECT_EQ(0x0D, testData[20]);
+	EXPECT_EQ(0xDE, testData[21]);
+	EXPECT_EQ(0x03, testData[22]);
+	EXPECT_EQ(0x02, testData[25]);
 
 }
