@@ -302,3 +302,16 @@ TEST(Suite_OcpMessageReader, ResponseListFromBuffer)
 	EXPECT_EQ(0x01, resp.parameters.parameters[0]);
 
 }
+
+TEST(Suite_OcpMessageReader, EventIdFromBuffer)
+{
+	const uint8_t testData[16] = {0x04, 0x01, 0x00, 0x02, 0x00, 0x00, 0x00, 0x03, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x04 };
+	boost::asio::const_buffer buf(testData, 16);
+
+	oca::OcaEventId id;
+	memset(&id, 0, sizeof(oca::OcaEventId));
+	oca::OcpMessageReader::EventIdFromBuffer(buf, id);
+
+	EXPECT_EQ(0x0401, id.treeLevel);
+	EXPECT_EQ(0x0002, id.eventIndex);
+}

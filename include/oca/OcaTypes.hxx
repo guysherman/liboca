@@ -46,9 +46,15 @@ namespace oca
 
 	typedef struct
 	{
-			OcaUint16 treeLevel;
-			OcaUint16 methodIndex;
+		OcaUint16 treeLevel;
+		OcaUint16 methodIndex;
 	} OcaMethodId;
+
+	typedef struct
+	{
+		OcaUint16 treeLevel;
+		OcaUint16 eventIndex;
+	} OcaEventId;
 
 }
 

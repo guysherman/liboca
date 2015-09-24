@@ -375,3 +375,23 @@ TEST(Suite_OcpMessageWriter, WriteResponseListToBuffer)
 	EXPECT_EQ(0x02, testData[25]);
 
 }
+
+TEST(Suite_OcpMessageWriter, WriteEventIdToBuffer)
+{
+	oca::OcaEventId id;
+	memset(&id, 0, sizeof(oca::OcaMethodId));
+	id.treeLevel = 0xDEAD;
+	id.eventIndex = 0xF00D;
+
+	uint8_t testData[64];
+	memset(&testData[0], 0, 64);
+
+	boost::asio::mutable_buffer buf(testData, 64);
+
+	oca::OcpMessageWriter::WriteEventIdToBuffer(id, buf);
+
+	EXPECT_EQ(testData[0], 0xDE);
+	EXPECT_EQ(testData[1], 0xAD);
+	EXPECT_EQ(testData[2], 0xF0);
+	EXPECT_EQ(testData[3], 0x0D);
+}

@@ -56,13 +56,16 @@ namespace oca
 			static void WriteResponseListToBuffer(oca::net::ResponseList const& responses, boost::asio::mutable_buffer& buffer);
 			static void WriteResponseToBuffer(const net::Ocp1Response& response, boost::asio::mutable_buffer& buffer);
 
-
+			static void WriteEventIdToBuffer(const OcaEventId& id, boost::asio::mutable_buffer& buffer);
 
 			static OcaUint32 ComputeCommandDataSize(net::Ocp1Command& command);
 			static OcaUint32 ComputeCommandListDataSize(net::CommandList& commands);
 
 			static OcaUint32 ComputeResponseDataSize(net::Ocp1Response& response);
 			static OcaUint32 ComputeResponseListDataSize(net::ResponseList& responses);
+
+
+
 
 		};
 }

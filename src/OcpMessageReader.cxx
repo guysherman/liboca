@@ -164,6 +164,14 @@ namespace oca
 		ParametersFromBuffer(paramsBuf, remainingBytes, resp.parameters);
 	}
 
+	void OcpMessageReader::EventIdFromBuffer(boost::asio::const_buffer& buffer, OcaEventId& eventId)
+	{
+		eventId.treeLevel = ntohs(*(boost::asio::buffer_cast<const OcaUint16*>(buffer)));
+
+		boost::asio::const_buffer indexBuf = buffer + sizeof(OcaUint16);
+		eventId.eventIndex = ntohs(*(boost::asio::buffer_cast<const OcaUint16*>(indexBuf)));
+	}
+
 	void OcpMessageReader::SyncValueReceived(uint8_t* bufferData,
 		const boost::system::error_code& error,
 		size_t bytesTransferred,

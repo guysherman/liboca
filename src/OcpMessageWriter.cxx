@@ -184,4 +184,14 @@ namespace oca
 
 			return responseListDataSize;
 		}
+
+		void OcpMessageWriter::WriteEventIdToBuffer(const OcaEventId &id, boost::asio::mutable_buffer &buffer)
+		{
+			OcaUint16* tl = boost::asio::buffer_cast<OcaUint16*>(buffer);
+			*tl = htons(id.treeLevel);
+
+			boost::asio::mutable_buffer indexBuf = buffer + sizeof(OcaUint16);
+			OcaUint16* ei = boost::asio::buffer_cast<OcaUint16*>(indexBuf);
+			*ei = htons(id.eventIndex);
+		}
 }
