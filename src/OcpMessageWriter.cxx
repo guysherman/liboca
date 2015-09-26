@@ -92,6 +92,7 @@ namespace oca
 			boost::asio::mutable_buffer message = buffer;
 			for (oca::net::CommandList::const_iterator it = commands.begin(); it != commands.end(); ++it)
 			{
+				// TODO: there's a bit of a security issue here: we trust that the buffer has enough space #security
 				oca::net::Ocp1Command cmd = *it;
 				WriteCommandToBuffer(cmd, message);
 				message = message + cmd.commandSize;
@@ -103,17 +104,21 @@ namespace oca
 			OcaUint32* cs = boost::asio::buffer_cast<OcaUint32*>(buffer);
 			*cs = htonl(command.commandSize);
 
+			// TODO: there's a bit of a security issue here: we trust that the buffer has enough space #security
 			boost::asio::mutable_buffer handleBuffer = buffer + sizeof(OcaUint32);
 			OcaUint32* hdl = boost::asio::buffer_cast<OcaUint32*>(handleBuffer);
 			*hdl = htonl(command.handle);
 
+			// TODO: there's a bit of a security issue here: we trust that the buffer has enough space #security
 			boost::asio::mutable_buffer oNoBuffer = handleBuffer + sizeof(OcaUint32);
 			OcaUint32* oNo = boost::asio::buffer_cast<OcaUint32*>(oNoBuffer);
 			*oNo = htonl(command.targetONo);
 
+			// TODO: there's a bit of a security issue here: we trust that the buffer has enough space #security
 			boost::asio::mutable_buffer methodBuffer = oNoBuffer + sizeof(OcaONo);
 			WriteMethodIdToBuffer(command.methodId, methodBuffer);
 
+			// TODO: there's a bit of a security issue here: we trust that the buffer has enough space #security
 			boost::asio::mutable_buffer paramBuffer = methodBuffer + sizeof(OcaMethodId);
 			WriteParametersToBuffer(command.parameters, paramBuffer);
 		}
@@ -154,14 +159,17 @@ namespace oca
 			OcaUint32* rs = boost::asio::buffer_cast<OcaUint32*>(buffer);
 			*rs = htonl(response.responseSize);
 
+			// TODO: there's a bit of a security issue here: we trust that the buffer has enough space #security
 			boost::asio::mutable_buffer handleBuf = buffer + sizeof(OcaUint32);
 			OcaUint32* handle = boost::asio::buffer_cast<OcaUint32*>(handleBuf);
 			*handle = htonl(response.handle);
 
+			// TODO: there's a bit of a security issue here: we trust that the buffer has enough space #security
 			boost::asio::mutable_buffer statusCodeBuf = handleBuf + sizeof(OcaUint32);
 			OcaUint8* statusCode = boost::asio::buffer_cast<OcaUint8*>(statusCodeBuf);
 			*statusCode = response.statusCode;
 
+			// TODO: there's a bit of a security issue here: we trust that the buffer has enough space #security
 			boost::asio::mutable_buffer paramsBuf = statusCodeBuf + sizeof(OcaUint8);
 			WriteParametersToBuffer(response.parameters, paramsBuf);
 		}
@@ -190,6 +198,7 @@ namespace oca
 			OcaUint16* tl = boost::asio::buffer_cast<OcaUint16*>(buffer);
 			*tl = htons(id.treeLevel);
 
+			// TODO: there's a bit of a security issue here: we trust that the buffer has enough space #security
 			boost::asio::mutable_buffer indexBuf = buffer + sizeof(OcaUint16);
 			OcaUint16* ei = boost::asio::buffer_cast<OcaUint16*>(indexBuf);
 			*ei = htons(id.eventIndex);
@@ -200,7 +209,18 @@ namespace oca
 			OcaONo* emitter = boost::asio::buffer_cast<OcaONo*>(buffer);
 			*emitter = htonl(event.emitterONo);
 
+			// TODO: there's a bit of a security issue here: we trust that the buffer has enough space #security
 			boost::asio::mutable_buffer idBuffer = buffer + sizeof(OcaONo);
 			WriteEventIdToBuffer(event.eventId, idBuffer);
+		}
+
+		void OcpMessageWriter::WriteEventDataToBuffer(const net::Ocp1EventData& data, boost::asio::mutable_buffer& buffer)
+		{
+			WriteEventToBuffer(data.event, buffer);
+
+			// TODO: there's a bit of a security issue here: we trust that the buffer has enough space #security
+			boost::asio::mutable_buffer paramsBuffer = buffer + sizeof(OcaEvent);
+			OcaUint8* destination = boost::asio::buffer_cast<OcaUint8*>(paramsBuffer);
+			memcpy(destination, &data.eventParameters[0], data.eventParameters.size());
 		}
 }

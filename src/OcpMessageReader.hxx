@@ -41,6 +41,7 @@
     #include "Ocp1Parameters.hxx"
     #include "Ocp1Command.hxx"
     #include "Ocp1Response.hxx"
+    #include "Ocp1EventData.hxx"
 
 	namespace oca
 	{
@@ -65,12 +66,15 @@
 
             static void EventIdFromBuffer(boost::asio::const_buffer& buffer, OcaEventId& eventId);
             static void EventFromBuffer(boost::asio::const_buffer& buffer, OcaEvent& event);
+            static void EventDataFromBuffer(boost::asio::const_buffer& buffer, size_t remainingBytes, net::Ocp1EventData& data);
 
             virtual void SyncValueReceived(uint8_t* bufferData, const boost::system::error_code& error, size_t bytesTransferred, boost::function<void(void)> getHeader);
 			virtual void Ocp1HeaderReceived(uint8_t* bufferData, uint64_t connectionIdentifier, const boost::system::error_code& error, size_t bytesTransferred, boost::function<void(uint32_t)> getData);
             virtual void Ocp1DataReceived(uint8_t* bufferData, uint64_t connectionIdentifier, const boost::system::error_code& error, size_t bytesTransferred);
 
         private:
+
+            static void bufferToUint8Vector(boost::asio::const_buffer& buffer, size_t numBytes, std::vector<OcaUint8>& vec);
 
             typedef std::map<uint64_t, oca::net::Ocp1Header> ConnectionStateMap;
             ConnectionStateMap perConnectionState;

@@ -38,6 +38,7 @@
 #include <Ocp1Parameters.hxx>
 #include <Ocp1Command.hxx>
 #include <Ocp1Response.hxx>
+#include <Ocp1EventData.hxx>
 
 TEST(Suite_OcpMessageWriter, WriteHeaderToBuffer)
 {
@@ -419,4 +420,42 @@ TEST(Suite_OcpMessageWriter, WriteEventToBuffer)
 	EXPECT_EQ(testData[5], 0xAD);
 	EXPECT_EQ(testData[6], 0xF0);
 	EXPECT_EQ(testData[7], 0x0D);
+}
+
+TEST(Suite_OcpMessageWriter, WriteEventDataToBuffer)
+{
+	oca::OcaEvent event;
+	memset(&event, 0, sizeof(oca::OcaEvent));
+	event.emitterONo = 0xC01DBEEF;
+	event.eventId.treeLevel = 0xDEAD;
+	event.eventId.eventIndex = 0xF00D;
+
+	oca::net::Ocp1EventData edata;
+	edata.event = event;
+	edata.eventParameters.push_back(0xCA);
+	edata.eventParameters.push_back(0xFE);
+	edata.eventParameters.push_back(0xBA);
+	edata.eventParameters.push_back(0xBE);
+	edata.eventParameters.push_back(0xAB);
+	edata.eventParameters.push_back(0xCD);
+	edata.eventParameters.push_back(0xEF);
+	edata.eventParameters.push_back(0xFE);
+
+
+	uint8_t testData[64];
+	memset(&testData[0], 0, 64);
+
+	boost::asio::mutable_buffer buf(testData, 64);
+
+	oca::OcpMessageWriter::WriteEventDataToBuffer(edata, buf);
+
+	EXPECT_EQ(testData[0], 0xC0);
+	EXPECT_EQ(testData[8], 0xCA);
+	EXPECT_EQ(testData[9], 0xFE);
+	EXPECT_EQ(testData[10], 0xBA);
+	EXPECT_EQ(testData[11], 0xBE);
+	EXPECT_EQ(testData[12], 0xAB);
+	EXPECT_EQ(testData[13], 0xCD);
+	EXPECT_EQ(testData[14], 0xEF);
+	EXPECT_EQ(testData[15], 0xFE);
 }

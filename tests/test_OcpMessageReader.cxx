@@ -36,6 +36,7 @@
 #include <Ocp1Parameters.hxx>
 #include <Ocp1Command.hxx>
 #include <Ocp1Response.hxx>
+#include <Ocp1EventData.hxx>
 
 class CallbackCheck
 {
@@ -328,5 +329,20 @@ TEST(Suite_OcpMessageReader, EventFromBuffer)
 	EXPECT_EQ(0x04010002, event.emitterONo);
 	EXPECT_EQ(0x0000, event.eventId.treeLevel);
 	EXPECT_EQ(0x0003, event.eventId.eventIndex);
+
+}
+
+TEST(Suite_OcpMessageReader, EventDataFromBuffer)
+{
+	const uint8_t testData[16] = {0x04, 0x01, 0x00, 0x02, 0x00, 0x00, 0x00, 0x03, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x04 };
+	boost::asio::const_buffer buf(testData, 16);
+
+	oca::net::Ocp1EventData edata;
+	oca::OcpMessageReader::EventDataFromBuffer(buf, 16, edata);
+
+	EXPECT_EQ(0x04010002, edata.event.emitterONo);
+	EXPECT_EQ(0x0000, edata.event.eventId.treeLevel);
+	EXPECT_EQ(0x0003, edata.event.eventId.eventIndex);
+	EXPECT_EQ(0x04, edata.eventParameters.at(7));
 
 }
