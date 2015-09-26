@@ -56,6 +56,12 @@ namespace oca
 		OcaUint16 eventIndex;
 	} OcaEventId;
 
+	typedef struct
+	{
+		OcaONo emitterONo;
+		OcaEventId eventId;
+	} OcaEvent;
+
 }
 
 #endif // __OCATYPES_HXX__

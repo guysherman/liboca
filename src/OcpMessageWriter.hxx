@@ -57,6 +57,7 @@ namespace oca
 			static void WriteResponseToBuffer(const net::Ocp1Response& response, boost::asio::mutable_buffer& buffer);
 
 			static void WriteEventIdToBuffer(const OcaEventId& id, boost::asio::mutable_buffer& buffer);
+			static void WriteEventToBuffer(const OcaEvent& event, boost::asio::mutable_buffer& buffer);
 
 			static OcaUint32 ComputeCommandDataSize(net::Ocp1Command& command);
 			static OcaUint32 ComputeCommandListDataSize(net::CommandList& commands);

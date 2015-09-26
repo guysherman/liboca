@@ -172,6 +172,14 @@ namespace oca
 		eventId.eventIndex = ntohs(*(boost::asio::buffer_cast<const OcaUint16*>(indexBuf)));
 	}
 
+	void OcpMessageReader::EventFromBuffer(boost::asio::const_buffer& buffer, OcaEvent& event)
+	{
+		event.emitterONo = ntohl(*(boost::asio::buffer_cast<const OcaONo*>(buffer)));
+
+		boost::asio::const_buffer idBuffer = buffer + sizeof(OcaONo);
+		EventIdFromBuffer(idBuffer, event.eventId);
+	}
+
 	void OcpMessageReader::SyncValueReceived(uint8_t* bufferData,
 		const boost::system::error_code& error,
 		size_t bytesTransferred,

@@ -379,7 +379,7 @@ TEST(Suite_OcpMessageWriter, WriteResponseListToBuffer)
 TEST(Suite_OcpMessageWriter, WriteEventIdToBuffer)
 {
 	oca::OcaEventId id;
-	memset(&id, 0, sizeof(oca::OcaMethodId));
+	memset(&id, 0, sizeof(oca::OcaEventId));
 	id.treeLevel = 0xDEAD;
 	id.eventIndex = 0xF00D;
 
@@ -394,4 +394,29 @@ TEST(Suite_OcpMessageWriter, WriteEventIdToBuffer)
 	EXPECT_EQ(testData[1], 0xAD);
 	EXPECT_EQ(testData[2], 0xF0);
 	EXPECT_EQ(testData[3], 0x0D);
+}
+
+TEST(Suite_OcpMessageWriter, WriteEventToBuffer)
+{
+	oca::OcaEvent event;
+	memset(&event, 0, sizeof(oca::OcaEvent));
+	event.emitterONo = 0xC01DBEEF;
+	event.eventId.treeLevel = 0xDEAD;
+	event.eventId.eventIndex = 0xF00D;
+
+	uint8_t testData[64];
+	memset(&testData[0], 0, 64);
+
+	boost::asio::mutable_buffer buf(testData, 64);
+
+	oca::OcpMessageWriter::WriteEventToBuffer(event, buf);
+
+	EXPECT_EQ(testData[0], 0xC0);
+	EXPECT_EQ(testData[1], 0x1D);
+	EXPECT_EQ(testData[2], 0xBE);
+	EXPECT_EQ(testData[3], 0xEF);
+	EXPECT_EQ(testData[4], 0xDE);
+	EXPECT_EQ(testData[5], 0xAD);
+	EXPECT_EQ(testData[6], 0xF0);
+	EXPECT_EQ(testData[7], 0x0D);
 }

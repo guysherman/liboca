@@ -194,4 +194,13 @@ namespace oca
 			OcaUint16* ei = boost::asio::buffer_cast<OcaUint16*>(indexBuf);
 			*ei = htons(id.eventIndex);
 		}
+
+		void OcpMessageWriter::WriteEventToBuffer(const OcaEvent& event, boost::asio::mutable_buffer& buffer)
+		{
+			OcaONo* emitter = boost::asio::buffer_cast<OcaONo*>(buffer);
+			*emitter = htonl(event.emitterONo);
+
+			boost::asio::mutable_buffer idBuffer = buffer + sizeof(OcaONo);
+			WriteEventIdToBuffer(event.eventId, idBuffer);
+		}
 }
