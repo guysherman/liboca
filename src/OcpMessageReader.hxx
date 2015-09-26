@@ -42,6 +42,7 @@
     #include "Ocp1Command.hxx"
     #include "Ocp1Response.hxx"
     #include "Ocp1EventData.hxx"
+    
 
 	namespace oca
 	{
@@ -74,7 +75,7 @@
 
         private:
 
-            static void bufferToUint8Vector(boost::asio::const_buffer& buffer, size_t numBytes, std::vector<OcaUint8>& vec);
+
 
             typedef std::map<uint64_t, oca::net::Ocp1Header> ConnectionStateMap;
             ConnectionStateMap perConnectionState;

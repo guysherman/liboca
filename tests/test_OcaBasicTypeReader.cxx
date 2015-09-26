@@ -16,56 +16,37 @@
   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 */
-#ifndef __OCATYPES_HXX__
-#define __OCATYPES_HXX__
 
 // C++ Standard Headers
-#include <vector>
+
 
 // C Standard Headers
-#include <stdint.h>
+#include <cstdio>
 
 // Boost Headers
-
+#include <boost/asio.hpp>
 
 // 3rd Party Headers
-
+#include <gtest/gtest.h>
 
 // GTK Headers
 
 
-namespace oca
+// Our Headers
+#include <oca/OcaTypes.hxx>
+#include <OcaBasicTypeReader.hxx>
+
+TEST(Suite_OcpBasicTypeReader, BlobFromBuffer)
 {
-	typedef uint8_t OcaUint8;
-	typedef uint16_t OcaUint16;
-	typedef uint32_t OcaUint32;
-	typedef uint64_t OcaUint64;
+	const uint8_t testData[20] = {0x00, 0x0E, 0x00, 0x02, 0x00, 0x00, 0x00, 0x03, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x04, 0xDE, 0xAD, 0xBE, 0xEF };
+	boost::asio::const_buffer buf(testData, 20);
 
-	typedef OcaUint32 	OcaONo;
-	typedef OcaUint8	OcaStatus;
+	oca::OcaBlob blob;
+	oca::OcaBasicTypeReader::BlobFromBuffer(buf, blob);
 
-	typedef struct
-	{
-		OcaUint16 treeLevel;
-		OcaUint16 methodIndex;
-	} OcaMethodId;
+	const uint8_t* bufferLocation = boost::asio::buffer_cast<const uint8_t*>(buf);
 
-	typedef struct
-	{
-		OcaUint16 treeLevel;
-		OcaUint16 eventIndex;
-	} OcaEventId;
-
-	typedef struct
-	{
-		OcaONo emitterONo;
-		OcaEventId eventId;
-	} OcaEvent;
-
-	// TODO: consider whether this is sufficient, or whether a struct with the
-	// "DataSize" and "Data" properties should be created #style
-	typedef std::vector<OcaUint8> OcaBlob;
-
+	EXPECT_EQ(0x02, blob[1]);
+	EXPECT_EQ(0x04, blob[13]);
+	EXPECT_EQ(&testData[16], bufferLocation);
 }
-
-#endif // __OCATYPES_HXX__

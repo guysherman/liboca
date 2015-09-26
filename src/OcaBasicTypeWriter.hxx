@@ -16,17 +16,17 @@
   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 */
-#ifndef __OCATYPES_HXX__
-#define __OCATYPES_HXX__
+#ifndef __OCABASICTYPEWRITER_HXX__
+#define __OCABASICTYPEWRITER_HXX__
 
 // C++ Standard Headers
-#include <vector>
+
 
 // C Standard Headers
-#include <stdint.h>
+
 
 // Boost Headers
-
+#include <boost/asio.hpp>
 
 // 3rd Party Headers
 
@@ -34,38 +34,20 @@
 // GTK Headers
 
 
+// Our Headers
+#include <oca/OcaTypes.hxx>
+
 namespace oca
 {
-	typedef uint8_t OcaUint8;
-	typedef uint16_t OcaUint16;
-	typedef uint32_t OcaUint32;
-	typedef uint64_t OcaUint64;
-
-	typedef OcaUint32 	OcaONo;
-	typedef OcaUint8	OcaStatus;
-
-	typedef struct
+	class OcaBasicTypeWriter
 	{
-		OcaUint16 treeLevel;
-		OcaUint16 methodIndex;
-	} OcaMethodId;
+	public:
 
-	typedef struct
-	{
-		OcaUint16 treeLevel;
-		OcaUint16 eventIndex;
-	} OcaEventId;
+		static void WriteBlobToBuffer(OcaBlob& blob, boost::asio::mutable_buffer& buffer);
+		static void WriteUint16ToBuffer(OcaUint16 value, boost::asio::mutable_buffer& buffer);
 
-	typedef struct
-	{
-		OcaONo emitterONo;
-		OcaEventId eventId;
-	} OcaEvent;
-
-	// TODO: consider whether this is sufficient, or whether a struct with the
-	// "DataSize" and "Data" properties should be created #style
-	typedef std::vector<OcaUint8> OcaBlob;
-
+		static void WriteVectorUint8ToBuffer(std::vector<OcaUint8>& vec, boost::asio::mutable_buffer& buffer);
+	};
 }
 
-#endif // __OCATYPES_HXX__
+#endif // __OCABASICTYPEWRITER_HXX__
