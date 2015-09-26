@@ -33,10 +33,12 @@
 
 
 #include <oca/OcaTypes.hxx>
+#include "OcaBasicTypeWriter.hxx"
 #include "Ocp1Header.hxx"
 #include "Ocp1Parameters.hxx"
 #include "Ocp1Command.hxx"
 #include "OcpMessageWriter.hxx"
+
 
 
 
@@ -223,4 +225,13 @@ namespace oca
 			OcaUint8* destination = boost::asio::buffer_cast<OcaUint8*>(paramsBuffer);
 			memcpy(destination, &data.eventParameters[0], data.eventParameters.size());
 		}
+
+		void OcpMessageWriter::WriteNtfParamsToBuffer(const net::Ocp1NtfParams& params, boost::asio::mutable_buffer& buffer)
+		{
+			boost::asio::mutable_buffer temp = buffer;
+			OcaBasicTypeWriter::WriteUint8ToBuffer(params.parameterCount, temp);
+			OcaBasicTypeWriter::WriteBlobToBuffer(params.context, temp);
+			WriteEventDataToBuffer(params.eventData, temp);
+		}
+
 }

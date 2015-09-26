@@ -185,6 +185,15 @@ namespace oca
 
 	}
 
+	void OcpMessageReader::NtfParamsFromBuffer(boost::asio::const_buffer& buffer, size_t remainingBytes, net::Ocp1NtfParams& params)
+	{
+		boost::asio::const_buffer temp = buffer;
+		params.parameterCount = OcaBasicTypeReader::Uint8FromBuffer(temp);
+		OcaBasicTypeReader::BlobFromBuffer(temp, params.context);
+		size_t remainingEventDataBytes = remainingBytes - sizeof(OcaUint8) - (params.context.size() * sizeof(OcaUint8)) - sizeof(OcaUint16);
+		EventDataFromBuffer(temp, remainingEventDataBytes, params.eventData);
+	}
+
 	void OcpMessageReader::SyncValueReceived(uint8_t* bufferData,
 		const boost::system::error_code& error,
 		size_t bytesTransferred,

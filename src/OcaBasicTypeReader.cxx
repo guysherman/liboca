@@ -46,6 +46,13 @@ namespace oca
 
 	}
 
+	OcaUint8 OcaBasicTypeReader::Uint8FromBuffer(boost::asio::const_buffer& buffer)
+	{
+		OcaUint8 result = *(boost::asio::buffer_cast<const OcaUint16*>(buffer));
+		buffer = buffer + sizeof(OcaUint8);
+		return result;
+	}
+
 	OcaUint16 OcaBasicTypeReader::Uint16FromBuffer(boost::asio::const_buffer& buffer)
 	{
 		OcaUint16 result = ntohs(*(boost::asio::buffer_cast<const OcaUint16*>(buffer)));

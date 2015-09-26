@@ -36,6 +36,30 @@
 #include <oca/OcaTypes.hxx>
 #include <OcaBasicTypeReader.hxx>
 
+TEST(Suite_OcpBasicTypeReader, Uint8FromBuffer)
+{
+	const uint8_t testData[16] = {0xBA, 0xBE, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+	boost::asio::const_buffer buf(testData, 16);
+
+	oca::OcaUint8 value = oca::OcaBasicTypeReader::Uint8FromBuffer(buf);
+	const uint8_t* bufferLocation = boost::asio::buffer_cast<const uint8_t*>(buf);
+
+	EXPECT_EQ(0xBA, value);
+	EXPECT_EQ(&testData[1], bufferLocation);
+}
+
+TEST(Suite_OcpBasicTypeReader, Uint16FromBuffer)
+{
+	const uint8_t testData[16] = {0xBA, 0xBE, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+	boost::asio::const_buffer buf(testData, 16);
+
+	oca::OcaUint16 value = oca::OcaBasicTypeReader::Uint16FromBuffer(buf);
+	const uint8_t* bufferLocation = boost::asio::buffer_cast<const uint8_t*>(buf);
+
+	EXPECT_EQ(0xBABE, value);
+	EXPECT_EQ(&testData[2], bufferLocation);
+}
+
 TEST(Suite_OcpBasicTypeReader, BlobFromBuffer)
 {
 	const uint8_t testData[20] = {0x00, 0x0E, 0x00, 0x02, 0x00, 0x00, 0x00, 0x03, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x04, 0xDE, 0xAD, 0xBE, 0xEF };

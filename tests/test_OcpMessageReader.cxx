@@ -37,6 +37,7 @@
 #include <Ocp1Command.hxx>
 #include <Ocp1Response.hxx>
 #include <Ocp1EventData.hxx>
+#include <Ocp1NtfParams.hxx>
 
 class CallbackCheck
 {
@@ -345,4 +346,25 @@ TEST(Suite_OcpMessageReader, EventDataFromBuffer)
 	EXPECT_EQ(0x0003, edata.event.eventId.eventIndex);
 	EXPECT_EQ(0x04, edata.eventParameters.at(7));
 
+}
+
+TEST(Suite_OcpMessageReader, Ocp1NtfParamsFromBuffer)
+{
+	const uint8_t testData[21] = {0x01, 0x00, 0x02, 0xBA, 0xBE, 0x04, 0x01, 0x00, 0x02, 0x00, 0x00, 0x00, 0x03, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x04 };
+	boost::asio::const_buffer buf(testData, 21);
+
+	oca::net::Ocp1NtfParams ntfParams;
+	oca::OcpMessageReader::NtfParamsFromBuffer(buf, 21, ntfParams);
+
+	oca::net::Ocp1EventData edata = ntfParams.eventData;
+	oca::OcaEvent event = edata.event;
+
+
+
+	EXPECT_EQ(1, ntfParams.parameterCount);
+	EXPECT_EQ(2, ntfParams.context.size());
+	EXPECT_EQ(0x04010002, event.emitterONo);
+	EXPECT_EQ(0x0000, event.eventId.treeLevel);
+	EXPECT_EQ(0x0003, event.eventId.eventIndex);
+	EXPECT_EQ(0x04, edata.eventParameters.at(7));
 }

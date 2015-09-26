@@ -459,3 +459,68 @@ TEST(Suite_OcpMessageWriter, WriteEventDataToBuffer)
 	EXPECT_EQ(testData[14], 0xEF);
 	EXPECT_EQ(testData[15], 0xFE);
 }
+
+TEST(Suite_OcpMessageWriter, WriteNtf1ParamsToBuffer)
+{
+	uint8_t testData[64];
+	memset(&testData[0], 0, 64);
+	boost::asio::mutable_buffer buf(testData, 64);
+
+	oca::net::Ocp1NtfParams ntfParams;
+	ntfParams.parameterCount = 1;
+	ntfParams.context.push_back(0xBA);
+	ntfParams.context.push_back(0xBE);
+
+	oca::OcaEvent event;
+	memset(&event, 0, sizeof(oca::OcaEvent));
+	event.emitterONo = 0xC01DBEEF;
+	event.eventId.treeLevel = 0xDEAD;
+	event.eventId.eventIndex = 0xF00D;
+
+	oca::net::Ocp1EventData edata;
+	edata.event = event;
+	edata.eventParameters.push_back(0xCA);
+	edata.eventParameters.push_back(0xFE);
+	edata.eventParameters.push_back(0xBA);
+	edata.eventParameters.push_back(0xBE);
+	edata.eventParameters.push_back(0xAB);
+	edata.eventParameters.push_back(0xCD);
+	edata.eventParameters.push_back(0xEF);
+	edata.eventParameters.push_back(0xFE);
+
+	ntfParams.eventData = edata;
+
+
+	oca::OcpMessageWriter::WriteNtfParamsToBuffer(ntfParams, buf);
+
+	// parameter count
+	EXPECT_EQ(testData[0], 0x01);
+
+	// context.size
+	EXPECT_EQ(testData[2], 0x02);
+	// context.data
+	EXPECT_EQ(testData[3], 0xBA);
+	EXPECT_EQ(testData[4], 0xBE);
+
+	// event.emitterONo
+	EXPECT_EQ(testData[5], 0xC0);
+	EXPECT_EQ(testData[6], 0x1D);
+	EXPECT_EQ(testData[7], 0xBE);
+	EXPECT_EQ(testData[8], 0xEF);
+	// eventId.treeLevel
+	EXPECT_EQ(testData[9], 0xDE);
+	EXPECT_EQ(testData[10], 0xAD);
+	// eventId.eventIndex
+	EXPECT_EQ(testData[11], 0xF0);
+	EXPECT_EQ(testData[12], 0x0D);
+
+	EXPECT_EQ(testData[13], 0xCA);
+	EXPECT_EQ(testData[14], 0xFE);
+	EXPECT_EQ(testData[15], 0xBA);
+	EXPECT_EQ(testData[16], 0xBE);
+	EXPECT_EQ(testData[17], 0xAB);
+	EXPECT_EQ(testData[18], 0xCD);
+	EXPECT_EQ(testData[19], 0xEF);
+	EXPECT_EQ(testData[20], 0xFE);
+
+}
