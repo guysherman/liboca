@@ -87,17 +87,6 @@ namespace oca
 
 		bufferToUint8Vector(paramBuffer, parameterBufferBytes, parameters.parameters);
 
-		// assert (parameters.parameters.size() == 0);
-		// // We ask the vector to grow in one hit, so we can memcpy straight after into it
-		// // We reserve then resize, rather than just resizing, so that we only get one
-		// // allocation, rather than log(n) allocations;
-		// // We resize so that the size()  value is up to date, and so that the
-		// // memory gets initialized to 0.
-		// parameters.parameters.reserve(parameterBufferBytes);
-		// parameters.parameters.resize(parameterBufferBytes, 0);
-		// // TODO: security issue: we trust that the buffer actually has the right number of bytes #security
-		// memcpy(&parameters.parameters[0], params, parameterBufferBytes);
-
 	}
 
 	void OcpMessageReader::bufferToUint8Vector(boost::asio::const_buffer& buffer, size_t numBytes, std::vector<OcaUint8>& vec)
