@@ -50,13 +50,13 @@ namespace oca
 			memset(&methodId, 0, sizeof(OcaMethodId));
 		}
 
-		Ocp1Notification::Ocp1Notification(Ocp1Notification& rhs)
+		Ocp1Notification::Ocp1Notification(const Ocp1Notification& rhs)
 			: notificationSize(rhs.notificationSize), targetONo(rhs.targetONo), methodId(rhs.methodId), parameters(rhs.parameters)
 		{
 
 		}
 
-		Ocp1Notification& Ocp1Notification::operator=(Ocp1Notification& rhs)
+		Ocp1Notification& Ocp1Notification::operator=(const Ocp1Notification& rhs)
 		{
 			notificationSize = rhs.notificationSize;
 			targetONo = rhs.targetONo;

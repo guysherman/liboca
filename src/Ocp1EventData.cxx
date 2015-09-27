@@ -46,13 +46,13 @@ namespace oca
 			memset(&event, 0, sizeof(OcaEvent));
 		}
 
-		Ocp1EventData::Ocp1EventData(Ocp1EventData& rhs)
+		Ocp1EventData::Ocp1EventData(const Ocp1EventData& rhs)
 			: event(rhs.event), eventParameters(rhs.eventParameters)
 		{
-		
+
 		}
 
-		Ocp1EventData& Ocp1EventData::operator=(Ocp1EventData& rhs)
+		Ocp1EventData& Ocp1EventData::operator=(const Ocp1EventData& rhs)
 		{
 			event = rhs.event;
 			eventParameters = rhs.eventParameters;

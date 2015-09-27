@@ -206,6 +206,18 @@ namespace oca
 		NtfParamsFromBuffer(temp, parameterChunkBytes, notification.parameters);
 	}
 
+	void OcpMessageReader::NotificationListFromBuffer(boost::asio::const_buffer& buffer, net::Ocp1Header header, net::NotificationList& notifications)
+	{
+		boost::asio::const_buffer message = buffer;
+		for (OcaUint16 i = 0; i < header.messageCount; ++i)
+		{
+			net::Ocp1Notification notification;
+			NotificationFromBuffer(message, notification);
+			notifications.push_back(notification);
+			message = message + notification.notificationSize;
+		}
+	}
+
 	void OcpMessageReader::SyncValueReceived(uint8_t* bufferData,
 		const boost::system::error_code& error,
 		size_t bytesTransferred,

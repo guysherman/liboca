@@ -46,8 +46,8 @@ namespace oca
 		struct Ocp1Notification
 		{
 			Ocp1Notification();
-			Ocp1Notification(Ocp1Notification& rhs);
-			Ocp1Notification& operator=(Ocp1Notification& rhs);
+			Ocp1Notification(const Ocp1Notification& rhs);
+			Ocp1Notification& operator=(const Ocp1Notification& rhs);
 			~Ocp1Notification();
 
 			OcaUint32		notificationSize;

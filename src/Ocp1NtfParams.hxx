@@ -45,8 +45,8 @@ namespace oca
 		struct Ocp1NtfParams
 		{
 			Ocp1NtfParams();
-			Ocp1NtfParams(Ocp1NtfParams& rhs);
-			Ocp1NtfParams& operator=(Ocp1NtfParams& rhs);
+			Ocp1NtfParams(const Ocp1NtfParams& rhs);
+			Ocp1NtfParams& operator=(const Ocp1NtfParams& rhs);
 			~Ocp1NtfParams();
 
 			OcaUint8		parameterCount;

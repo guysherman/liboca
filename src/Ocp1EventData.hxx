@@ -45,8 +45,8 @@ namespace oca
         {
 
             Ocp1EventData();
-            Ocp1EventData(Ocp1EventData& rhs);
-            Ocp1EventData& operator=(Ocp1EventData& rhs);
+            Ocp1EventData(const Ocp1EventData& rhs);
+            Ocp1EventData& operator=(const Ocp1EventData& rhs);
             ~Ocp1EventData();
 
             OcaEvent event;

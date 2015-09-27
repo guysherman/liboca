@@ -246,4 +246,41 @@ namespace oca
 			WriteNtfParamsToBuffer(notification.parameters, temp);
 		}
 
+		void OcpMessageWriter::WriteNotificationListToBuffer(const net::NotificationList& notifications, boost::asio::mutable_buffer& buffer)
+		{
+			boost::asio::mutable_buffer message = buffer;
+			for (net::NotificationList::const_iterator it = notifications.begin(); it != notifications.end(); ++it)
+			{
+				const net::Ocp1Notification& notification = *it;
+				WriteNotificationToBuffer(notification, message);
+				message = message + notification.notificationSize;
+			}
+		}
+
+		OcaUint32 OcpMessageWriter::ComputeNotificationDataSize(net::Ocp1Notification& notification)
+		{
+			size_t parameterBytes = notification.parameters.eventData.eventParameters.size();
+			size_t eventDataSize = parameterBytes + sizeof(OcaEvent);
+			size_t contextSize = notification.parameters.context.size() + sizeof(OcaUint16);
+			size_t ntfParamsSize = eventDataSize + contextSize + sizeof(OcaUint8);
+
+			size_t notificationHeaderSize = sizeof(OcaUint32) + sizeof(OcaONo) + sizeof(OcaMethodId);
+			size_t notificationSize = notificationHeaderSize + ntfParamsSize;
+
+			notification.notificationSize = notificationSize;
+			return notificationSize;
+		}
+
+		OcaUint32 OcpMessageWriter::ComputeNotificationListDataSize(net::NotificationList& notifications)
+		{
+			size_t notificationListDataSize = 0;
+			for (net::NotificationList::iterator it = notifications.begin(); it != notifications.end(); ++it)
+			{
+				notificationListDataSize += ComputeNotificationDataSize(*it);
+			}
+
+
+			return notificationListDataSize;
+		}
+
 }

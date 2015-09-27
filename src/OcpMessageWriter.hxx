@@ -65,6 +65,7 @@ namespace oca
 
 			static void WriteNtfParamsToBuffer(const net::Ocp1NtfParams& params, boost::asio::mutable_buffer& buffer);
 			static void WriteNotificationToBuffer(const net::Ocp1Notification& notification, boost::asio::mutable_buffer& buffer);
+			static void WriteNotificationListToBuffer(const net::NotificationList& notifications, boost::asio::mutable_buffer& buffer);
 
 			static OcaUint32 ComputeCommandDataSize(net::Ocp1Command& command);
 			static OcaUint32 ComputeCommandListDataSize(net::CommandList& commands);
@@ -72,7 +73,8 @@ namespace oca
 			static OcaUint32 ComputeResponseDataSize(net::Ocp1Response& response);
 			static OcaUint32 ComputeResponseListDataSize(net::ResponseList& responses);
 
-
+			static OcaUint32 ComputeNotificationDataSize(net::Ocp1Notification& notification);
+			static OcaUint32 ComputeNotificationListDataSize(net::NotificationList& notifications);
 
 
 		};

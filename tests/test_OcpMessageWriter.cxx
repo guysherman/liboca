@@ -619,3 +619,154 @@ TEST(Suite_OcpMessageWriter, WriteNotificationToBuffer)
 	EXPECT_EQ(testData[32], 0xFE);
 
 }
+
+TEST(Suite_OcpMessageWriter, ComputeNotificationSize)
+{
+	uint8_t testData[1024];
+	memset(&testData[0], 0, 1024);
+	boost::asio::mutable_buffer buf(testData, 1024);
+
+
+	oca::net::Ocp1Notification notification;
+	notification.notificationSize = 0;
+	notification.targetONo = 0xDEADBEEF;
+	notification.methodId.treeLevel = 0x1234;
+	notification.methodId.methodIndex = 0x5678;
+
+	oca::net::Ocp1NtfParams ntfParams;
+	ntfParams.parameterCount = 1;
+	ntfParams.context.push_back(0xBA);
+	ntfParams.context.push_back(0xBE);
+
+	oca::OcaEvent event;
+	memset(&event, 0, sizeof(oca::OcaEvent));
+	event.emitterONo = 0xC01DBEEF;
+	event.eventId.treeLevel = 0xDEAD;
+	event.eventId.eventIndex = 0xF00D;
+
+	oca::net::Ocp1EventData edata;
+	edata.event = event;
+	edata.eventParameters.push_back(0xCA);
+	edata.eventParameters.push_back(0xFE);
+	edata.eventParameters.push_back(0xBA);
+	edata.eventParameters.push_back(0xBE);
+	edata.eventParameters.push_back(0xAB);
+	edata.eventParameters.push_back(0xCD);
+	edata.eventParameters.push_back(0xEF);
+	edata.eventParameters.push_back(0xFE);
+
+	ntfParams.eventData = edata;
+	notification.parameters = ntfParams;
+
+	oca::OcaUint32 size = oca::OcpMessageWriter::ComputeNotificationDataSize(notification);
+
+	EXPECT_EQ(size, 33);
+	EXPECT_EQ(notification.notificationSize, 33);
+
+}
+
+TEST(Suite_OcpMessageWriter, ComputeNotificationListSize)
+{
+	uint8_t testData[1024];
+	memset(&testData[0], 0, 1024);
+	boost::asio::mutable_buffer buf(testData, 1024);
+
+
+	oca::net::Ocp1Notification notification;
+	notification.notificationSize = 0;
+	notification.targetONo = 0xDEADBEEF;
+	notification.methodId.treeLevel = 0x1234;
+	notification.methodId.methodIndex = 0x5678;
+
+	oca::net::Ocp1NtfParams ntfParams;
+	ntfParams.parameterCount = 1;
+	ntfParams.context.push_back(0xBA);
+	ntfParams.context.push_back(0xBE);
+
+	oca::OcaEvent event;
+	memset(&event, 0, sizeof(oca::OcaEvent));
+	event.emitterONo = 0xC01DBEEF;
+	event.eventId.treeLevel = 0xDEAD;
+	event.eventId.eventIndex = 0xF00D;
+
+	oca::net::Ocp1EventData edata;
+	edata.event = event;
+	edata.eventParameters.push_back(0xCA);
+	edata.eventParameters.push_back(0xFE);
+	edata.eventParameters.push_back(0xBA);
+	edata.eventParameters.push_back(0xBE);
+	edata.eventParameters.push_back(0xAB);
+	edata.eventParameters.push_back(0xCD);
+	edata.eventParameters.push_back(0xEF);
+	edata.eventParameters.push_back(0xFE);
+
+	ntfParams.eventData = edata;
+	notification.parameters = ntfParams;
+
+	oca::net::NotificationList notifs;
+	notifs.push_back(notification);
+	notifs.push_back(notification);
+	notifs.push_back(notification);
+
+	oca::OcaUint32 size = oca::OcpMessageWriter::ComputeNotificationListDataSize(notifs);
+
+	EXPECT_EQ(size, 99);
+
+}
+
+TEST(Suite_OcpMessageWriter, WriteNotificationListToBuffer)
+{
+	uint8_t testData[1024];
+	memset(&testData[0], 0, 1024);
+	boost::asio::mutable_buffer buf(testData, 1024);
+
+
+	oca::net::Ocp1Notification notification;
+	notification.notificationSize = 33;
+	notification.targetONo = 0xDEADBEEF;
+	notification.methodId.treeLevel = 0x1234;
+	notification.methodId.methodIndex = 0x5678;
+
+	oca::net::Ocp1NtfParams ntfParams;
+	ntfParams.parameterCount = 1;
+	ntfParams.context.push_back(0xBA);
+	ntfParams.context.push_back(0xBE);
+
+	oca::OcaEvent event;
+	memset(&event, 0, sizeof(oca::OcaEvent));
+	event.emitterONo = 0xC01DBEEF;
+	event.eventId.treeLevel = 0xDEAD;
+	event.eventId.eventIndex = 0xF00D;
+
+	oca::net::Ocp1EventData edata;
+	edata.event = event;
+	edata.eventParameters.push_back(0xCA);
+	edata.eventParameters.push_back(0xFE);
+	edata.eventParameters.push_back(0xBA);
+	edata.eventParameters.push_back(0xBE);
+	edata.eventParameters.push_back(0xAB);
+	edata.eventParameters.push_back(0xCD);
+	edata.eventParameters.push_back(0xEF);
+	edata.eventParameters.push_back(0xFE);
+
+	ntfParams.eventData = edata;
+	notification.parameters = ntfParams;
+
+	oca::net::NotificationList notifs;
+	notifs.push_back(notification);
+	notifs.push_back(notification);
+	notifs.push_back(notification);
+
+	oca::OcpMessageWriter::WriteNotificationListToBuffer(notifs, buf);
+
+
+	EXPECT_EQ(testData[3], 0x21);
+	EXPECT_EQ(testData[32], 0xFE);
+
+	EXPECT_EQ(testData[36], 0x21);
+	EXPECT_EQ(testData[65], 0xFE);
+
+	EXPECT_EQ(testData[69], 0x21);
+	EXPECT_EQ(testData[98], 0xFE);
+
+}
