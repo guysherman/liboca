@@ -16,17 +16,15 @@
   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 */
-#ifndef __OCABASICTYPEREADER_HXX__
-#define __OCABASICTYPEREADER_HXX__
 
 // C++ Standard Headers
 
 
 // C Standard Headers
-
+#include <cstring>
 
 // Boost Headers
-#include <boost/asio.hpp>
+
 
 // 3rd Party Headers
 
@@ -35,21 +33,45 @@
 
 
 // Our Headers
+
+
 #include <oca/OcaTypes.hxx>
+#include "Ocp1NtfParams.hxx"
+
+#include "Ocp1Notification.hxx"
 
 namespace oca
 {
-	class OcaBasicTypeReader
+	namespace net
 	{
-	public:
+		Ocp1Notification::Ocp1Notification()
+			: notificationSize(0), targetONo(0), parameters()
+		{
+			memset(&methodId, 0, sizeof(OcaMethodId));
+		}
 
-		static void BlobFromBuffer(boost::asio::const_buffer& buffer, OcaBlob& blob);
-		static OcaUint8 Uint8FromBuffer(boost::asio::const_buffer& buffer);
-		static OcaUint16 Uint16FromBuffer(boost::asio::const_buffer& buffer);
-		static OcaUint32 Uint32FromBuffer(boost::asio::const_buffer& buffer);
+		Ocp1Notification::Ocp1Notification(Ocp1Notification& rhs)
+			: notificationSize(rhs.notificationSize), targetONo(rhs.targetONo), methodId(rhs.methodId), parameters(rhs.parameters)
+		{
 
-		static void BufferToUint8Vector(boost::asio::const_buffer& buffer, size_t numBytes, std::vector<OcaUint8>& vec);
-	};
+		}
+
+		Ocp1Notification& Ocp1Notification::operator=(Ocp1Notification& rhs)
+		{
+			notificationSize = rhs.notificationSize;
+			targetONo = rhs.targetONo;
+			methodId = rhs.methodId;
+			parameters = rhs.parameters;
+
+			return *this;
+		}
+
+		Ocp1Notification::~Ocp1Notification()
+		{
+
+		}
+
+
+
+	}
 }
-
-#endif // __OCABASICTYPEREADER_HXX__

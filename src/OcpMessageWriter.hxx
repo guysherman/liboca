@@ -40,6 +40,7 @@
 #include "Ocp1Response.hxx"
 #include "Ocp1EventData.hxx"
 #include "Ocp1NtfParams.hxx"
+#include "Ocp1Notification.hxx"
 
 namespace oca
 {
@@ -63,6 +64,7 @@ namespace oca
 			static void WriteEventDataToBuffer(const net::Ocp1EventData& data, boost::asio::mutable_buffer& buffer);
 
 			static void WriteNtfParamsToBuffer(const net::Ocp1NtfParams& params, boost::asio::mutable_buffer& buffer);
+			static void WriteNotificationToBuffer(const net::Ocp1Notification& notification, boost::asio::mutable_buffer& buffer);
 
 			static OcaUint32 ComputeCommandDataSize(net::Ocp1Command& command);
 			static OcaUint32 ComputeCommandListDataSize(net::CommandList& commands);

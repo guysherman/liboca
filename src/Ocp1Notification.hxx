@@ -16,17 +16,17 @@
   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 */
-#ifndef __OCABASICTYPEREADER_HXX__
-#define __OCABASICTYPEREADER_HXX__
+#ifndef __OCP1NOTIFICATION_HXX__
+#define __OCP1NOTIFICATION_HXX__
 
 // C++ Standard Headers
-
+#include <vector>
 
 // C Standard Headers
 
 
 // Boost Headers
-#include <boost/asio.hpp>
+
 
 // 3rd Party Headers
 
@@ -35,21 +35,30 @@
 
 
 // Our Headers
+
 #include <oca/OcaTypes.hxx>
+#include "Ocp1NtfParams.hxx"
 
 namespace oca
 {
-	class OcaBasicTypeReader
+	namespace net
 	{
-	public:
+		struct Ocp1Notification
+		{
+			Ocp1Notification();
+			Ocp1Notification(Ocp1Notification& rhs);
+			Ocp1Notification& operator=(Ocp1Notification& rhs);
+			~Ocp1Notification();
 
-		static void BlobFromBuffer(boost::asio::const_buffer& buffer, OcaBlob& blob);
-		static OcaUint8 Uint8FromBuffer(boost::asio::const_buffer& buffer);
-		static OcaUint16 Uint16FromBuffer(boost::asio::const_buffer& buffer);
-		static OcaUint32 Uint32FromBuffer(boost::asio::const_buffer& buffer);
+			OcaUint32		notificationSize;
+			OcaONo			targetONo;
+			OcaMethodId		methodId;
+			Ocp1NtfParams	parameters;
+		};
 
-		static void BufferToUint8Vector(boost::asio::const_buffer& buffer, size_t numBytes, std::vector<OcaUint8>& vec);
-	};
+		typedef std::vector<Ocp1Notification> NotificationList;
+	}
 }
 
-#endif // __OCABASICTYPEREADER_HXX__
+
+#endif // __OCP1NOTIFICATION_HXX__

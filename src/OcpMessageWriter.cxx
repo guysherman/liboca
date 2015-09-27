@@ -42,6 +42,7 @@
 
 
 
+
 namespace oca
 {
 		void OcpMessageWriter::WriteHeaderToBuffer(const net::Ocp1Header& header, boost::asio::mutable_buffer& buffer)
@@ -232,6 +233,17 @@ namespace oca
 			OcaBasicTypeWriter::WriteUint8ToBuffer(params.parameterCount, temp);
 			OcaBasicTypeWriter::WriteBlobToBuffer(params.context, temp);
 			WriteEventDataToBuffer(params.eventData, temp);
+		}
+
+		void OcpMessageWriter::WriteNotificationToBuffer(const net::Ocp1Notification& notification, boost::asio::mutable_buffer& buffer)
+		{
+			boost::asio::mutable_buffer temp = buffer;
+			OcaBasicTypeWriter::WriteUint32ToBuffer(notification.notificationSize, temp);
+			OcaBasicTypeWriter::WriteUint32ToBuffer(notification.targetONo, temp);
+			WriteMethodIdToBuffer(notification.methodId, temp);
+			temp = temp + sizeof(OcaMethodId);
+
+			WriteNtfParamsToBuffer(notification.parameters, temp);
 		}
 
 }

@@ -60,6 +60,18 @@ TEST(Suite_OcpBasicTypeReader, Uint16FromBuffer)
 	EXPECT_EQ(&testData[2], bufferLocation);
 }
 
+TEST(Suite_OcpBasicTypeReader, Uint32FromBuffer)
+{
+	const uint8_t testData[16] = {0xBA, 0xBE, 0xCA, 0xFE, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+	boost::asio::const_buffer buf(testData, 16);
+
+	oca::OcaUint32 value = oca::OcaBasicTypeReader::Uint32FromBuffer(buf);
+	const uint8_t* bufferLocation = boost::asio::buffer_cast<const uint8_t*>(buf);
+
+	EXPECT_EQ(0xBABECAFE, value);
+	EXPECT_EQ(&testData[4], bufferLocation);
+}
+
 TEST(Suite_OcpBasicTypeReader, BlobFromBuffer)
 {
 	const uint8_t testData[20] = {0x00, 0x0E, 0x00, 0x02, 0x00, 0x00, 0x00, 0x03, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x04, 0xDE, 0xAD, 0xBE, 0xEF };

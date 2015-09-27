@@ -46,7 +46,7 @@ namespace oca
 		WriteVectorUint8ToBuffer(blob, buffer);
 	}
 
-	void OcaBasicTypeWriter::WriteUint8ToBuffer(OcaUint8 value, boost::asio::mutable_buffer& buffer)
+	void OcaBasicTypeWriter::WriteUint8ToBuffer(const OcaUint8 value, boost::asio::mutable_buffer& buffer)
 	{
 		OcaUint8* dest = boost::asio::buffer_cast<OcaUint8*>(buffer);
 		*dest = value;
@@ -54,11 +54,18 @@ namespace oca
 	}
 
 
-	void OcaBasicTypeWriter::WriteUint16ToBuffer(OcaUint16 value, boost::asio::mutable_buffer& buffer)
+	void OcaBasicTypeWriter::WriteUint16ToBuffer(const OcaUint16 value, boost::asio::mutable_buffer& buffer)
 	{
 		OcaUint16* dest = boost::asio::buffer_cast<OcaUint16*>(buffer);
 		*dest = htons(value);
 		buffer = buffer + sizeof(OcaUint16);
+	}
+
+	void OcaBasicTypeWriter::WriteUint32ToBuffer(const OcaUint32 value, boost::asio::mutable_buffer& buffer)
+	{
+		OcaUint32* dest = boost::asio::buffer_cast<OcaUint32*>(buffer);
+		*dest = htonl(value);
+		buffer = buffer + sizeof(OcaUint32);
 	}
 
 	void OcaBasicTypeWriter::WriteVectorUint8ToBuffer(const std::vector<OcaUint8>& vec, boost::asio::mutable_buffer& buffer)

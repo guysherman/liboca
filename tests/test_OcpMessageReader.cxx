@@ -350,7 +350,12 @@ TEST(Suite_OcpMessageReader, EventDataFromBuffer)
 
 TEST(Suite_OcpMessageReader, Ocp1NtfParamsFromBuffer)
 {
-	const uint8_t testData[21] = {0x01, 0x00, 0x02, 0xBA, 0xBE, 0x04, 0x01, 0x00, 0x02, 0x00, 0x00, 0x00, 0x03, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x04 };
+	const uint8_t testData[21] = {	0x01, 0x00, 0x02, 0xBA,
+									0xBE, 0x04, 0x01, 0x00,
+									0x02, 0x00, 0x00, 0x00,
+									0x03, 0x00, 0x00, 0x00,
+									0x00, 0x00, 0x00, 0x00,
+									0x04 };
 	boost::asio::const_buffer buf(testData, 21);
 
 	oca::net::Ocp1NtfParams ntfParams;
@@ -361,6 +366,38 @@ TEST(Suite_OcpMessageReader, Ocp1NtfParamsFromBuffer)
 
 
 
+	EXPECT_EQ(1, ntfParams.parameterCount);
+	EXPECT_EQ(2, ntfParams.context.size());
+	EXPECT_EQ(0x04010002, event.emitterONo);
+	EXPECT_EQ(0x0000, event.eventId.treeLevel);
+	EXPECT_EQ(0x0003, event.eventId.eventIndex);
+	EXPECT_EQ(0x04, edata.eventParameters.at(7));
+}
+
+TEST(Suite_OcpMessageReader, NotificationFromBuffer)
+{
+	const uint8_t testData[33] = {	0x00, 0x00, 0x00, 0x21,
+									0xDE, 0xAD, 0xBE, 0xEF,
+									0x12, 0x34, 0x56, 0x78,
+									0x01, 0x00, 0x02, 0xBA,
+									0xBE, 0x04, 0x01, 0x00, 
+									0x02, 0x00, 0x00, 0x00,
+									0x03, 0x00, 0x00, 0x00,
+									0x00, 0x00, 0x00, 0x00,
+									0x04 };
+	boost::asio::const_buffer buf(testData, 33);
+
+	oca::net::Ocp1Notification notification;
+	oca::OcpMessageReader::NotificationFromBuffer(buf, notification);
+
+	oca::net::Ocp1NtfParams ntfParams = notification.parameters;
+	oca::net::Ocp1EventData edata = ntfParams.eventData;
+	oca::OcaEvent event = edata.event;
+
+	EXPECT_EQ(33, notification.notificationSize);
+	EXPECT_EQ(0xDEADBEEF, notification.targetONo);
+	EXPECT_EQ(0x1234, notification.methodId.treeLevel);
+	EXPECT_EQ(0x5678, notification.methodId.methodIndex);
 	EXPECT_EQ(1, ntfParams.parameterCount);
 	EXPECT_EQ(2, ntfParams.context.size());
 	EXPECT_EQ(0x04010002, event.emitterONo);

@@ -92,6 +92,7 @@ namespace oca
 
 
 
+	// TODO: move this to OcpBasicTypeReader and make it implicitly advance buffer #refactor
 	void OcpMessageReader::MethodIdFromBuffer(boost::asio::const_buffer& buffer, OcaMethodId& methodId)
 	{
 		methodId.treeLevel = ntohs(*(boost::asio::buffer_cast<const OcaUint16*>(buffer)));
@@ -192,6 +193,17 @@ namespace oca
 		OcaBasicTypeReader::BlobFromBuffer(temp, params.context);
 		size_t remainingEventDataBytes = remainingBytes - sizeof(OcaUint8) - (params.context.size() * sizeof(OcaUint8)) - sizeof(OcaUint16);
 		EventDataFromBuffer(temp, remainingEventDataBytes, params.eventData);
+	}
+
+	void OcpMessageReader::NotificationFromBuffer(boost::asio::const_buffer& buffer, net::Ocp1Notification& notification)
+	{
+		boost::asio::const_buffer temp = buffer;
+		notification.notificationSize = oca::OcaBasicTypeReader::Uint32FromBuffer(temp);
+		notification.targetONo = oca::OcaBasicTypeReader::Uint32FromBuffer(temp);
+		MethodIdFromBuffer(temp, notification.methodId);
+		temp = temp + sizeof(OcaMethodId);
+		size_t parameterChunkBytes = notification.notificationSize - sizeof(OcaUint32) - sizeof(OcaONo) - sizeof(OcaMethodId);
+		NtfParamsFromBuffer(temp, parameterChunkBytes, notification.parameters);
 	}
 
 	void OcpMessageReader::SyncValueReceived(uint8_t* bufferData,

@@ -60,6 +60,13 @@ namespace oca
 		return result;
 	}
 
+	OcaUint32 OcaBasicTypeReader::Uint32FromBuffer(boost::asio::const_buffer& buffer)
+	{
+		OcaUint32 result = ntohl(*(boost::asio::buffer_cast<const OcaUint32*>(buffer)));
+		buffer = buffer + sizeof(OcaUint32);
+		return result;
+	}
+
 	void OcaBasicTypeReader::BufferToUint8Vector(boost::asio::const_buffer& buffer, size_t numBytes, std::vector<OcaUint8>& vec)
 	{
 		assert (vec.size() == 0);

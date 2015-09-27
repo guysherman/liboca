@@ -43,6 +43,7 @@
     #include "Ocp1Response.hxx"
     #include "Ocp1EventData.hxx"
     #include "Ocp1NtfParams.hxx"
+    #include "Ocp1Notification.hxx"
 
 
 	namespace oca
@@ -71,6 +72,7 @@
             static void EventDataFromBuffer(boost::asio::const_buffer& buffer, size_t remainingBytes, net::Ocp1EventData& data);
 
             static void NtfParamsFromBuffer(boost::asio::const_buffer& buffer, size_t remainingBytes, net::Ocp1NtfParams& params);
+            static void NotificationFromBuffer(boost::asio::const_buffer& buffer, net::Ocp1Notification& notification);
 
             virtual void SyncValueReceived(uint8_t* bufferData, const boost::system::error_code& error, size_t bytesTransferred, boost::function<void(void)> getHeader);
 			virtual void Ocp1HeaderReceived(uint8_t* bufferData, uint64_t connectionIdentifier, const boost::system::error_code& error, size_t bytesTransferred, boost::function<void(uint32_t)> getData);
