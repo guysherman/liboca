@@ -1,0 +1,20 @@
+def options(opt):
+	return
+
+
+def configure(conf):
+	conf.load('compiler_cxx')
+	conf.load('cppcheck')
+	conf.env.CXXFLAGS = ['-Wall', '-ansi', '-ggdb']
+
+
+
+def build(bld):
+	bld.stlib(
+	source = bld.path.ant_glob('src/*.cxx'),
+	cxxflags=['-Werror', '-pedantic-errors'],
+	target="wq",
+	includes = ['./include'],
+	export_includes=['./include'],
+	install_path='${LIBDIR}',
+	cppcheck_skip=True)

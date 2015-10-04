@@ -6,7 +6,6 @@ def configure(conf):
 	conf.load('compiler_cxx')
 	conf.load('cppcheck')
 	conf.env.CXXFLAGS = ['-Wall', '-ansi', '-ggdb']
-	return
 
 
 def build(bld):

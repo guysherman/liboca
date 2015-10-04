@@ -66,13 +66,13 @@ def build(bld):
                 defines = defines)
 
     bld.program(source = bld.path.ant_glob('tests/**/*.cxx'),
-                includes = ['./include', './src'],
+                includes = ['./include', './src', './dep/wq/include'],
                 cxxflags=['-w'],
                 lib = ['pthread', 'boost_system'],
                 target = 'tests/all',
                 install_path = '${BINDIR}',
                 defines = defines,
-                use=['oca', 'gtest', 'gtest_main'],
+                use=['oca', 'wq', 'gtest', 'gtest_main'],
             	cppcheck_skip=True)
 
 
