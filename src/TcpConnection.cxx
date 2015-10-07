@@ -23,6 +23,7 @@
 // C Standard Headers
 
 // Boost Headers
+#include <boost/asio.hpp>
 #include <boost/bind/protect.hpp>
 
 
@@ -63,6 +64,13 @@ namespace oca
 		boost::asio::ip::tcp::socket& TcpConnection::GetSocket()
 		{
 			return socket;
+		}
+
+		boost::system::error_code TcpConnection::Send(boost::asio::const_buffer& buffer, size_t bytesToTransfer)
+		{
+			boost::system::error_code error;
+			boost::asio::write(socket, boost::asio::buffer(buffer, bytesToTransfer), error);
+			return error;
 		}
 
 		void TcpConnection::readSyncValue()

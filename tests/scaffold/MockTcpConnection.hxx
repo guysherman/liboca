@@ -66,6 +66,11 @@ namespace oca
 				started = true;
 			}
 
+			boost::system::error_code Send(boost::asio::const_buffer& buffer, size_t bytesToTransfer)
+			{
+				return boost::asio::error::eof;
+			}
+
 			virtual ~MockTcpConnection()
 			{
 

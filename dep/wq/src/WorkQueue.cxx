@@ -103,10 +103,6 @@ namespace oca
 						deque.pop_front();
 					}
 				}
-
-
-
-
 			}
 			isRunning = false;
 		}

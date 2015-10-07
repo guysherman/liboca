@@ -56,6 +56,9 @@ namespace oca
 
 			void Start();
 
+			// The buffer contains the full data for the message, including the sync value and the
+			boost::system::error_code Send(boost::asio::const_buffer& buffer, size_t bytesToTransfer);
+
 			virtual ~TcpConnection();
 		private:
 			// We make it non-constructible, and non-copyable so that the

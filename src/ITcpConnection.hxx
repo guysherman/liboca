@@ -45,6 +45,7 @@ namespace oca
 			typedef boost::shared_ptr<ITcpConnection> pointer;
 			virtual void Start() = 0;
 			virtual boost::asio::ip::tcp::socket& GetSocket() = 0;
+			virtual boost::system::error_code Send(boost::asio::const_buffer& buffer, size_t bytesToTransfer) = 0;
 		};
 	}
 }
