@@ -39,7 +39,7 @@ namespace oca
 {
 	namespace net
 	{
-		TcpConnection::pointer TcpConnection::Create(boost::asio::io_service &ioService, OcpMessageReader::pointer processor)
+		TcpConnection::pointer TcpConnection::Create(boost::asio::io_service &ioService, OcpSession::pointer processor)
 		{
 			return pointer(new TcpConnection(ioService, processor));
 		}
@@ -50,7 +50,7 @@ namespace oca
 
 		}
 
-		TcpConnection::TcpConnection(boost::asio::io_service &ioService, OcpMessageReader::pointer processor)
+		TcpConnection::TcpConnection(boost::asio::io_service &ioService, OcpSession::pointer processor)
 			:	socket(ioService), processor(processor), identifier((uint64_t)this)
 		{
 			memset(&dataBuffer[0], 0, OCP1_DATA_BUFFER_SIZE);

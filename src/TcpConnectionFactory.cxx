@@ -32,16 +32,20 @@
 
 // GTK Headers
 
+
+
+// Our Headers
 #include "TcpConnectionFactory.hxx"
 #include "ITcpConnection.hxx"
 #include "TcpConnection.hxx"
 
+#include "OcpSession.hxx"
 
 namespace oca
 {
 	namespace net
 	{
-		TcpConnectionFactory::TcpConnectionFactory(boost::shared_ptr<boost::asio::io_service> ioService, boost::shared_ptr<OcpMessageReader> processor)
+		TcpConnectionFactory::TcpConnectionFactory(boost::shared_ptr<boost::asio::io_service> ioService, OcpSession::pointer processor)
 			:	ioService(ioService), processor(processor)
 		{
 

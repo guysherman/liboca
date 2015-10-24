@@ -36,6 +36,7 @@
 // GTK Headers
 #include <ITcpConnection.hxx>
 #include <TcpConnectionFactory.hxx>
+#include <OcpSession.hxx>
 #include "MockTcpConnection.hxx"
 
 namespace oca
@@ -50,7 +51,7 @@ namespace oca
 		{
 		public:
 			MockTcpConnectionFactory(boost::shared_ptr<boost::asio::io_service> ioService, int maxConns)
-                :   TcpConnectionFactory(ioService, boost::shared_ptr<OcpMessageReader>()), countConns(0), maxConns(maxConns)
+                :   TcpConnectionFactory(ioService, OcpSession::pointer()), countConns(0), maxConns(maxConns)
             {
 
             }

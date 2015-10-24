@@ -34,7 +34,8 @@
 
 // GTK Headers
 
-
+// Our Headers
+#include "OcpSession.hxx"
 
 namespace oca
 {
@@ -47,14 +48,14 @@ namespace oca
 		class TcpConnectionFactory
 		{
 		public:
-			TcpConnectionFactory(boost::shared_ptr<boost::asio::io_service> ioService, boost::shared_ptr<OcpMessageReader> processor);
+			TcpConnectionFactory(boost::shared_ptr<boost::asio::io_service> ioService, OcpSession::pointer processor);
 			virtual ~TcpConnectionFactory();
 
 			virtual boost::shared_ptr<ITcpConnection> CreateConnection();
 
 		protected:
 			boost::shared_ptr<boost::asio::io_service> ioService;
-			boost::shared_ptr<OcpMessageReader> processor;
+			OcpSession::pointer processor;
 		};
 	}
 }
