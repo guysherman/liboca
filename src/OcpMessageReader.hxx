@@ -75,16 +75,8 @@
             static void NotificationFromBuffer(boost::asio::const_buffer& buffer, net::Ocp1Notification& notification);
             static void NotificationListFromBuffer(boost::asio::const_buffer& buffer, net::Ocp1Header header, net::NotificationList& notifications);
 
-            virtual void SyncValueReceived(uint8_t* bufferData, const boost::system::error_code& error, size_t bytesTransferred, boost::function<void(void)> getHeader);
-			virtual void Ocp1HeaderReceived(uint8_t* bufferData, uint64_t connectionIdentifier, const boost::system::error_code& error, size_t bytesTransferred, boost::function<void(uint32_t)> getData);
-            virtual void Ocp1DataReceived(uint8_t* bufferData, uint64_t connectionIdentifier, const boost::system::error_code& error, size_t bytesTransferred);
-
         private:
-
-
-
-            typedef std::map<uint64_t, oca::net::Ocp1Header> ConnectionStateMap;
-            ConnectionStateMap perConnectionState;
+            
 		};
 	}
 

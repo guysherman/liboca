@@ -31,6 +31,8 @@
 
 // GTK Headers
 
+
+// Our Headers
 #include <OcpMessageReader.hxx>
 #include <Ocp1Header.hxx>
 #include <Ocp1Parameters.hxx>
@@ -54,118 +56,6 @@ public:
 
 };
 
-
-TEST(Suite_OcpMessageReader, SyncValueReceived_GetHeaderCalledForCorrectSyncValue)
-{
-	oca::OcpMessageReader processor;
-	CallbackCheck cbc;
-
-	uint8_t buffer[1024];
-	memset(&buffer[0], 0, 1024);
-	buffer[0] = 0x3B;
-
-	boost::system::error_code ec = boost::system::errc::make_error_code(boost::system::errc::success);
-
-	processor.SyncValueReceived(&buffer[0], ec, 1, boost::bind(&CallbackCheck::Fire, &cbc));
-
-	EXPECT_EQ(true, cbc.fired);
-}
-
-TEST(Suite_OcpMessageReader, SyncValueReceived_GetHeaderNotCalledForIncorrectSyncValue)
-{
-	oca::OcpMessageReader processor;
-	CallbackCheck cbc;
-
-	uint8_t buffer[1024];
-	memset(&buffer[0], 0, 1024);
-	buffer[0] = 0xDE;
-	buffer[1] = 0xAD;
-	buffer[2] = 0xBE;
-	buffer[3] = 0xEF;
-
-
-	boost::system::error_code ec = boost::system::errc::make_error_code(boost::system::errc::success);
-
-	processor.SyncValueReceived(&buffer[0], ec, 1, boost::bind(&CallbackCheck::Fire, &cbc));
-
-	EXPECT_EQ(false, cbc.fired);
-}
-
-TEST(Suite_OcpMessageReader, SyncValueReceived_GetHeaderNotCalledForNullData)
-{
-	oca::OcpMessageReader processor;
-	CallbackCheck cbc;
-
-	boost::system::error_code ec = boost::system::errc::make_error_code(boost::system::errc::success);
-
-	processor.SyncValueReceived(0, ec, 1, boost::bind(&CallbackCheck::Fire, &cbc));
-
-	EXPECT_EQ(false, cbc.fired);
-}
-
-
-TEST(Suite_OcpMessageReader, SyncValueReceived_GetHeaderNotCalledForLtOneByte)
-{
-	oca::OcpMessageReader processor;
-	CallbackCheck cbc;
-
-	uint8_t buffer[1024];
-	memset(&buffer[0], 0, 1024);
-	buffer[0] = 0xDE;
-	buffer[1] = 0xAD;
-	buffer[2] = 0xBE;
-	buffer[3] = 0xEF;
-
-	boost::system::error_code ec = boost::system::errc::make_error_code(boost::system::errc::success);
-
-	processor.SyncValueReceived(&buffer[0], ec, 0, boost::bind(&CallbackCheck::Fire, &cbc));
-
-	EXPECT_EQ(false, cbc.fired);
-}
-
-TEST(Suite_OcpMessageReader, SyncValueReceived_GetHeaderNotCalledForGtOneByte)
-{
-	oca::OcpMessageReader processor;
-	CallbackCheck cbc;
-
-	uint8_t buffer[1024];
-	memset(&buffer[0], 0, 1024);
-	buffer[0] = 0xDE;
-	buffer[1] = 0xAD;
-	buffer[2] = 0xBE;
-	buffer[3] = 0xEF;
-
-	boost::system::error_code ec = boost::system::errc::make_error_code(boost::system::errc::success);
-
-	processor.SyncValueReceived(&buffer[0], ec, 22346, boost::bind(&CallbackCheck::Fire, &cbc));
-
-	EXPECT_EQ(false, cbc.fired);
-}
-
-TEST(Suite_OcpMessageReader, SyncValueReceived_GetHeaderNotCalledForErrCode)
-{
-	oca::OcpMessageReader processor;
-	CallbackCheck cbc;
-
-	uint8_t buffer[1024];
-	memset(&buffer[0], 0, 1024);
-	buffer[0] = 0xDE;
-	buffer[1] = 0xAD;
-	buffer[2] = 0xBE;
-	buffer[3] = 0xEF;
-
-	boost::system::error_code ec = boost::system::errc::make_error_code(boost::system::errc::io_error);
-
-	processor.SyncValueReceived(&buffer[0], ec, 1, boost::bind(&CallbackCheck::Fire, &cbc));
-
-	EXPECT_EQ(false, cbc.fired);
-
-	ec = boost::system::errc::make_error_code(boost::system::errc::host_unreachable);
-
-	processor.SyncValueReceived(&buffer[0], ec, 1, boost::bind(&CallbackCheck::Fire, &cbc));
-
-	EXPECT_EQ(false, cbc.fired);
-}
 
 TEST(Suite_OcpMessageReader, HeaderFromBuffer)
 {
