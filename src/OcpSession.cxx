@@ -34,10 +34,12 @@
 
 // Our Headers
 
+#include <oca/OcaTypes.hxx>
 
 #include "OcpSession.hxx"
 #include "Ocp1Header.hxx"
 #include "OcpMessageReader.hxx"
+#include "ITcpConnection.hxx"
 
 namespace oca
 {
@@ -46,6 +48,7 @@ namespace oca
 	{
 
 		OcpSession::OcpSession()
+			: stashedHeader(boost::shared_ptr<Ocp1Header>()), tcpConnection(ITcpConnection::pointer())
 		{
 
 		}
@@ -53,6 +56,12 @@ namespace oca
 		OcpSession::~OcpSession()
 		{
 
+		}
+
+		void OcpSession::SetTcpConnection(ITcpConnection::pointer connection)
+		{
+			tcpConnection = connection;
+			tcpConnection->SetOcpSession(shared_from_this());
 		}
 
 		void OcpSession::SyncValueReceived(uint8_t* bufferData,
@@ -117,8 +126,13 @@ namespace oca
 			const boost::system::error_code& error,
 			size_t bytesTransferred)
 		{
-			// Don't really have anything to do here yet...
-
+			// assert(stashedHeader != NULL);
+			// switch (stashedHeader->messageType)
+			// {
+			// 	case OcaMessageType::OcaKeepAlive:
+			// 		processKeepAliveMessage(bufferData, stashedHeader);
+			// 		break;
+			// }
 
 
 			// ...but before we go, lets clean up

@@ -49,6 +49,19 @@ public:
 
 };
 
+struct ThreadArgWrapper
+{
+	ThreadArgWrapper(boost::asio::io_service& svc, boost::asio::ip::tcp::acceptor& acc, oca_test::MockMessageReader::pointer sess)
+		:	svc(svc), acc(acc), sess(sess)
+	{
+
+	}
+
+	boost::asio::io_service& svc;
+	boost::asio::ip::tcp::acceptor& acc;
+	oca_test::MockMessageReader::pointer sess;
+};
+
 static void* clientRun(void* arg)
 {
 	if (arg == NULL)
@@ -89,7 +102,7 @@ static void* clientRun(void* arg)
 static void* serverRun(void* arg)
 {
 	//localScaffold l;
-	boost::asio::io_service svc;
+
 
 	if (arg == NULL)
 	{
@@ -97,16 +110,17 @@ static void* serverRun(void* arg)
 		return NULL;
 	}
 
-	oca_test::MockMessageReader::pointer proc = *(reinterpret_cast<oca_test::MockMessageReader::pointer*>(arg));
+	ThreadArgWrapper* wrap = reinterpret_cast<ThreadArgWrapper*>(arg);
 
-	boost::asio::ip::tcp::acceptor acc(svc, boost::asio::ip::tcp::endpoint(boost::asio::ip::tcp::v4(), 60000) );
+	oca::net::TcpConnection::pointer con = oca::net::TcpConnection::Create(wrap->acc.get_io_service());
+	oca_test::MockMessageReader::pointer proc = wrap->sess;
+	proc->SetTcpConnection(con);
 
-	oca::net::TcpConnection::pointer con = oca::net::TcpConnection::Create(acc.get_io_service(), proc);
 
-	acc.async_accept(con->GetSocket(),
+	wrap->acc.async_accept(con->GetSocket(),
         boost::bind(&localScaffold::handleAccept, con, boost::asio::placeholders::error));
 
-	svc.run();
+	wrap->svc.run();
 
 	pthread_detach(pthread_self());
 	return NULL;
@@ -114,13 +128,16 @@ static void* serverRun(void* arg)
 
 TEST(Suite_TcpConnection, ReadSyncValue_CorrectValue)
 {
+	boost::asio::io_service svc;
+	boost::asio::ip::tcp::acceptor acc(svc, boost::asio::ip::tcp::endpoint(boost::asio::ip::tcp::v4(), 60000) );
 	boost::shared_ptr<oca_test::MockMessageReader> sproc(new oca_test::MockMessageReader());
+	ThreadArgWrapper wrap(svc, acc, sproc);
 
 	//					  SV,    PV,        MS,						MT,	  MC			D            SV
 	uint8_t testData[16] = {0x3B, 0x00, 0x01, 0x00, 0x00, 0x00, 0x02, 0x01, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
 
 	pthread_t s, t;
-	pthread_create(&s, NULL, &serverRun, &sproc);
+	pthread_create(&s, NULL, &serverRun, &wrap);
 	usleep(500000);
 	pthread_create(&t, NULL, &clientRun, &testData[0]);
 	pthread_join(s, NULL);
@@ -131,12 +148,15 @@ TEST(Suite_TcpConnection, ReadSyncValue_CorrectValue)
 
 TEST(Suite_TcpConnection, ReadSyncValue_IncorrectValue)
 {
+	boost::asio::io_service svc;
+	boost::asio::ip::tcp::acceptor acc(svc, boost::asio::ip::tcp::endpoint(boost::asio::ip::tcp::v4(), 60000) );
 	boost::shared_ptr<oca_test::MockMessageReader> sproc(new oca_test::MockMessageReader());
+	ThreadArgWrapper wrap(svc, acc, sproc);
 
 	uint8_t testData[16] = {0xDE, 0xAD, 0xBE, 0xEF, 0xDE, 0xAD, 0xBE, 0xEF,0xDE, 0xAD, 0xBE, 0xEF, 0xDE, 0xAD, 0xBE, 0xEF };
 
 	pthread_t s, t;
-	pthread_create(&s, NULL, &serverRun, &sproc);
+	pthread_create(&s, NULL, &serverRun, &wrap);
 	usleep(500000);
 	pthread_create(&t, NULL, &clientRun, &testData[0]);
 	pthread_join(s, NULL);
@@ -158,7 +178,7 @@ static void* sendServer(void* arg)
 	// Make cancellation asynchronous
 	int oldType = 0;
 	pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, &oldType);
-	boost::asio::io_service svc;
+
 
 	if (arg == NULL)
 	{
@@ -167,15 +187,17 @@ static void* sendServer(void* arg)
 	}
 
 	// Set up a basic TCP server infrastructure
-	oca_test::MockMessageReader::pointer proc = *(reinterpret_cast<oca_test::MockMessageReader::pointer*>(arg));
-	boost::asio::ip::tcp::acceptor acc(svc, boost::asio::ip::tcp::endpoint(boost::asio::ip::tcp::v4(), 60000) );
-	oca::net::TcpConnection::pointer con = oca::net::TcpConnection::Create(acc.get_io_service(), proc);
+	ThreadArgWrapper* wrap = reinterpret_cast<ThreadArgWrapper*>(arg);
+	oca_test::MockMessageReader::pointer proc = wrap->sess;
+
+	oca::net::TcpConnection::pointer con = oca::net::TcpConnection::Create(wrap->acc.get_io_service());
+	proc->SetTcpConnection(con);
 	extCon = con.get();
 
-	acc.async_accept(con->GetSocket(),
+	wrap->acc.async_accept(con->GetSocket(),
         boost::bind(&localScaffold::handleAccept, con, boost::asio::placeholders::error));
 
-	svc.run();
+	wrap->svc.run();
 
 	pthread_detach(pthread_self());
 	return NULL;
@@ -228,14 +250,17 @@ static void* sendClient(void* arg)
 
 TEST(Suite_TcpConnection, Send)
 {
+	boost::asio::io_service svc;
+	boost::asio::ip::tcp::acceptor acc(svc, boost::asio::ip::tcp::endpoint(boost::asio::ip::tcp::v4(), 60000) );
 	boost::shared_ptr<oca_test::MockMessageReader> sproc(new oca_test::MockMessageReader());
+	ThreadArgWrapper wrap(svc, acc, sproc);
 
 	uint8_t testData[16] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
 	uint8_t testData2[16] = { 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f, 0x00 };
 	boost::asio::const_buffer b = boost::asio::buffer(&testData2[0], 16);
 
 	pthread_t s, t;
-	pthread_create(&s, NULL, &sendServer, &sproc);
+	pthread_create(&s, NULL, &sendServer, &wrap);
 	usleep(100000);
 	pthread_create(&t, NULL, &sendClient, &testData[0]);
 	usleep(100000);

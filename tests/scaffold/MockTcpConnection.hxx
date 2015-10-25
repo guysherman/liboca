@@ -36,6 +36,7 @@
 
 // GTK Headers
 #include <ITcpConnection.hxx>
+#include <IOcpSession.hxx>
 
 
 namespace oca
@@ -66,6 +67,12 @@ namespace oca
 				started = true;
 			}
 
+			void SetOcpSession(IOcpSession::pointer session)
+			{
+				this->session = session;
+				sessionSet = true;
+			}
+
 			boost::system::error_code Send(boost::asio::const_buffer& buffer, size_t bytesToTransfer)
 			{
 				return boost::asio::error::eof;
@@ -77,13 +84,15 @@ namespace oca
 			}
 
 			bool started;
+			bool sessionSet;
+			IOcpSession::pointer session;
 
 		private:
 			// We make it non-constructible, and non-copyable so that the
 			// only way to get an instance is through the Create member function
 			// which forces the consumer to get a shared_ptr. Nice encapsulation!
 			MockTcpConnection(boost::asio::io_service& ioService)
-				: started(false), socket(ioService) {}
+				: started(false), sessionSet(false), socket(ioService) {}
 			MockTcpConnection(const MockTcpConnection& rhs);
 			MockTcpConnection& operator=(const MockTcpConnection& rhs);
 

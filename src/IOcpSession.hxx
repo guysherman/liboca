@@ -16,8 +16,8 @@
   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 */
-#ifndef __TCPCONNECTIONFACTORY_HXX_
-#define __TCPCONNECTIONFACTORY_HXX_
+#ifndef __IOCPSESSION_HXX__
+#define __IOCPSESSION_HXX__
 
 // C++ Standard Headers
 
@@ -26,39 +26,42 @@
 
 
 // Boost Headers
+#include <boost/system/error_code.hpp>
+#include <boost/function.hpp>
+#include <boost/bind.hpp>
 #include <boost/shared_ptr.hpp>
-#include <boost/asio.hpp>
+#include <boost/enable_shared_from_this.hpp>
 
 // 3rd Party Headers
 
 
 // GTK Headers
 
+
 // Our Headers
-#include "OcpSession.hxx"
+#include "Ocp1Header.hxx"
+
 
 namespace oca
 {
-	class OcpMessageReader;
-
 	namespace net
 	{
 		class ITcpConnection;
 
-		class TcpConnectionFactory
+		class IOcpSession
 		{
 		public:
-			TcpConnectionFactory(boost::shared_ptr<boost::asio::io_service> ioService);
-			virtual ~TcpConnectionFactory();
+			typedef boost::shared_ptr<IOcpSession> pointer;
 
-			virtual boost::shared_ptr<ITcpConnection> CreateConnection();
+			virtual void SetTcpConnection(boost::shared_ptr<ITcpConnection> connection) = 0;
 
+			virtual void SyncValueReceived(uint8_t* bufferData, const boost::system::error_code& error, size_t bytesTransferred, boost::function<void(void)> getHeader) = 0;
+			virtual void Ocp1HeaderReceived(uint8_t* bufferData, uint64_t connectionIdentifier, const boost::system::error_code& error, size_t bytesTransferred, boost::function<void(uint32_t)> getData) = 0;
+            virtual void Ocp1DataReceived(uint8_t* bufferData, uint64_t connectionIdentifier, const boost::system::error_code& error, size_t bytesTransferred) = 0;
 
-		protected:
-			boost::shared_ptr<boost::asio::io_service> ioService;
 		};
 	}
 }
 
 
-#endif // __TCPCONNECTIONFACTORY_HXX_
+#endif // __IOCPSESSION_HXX__

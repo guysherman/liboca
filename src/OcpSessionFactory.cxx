@@ -16,8 +16,6 @@
   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 */
-#ifndef __TCPCONNECTIONFACTORY_HXX_
-#define __TCPCONNECTIONFACTORY_HXX_
 
 // C++ Standard Headers
 
@@ -26,39 +24,34 @@
 
 
 // Boost Headers
-#include <boost/shared_ptr.hpp>
-#include <boost/asio.hpp>
+
 
 // 3rd Party Headers
 
 
 // GTK Headers
 
+
 // Our Headers
+
+
+#include "OcpSessionFactory.hxx"
+#include "IOcpSession.hxx"
+#include "ITcpConnection.hxx"
 #include "OcpSession.hxx"
 
 namespace oca
 {
-	class OcpMessageReader;
-
 	namespace net
 	{
-		class ITcpConnection;
+		OcpSessionFactory::OcpSessionFactory() {}
 
-		class TcpConnectionFactory
+		OcpSessionFactory::~OcpSessionFactory() {}
+
+		boost::shared_ptr<IOcpSession> OcpSessionFactory::CreateSession(ITcpConnection::pointer tcpConnection)
 		{
-		public:
-			TcpConnectionFactory(boost::shared_ptr<boost::asio::io_service> ioService);
-			virtual ~TcpConnectionFactory();
-
-			virtual boost::shared_ptr<ITcpConnection> CreateConnection();
-
-
-		protected:
-			boost::shared_ptr<boost::asio::io_service> ioService;
-		};
+			return boost::shared_ptr<IOcpSession>(new OcpSession());
+		}
 	}
+
 }
-
-
-#endif // __TCPCONNECTIONFACTORY_HXX_

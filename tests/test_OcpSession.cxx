@@ -41,6 +41,7 @@
 #include <Ocp1Response.hxx>
 #include <Ocp1EventData.hxx>
 #include <Ocp1NtfParams.hxx>
+#include "scaffold/MockTcpConnection.hxx"
 
 class CallbackCheck
 {

@@ -34,14 +34,15 @@
 #include "TcpConnection.hxx"
 #include "OcpMessageReader.hxx"
 #include "Ocp1Header.hxx"
+#include "IOcpSession.hxx"
 
 namespace oca
 {
 	namespace net
 	{
-		TcpConnection::pointer TcpConnection::Create(boost::asio::io_service &ioService, OcpSession::pointer processor)
+		TcpConnection::pointer TcpConnection::Create(boost::asio::io_service &ioService)
 		{
-			return pointer(new TcpConnection(ioService, processor));
+			return pointer(new TcpConnection(ioService));
 		}
 
 		void TcpConnection::Start()
@@ -50,8 +51,14 @@ namespace oca
 
 		}
 
-		TcpConnection::TcpConnection(boost::asio::io_service &ioService, OcpSession::pointer processor)
-			:	socket(ioService), processor(processor), identifier((uint64_t)this)
+		void TcpConnection::SetOcpSession(IOcpSession::pointer session)
+		{
+			assert(processor.expired());
+			processor = boost::weak_ptr<IOcpSession>(session);
+		}
+
+		TcpConnection::TcpConnection(boost::asio::io_service &ioService)
+			:	socket(ioService), processor(boost::weak_ptr<IOcpSession>()), identifier((uint64_t)this)
 		{
 			memset(&dataBuffer[0], 0, OCP1_DATA_BUFFER_SIZE);
 		}
@@ -87,11 +94,16 @@ namespace oca
 
 		void TcpConnection::syncValueRead(const boost::system::error_code& error, size_t bytesTransferred)
 		{
-				processor->SyncValueReceived(&dataBuffer[0],
-					error,
-					bytesTransferred,
-					boost::bind(&TcpConnection::readOcp1Header, shared_from_this())
-				);
+				boost::shared_ptr<IOcpSession> proc = processor.lock();
+				if (proc)
+				{
+					proc->SyncValueReceived(&dataBuffer[0],
+						error,
+						bytesTransferred,
+						boost::bind(&TcpConnection::readOcp1Header, shared_from_this())
+					);
+				}
+
 
 		}
 
@@ -110,13 +122,17 @@ namespace oca
 
 		void TcpConnection::ocp1HeaderRead(const boost::system::error_code& error, size_t bytesTransferred)
 		{
-			processor->Ocp1HeaderReceived(
-				&dataBuffer[0],
-				identifier,
-				error,
-				bytesTransferred,
-				boost::bind(&TcpConnection::readOcp1Data, shared_from_this(), _1)
-		    );
+			boost::shared_ptr<IOcpSession> proc = processor.lock();
+			if (proc)
+			{
+				proc->Ocp1HeaderReceived(
+					&dataBuffer[0],
+					identifier,
+					error,
+					bytesTransferred,
+					boost::bind(&TcpConnection::readOcp1Data, shared_from_this(), _1)
+			    );
+			}
 		}
 
 		void TcpConnection::readOcp1Data(uint32_t dataSize)
@@ -133,7 +149,11 @@ namespace oca
 
 		void TcpConnection::ocp1DataRead(const boost::system::error_code& error, size_t bytesTransferred)
 		{
-			processor->Ocp1DataReceived(&dataBuffer[0], identifier, error, bytesTransferred);
+			boost::shared_ptr<IOcpSession> proc = processor.lock();
+			if (proc)
+			{
+				proc->Ocp1DataReceived(&dataBuffer[0], identifier, error, bytesTransferred);
+			}
 
 
 			// Now that we've read all the way through the message, we go wait

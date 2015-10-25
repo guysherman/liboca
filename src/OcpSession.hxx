@@ -40,30 +40,39 @@
 
 // Our Headers
 #include "Ocp1Header.hxx"
-
+#include "IOcpSession.hxx"
 
 namespace oca
 {
 	namespace net
 	{
-		class OcpSession : public boost::enable_shared_from_this<OcpSession>
+		class ITcpConnection;
+
+		class OcpSession : public IOcpSession, public boost::enable_shared_from_this<OcpSession>
 		{
 		public:
-			typedef boost::shared_ptr<OcpSession> pointer;
+			
 
 			OcpSession();
 			virtual ~OcpSession();
 
+			virtual void SetTcpConnection(boost::shared_ptr<ITcpConnection> connection);
 
 			virtual void SyncValueReceived(uint8_t* bufferData, const boost::system::error_code& error, size_t bytesTransferred, boost::function<void(void)> getHeader);
 			virtual void Ocp1HeaderReceived(uint8_t* bufferData, uint64_t connectionIdentifier, const boost::system::error_code& error, size_t bytesTransferred, boost::function<void(uint32_t)> getData);
             virtual void Ocp1DataReceived(uint8_t* bufferData, uint64_t connectionIdentifier, const boost::system::error_code& error, size_t bytesTransferred);
 
 		private:
+
+
+
 			OcpSession(const OcpSession& rhs);
 			OcpSession& operator=(const OcpSession& rhs);
 
 			boost::shared_ptr<oca::net::Ocp1Header> stashedHeader;
+
+		protected:
+			boost::shared_ptr<ITcpConnection> tcpConnection;
 
 
 		};

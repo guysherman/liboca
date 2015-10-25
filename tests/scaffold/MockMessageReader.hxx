@@ -37,17 +37,17 @@
 
   // GTK Headers
 
-#include <OcpSession.hxx>
+#include <ITcpConnection.hxx>
+#include <IOcpSession.hxx>
 
 
   namespace oca_test
   {
-	  class MockMessageReader : public oca::net::OcpSession
+	  class MockMessageReader : public oca::net::IOcpSession, public boost::enable_shared_from_this<MockMessageReader>
 	  {
 	  public:
-		  typedef boost::shared_ptr<oca::net::OcpSession> pointer;
 
-		  MockMessageReader()
+		  MockMessageReader() : tcpConnection(boost::shared_ptr<oca::net::ITcpConnection>())
 		  {
 			  gotCorrectValue = false;
               dataSize = 0;
@@ -60,6 +60,12 @@
 		  {
 
 		  }
+
+          virtual void SetTcpConnection(boost::shared_ptr<oca::net::ITcpConnection> connection)
+  		  {
+  			  tcpConnection = connection;
+  			  tcpConnection->SetOcpSession(shared_from_this());
+  		  }
 
 
 		  virtual void SyncValueReceived(uint8_t* bufferData, const boost::system::error_code& error, size_t bytesTransferred, boost::function<void(void)> getHeader)
@@ -125,6 +131,8 @@
           size_t bytesTransferred;
           size_t bytesTransferred2;
           size_t bytesTransferred3;
+
+          boost::shared_ptr<oca::net::ITcpConnection> tcpConnection;
 
 	  };
   }

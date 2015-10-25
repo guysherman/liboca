@@ -40,14 +40,14 @@
 
 struct ThreadArgWrapper
 {
-	ThreadArgWrapper(boost::asio::io_service& svc, boost::shared_ptr<oca::net::MockTcpConnectionFactory> cf, oca::net::TcpServer& srv)
+	ThreadArgWrapper(boost::asio::io_service& svc, oca::net::MockTcpConnectionFactory& cf, oca::net::TcpServer& srv)
 		:	svc(svc), cf(cf), srv(srv)
 	{
 
 	}
 
 	boost::asio::io_service& svc;
-	boost::shared_ptr<oca::net::MockTcpConnectionFactory> cf;
+	oca::net::MockTcpConnectionFactory& cf;
 	oca::net::TcpServer& srv;
 };
 
@@ -134,9 +134,9 @@ TEST(Suite_TcpServer, TcpServer_AcceptsCorrectPort)
 	boost::shared_ptr<oca::net::MockTcpConnectionFactory> cf(new oca::net::MockTcpConnectionFactory(svcp, 1));
 	oca::net::TcpServer srv(cf, svcp, 60000);
 
-	ThreadArgWrapper wrp(*svcp, cf, srv);
+	ThreadArgWrapper wrp(*svcp, *cf, srv);
 
-
+	
 	pthread_t s, t;
 	pthread_create(&s, NULL, &serverRun, &wrp);
 
@@ -157,7 +157,7 @@ TEST(Suite_TcpServer, TcpServer_RefusesOtherPorts)
 	boost::shared_ptr<oca::net::MockTcpConnectionFactory> cf(new oca::net::MockTcpConnectionFactory(svcp, 1));
 	oca::net::TcpServer srv(cf, svcp, 60000);
 
-	ThreadArgWrapper wrp(*svcp, cf, srv);
+	ThreadArgWrapper wrp(*svcp, *cf, srv);
 
 	pthread_t s, t;
 	pthread_create(&s, NULL, &serverRun, &wrp);
@@ -185,7 +185,7 @@ TEST(Suite_TcpServer, TcpServer_AcceptsMultiple)
 	boost::shared_ptr<oca::net::MockTcpConnectionFactory> cf(new oca::net::MockTcpConnectionFactory(svcp, 2));
 	oca::net::TcpServer srv(cf, svcp, 60000);
 
-	ThreadArgWrapper wrp(*svcp, cf, srv);
+	ThreadArgWrapper wrp(*svcp, *cf, srv);
 
 	pthread_t s, t;
 	pthread_create(&s, NULL, &serverRun, &wrp);

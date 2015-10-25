@@ -39,23 +39,20 @@
 
 namespace oca
 {
-	class OcpMessageReader;
 
 	namespace net
 	{
+		class IOcpSession;
 		class ITcpConnection;
 
-		class TcpConnectionFactory
+		class OcpSessionFactory
 		{
 		public:
-			TcpConnectionFactory(boost::shared_ptr<boost::asio::io_service> ioService);
-			virtual ~TcpConnectionFactory();
+			OcpSessionFactory();
+			virtual ~OcpSessionFactory();
 
-			virtual boost::shared_ptr<ITcpConnection> CreateConnection();
+			virtual boost::shared_ptr<IOcpSession> CreateSession(boost::shared_ptr<ITcpConnection> tcpConnection);
 
-
-		protected:
-			boost::shared_ptr<boost::asio::io_service> ioService;
 		};
 	}
 }

@@ -57,8 +57,7 @@ namespace oca
         }
 
         boost::shared_ptr<boost::asio::io_service> ioService(new boost::asio::io_service());
-        oca::net::OcpSession::pointer processor(new oca::net::OcpSession());
-        boost::shared_ptr<oca::net::TcpConnectionFactory> factory(new oca::net::TcpConnectionFactory(ioService, processor));
+        boost::shared_ptr<oca::net::TcpConnectionFactory> factory(new oca::net::TcpConnectionFactory(ioService));
         tcpServer = boost::shared_ptr<oca::net::TcpServer>(new oca::net::TcpServer(factory, ioService, port));
     }
 

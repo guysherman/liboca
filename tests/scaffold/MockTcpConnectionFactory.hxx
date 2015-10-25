@@ -51,7 +51,7 @@ namespace oca
 		{
 		public:
 			MockTcpConnectionFactory(boost::shared_ptr<boost::asio::io_service> ioService, int maxConns)
-                :   TcpConnectionFactory(ioService, OcpSession::pointer()), countConns(0), maxConns(maxConns)
+                :   TcpConnectionFactory(ioService), countConns(0), maxConns(maxConns)
             {
 
             }

@@ -40,7 +40,7 @@
 
 // Our Headers
 #include "ITcpConnection.hxx"
-#include "OcpSession.hxx"
+#include "IOcpSession.hxx"
 
 #define OCP1_DATA_BUFFER_SIZE 1024
 
@@ -55,10 +55,11 @@ namespace oca
 		{
 		public:
 
-			static ITcpConnection::pointer Create(boost::asio::io_service& ioService, OcpSession::pointer processor);
+			static ITcpConnection::pointer Create(boost::asio::io_service& ioService);
 			boost::asio::ip::tcp::socket& GetSocket();
 
 			void Start();
+			void SetOcpSession(IOcpSession::pointer session);
 
 			// The buffer contains the full data for the message, including the sync value and the
 			boost::system::error_code Send(boost::asio::const_buffer& buffer, size_t bytesToTransfer);
@@ -68,7 +69,7 @@ namespace oca
 			// We make it non-constructible, and non-copyable so that the
 			// only way to get an instance is through the Create member function
 			// which forces the consumer to get a shared_ptr. Nice encapsulation!
-			TcpConnection(boost::asio::io_service& ioService, OcpSession::pointer processor);
+			TcpConnection(boost::asio::io_service& ioService);
 			TcpConnection(const TcpConnection& rhs);
             TcpConnection& operator=(const TcpConnection& rhs);
 
@@ -93,7 +94,7 @@ namespace oca
 
 			uint8_t dataBuffer[OCP1_DATA_BUFFER_SIZE];
 			boost::asio::ip::tcp::socket socket;
-            OcpSession::pointer processor;
+            boost::weak_ptr<IOcpSession> processor;
 			uint64_t identifier;
 		};
 	}
