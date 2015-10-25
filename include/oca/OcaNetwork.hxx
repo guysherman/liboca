@@ -59,7 +59,7 @@ namespace oca
         OcaNetwork(const OcaNetwork& rhs);
         OcaNetwork& operator=(const OcaNetwork& rhs);
 
-        void newConnectionCreated(boost::shared_ptr<oca::net::ITcpConnection> connection);
+        static void newConnectionCreated(boost::shared_ptr<oca::net::ITcpConnection> connection);
 
         boost::shared_ptr<oca::net::OcpSessionFactory> sessionFactory;
         boost::shared_ptr<oca::net::TcpServer> tcpServer;

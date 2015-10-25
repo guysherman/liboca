@@ -72,7 +72,6 @@ namespace oca
                 port,
                 boost::bind(
                     &OcaNetwork::newConnectionCreated,
-                    this,
                     _1
                 )
             )
