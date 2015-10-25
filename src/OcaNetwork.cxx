@@ -24,6 +24,8 @@
 #include <stdint.h>
 
 // Boost Headers
+#include <boost/function.hpp>
+#include <boost/bind.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/asio.hpp>
 
@@ -35,8 +37,12 @@
 #include <oca/OcaException.hxx>
 #include <oca/OcaNetwork.hxx>
 
-#include "TcpServer.hxx"
+#include "OcpSessionFactory.hxx"
 #include "TcpConnectionFactory.hxx"
+#include "TcpServer.hxx"
+
+#include "IOcpSession.hxx"
+
 #include "OcpSession.hxx"
 
 
@@ -56,9 +62,21 @@ namespace oca
             throw e;
         }
 
+        sessionFactory = boost::shared_ptr<oca::net::OcpSessionFactory>(new oca::net::OcpSessionFactory());
         boost::shared_ptr<boost::asio::io_service> ioService(new boost::asio::io_service());
         boost::shared_ptr<oca::net::TcpConnectionFactory> factory(new oca::net::TcpConnectionFactory(ioService));
-        tcpServer = boost::shared_ptr<oca::net::TcpServer>(new oca::net::TcpServer(factory, ioService, port));
+        tcpServer = boost::shared_ptr<oca::net::TcpServer>(
+            new oca::net::TcpServer(
+                factory,
+                ioService,
+                port,
+                boost::bind(
+                    &OcaNetwork::newConnectionCreated,
+                    this,
+                    _1
+                )
+            )
+        );
     }
 
     void OcaNetwork::Start()
@@ -75,6 +93,13 @@ namespace oca
         {
             usleep(32000);
         }
+    }
+
+    void OcaNetwork::newConnectionCreated(boost::shared_ptr<oca::net::ITcpConnection> connection)
+    {
+        // oca::net::IOcpSession::pointer session = sessionFactory->CreateSession();
+        // session->SetTcpConnection(connection);
+
     }
 
     OcaNetwork::~OcaNetwork()

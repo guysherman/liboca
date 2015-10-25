@@ -26,7 +26,9 @@
 
 
     // Boost Headers
-	#include <boost/shared_ptr.hpp>
+    #include <boost/function.hpp>
+    #include <boost/bind.hpp>
+    #include <boost/shared_ptr.hpp>
 	#include <boost/asio.hpp>
 
     // 3rd Party Headers
@@ -34,19 +36,26 @@
 
     // GTK Headers
 
+// Our Headers
 
+#include "TcpConnectionFactory.hxx"
+#include "ITcpConnection.hxx"
 
 namespace oca
 {
 	namespace net
 	{
-		class ITcpConnection;
-        class TcpConnectionFactory;
 
 		class TcpServer
 		{
 		public:
-			TcpServer(boost::shared_ptr<TcpConnectionFactory> connectionFactory, boost::shared_ptr<boost::asio::io_service> ioService, uint16_t port);
+			typedef boost::function< void(boost::shared_ptr<ITcpConnection>) > ConnectionEventHandler;
+
+            TcpServer(
+                boost::shared_ptr<oca::net::TcpConnectionFactory> connectionFactory,
+                boost::shared_ptr<boost::asio::io_service> ioService,
+                uint16_t port,
+                ConnectionEventHandler handler);
             void Start();
             void Stop();
 			virtual ~TcpServer();
@@ -62,6 +71,7 @@ namespace oca
             boost::shared_ptr<boost::asio::io_service> ioService;
             uint16_t port;
             bool isRunning;
+            ConnectionEventHandler handler;
 
 		};
 	}

@@ -48,7 +48,7 @@ namespace oca
 
 		OcpSessionFactory::~OcpSessionFactory() {}
 
-		boost::shared_ptr<IOcpSession> OcpSessionFactory::CreateSession(ITcpConnection::pointer tcpConnection)
+		boost::shared_ptr<IOcpSession> OcpSessionFactory::CreateSession()
 		{
 			return boost::shared_ptr<IOcpSession>(new OcpSession());
 		}

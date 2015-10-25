@@ -35,11 +35,9 @@
 // GTK Headers
 
 // Our Headers
-#include "OcpSession.hxx"
 
 namespace oca
 {
-	class OcpMessageReader;
 
 	namespace net
 	{

@@ -25,6 +25,7 @@
 
 // Boost Headers
 #include <boost/shared_ptr.hpp>
+#include <boost/function.hpp>
 #include <boost/bind.hpp>
 #include <boost/asio.hpp>
 
@@ -42,8 +43,17 @@ namespace oca
 {
     namespace net
     {
-        TcpServer::TcpServer(boost::shared_ptr<TcpConnectionFactory> connectionFactory, boost::shared_ptr<boost::asio::io_service> ioService, uint16_t port)
-            : acceptor(*ioService, boost::asio::ip::tcp::endpoint(boost::asio::ip::tcp::v4(), port)), connectionFactory(connectionFactory), ioService(ioService), port(port), isRunning(false)
+        TcpServer::TcpServer(
+            boost::shared_ptr<TcpConnectionFactory> connectionFactory,
+            boost::shared_ptr<boost::asio::io_service> ioService,
+            uint16_t port,
+            ConnectionEventHandler handler)
+            : acceptor(*ioService, boost::asio::ip::tcp::endpoint(boost::asio::ip::tcp::v4(), port)),
+            connectionFactory(connectionFactory),
+            ioService(ioService),
+            port(port),
+            isRunning(false),
+            handler(handler)
         {
             accept();
         }
@@ -69,6 +79,7 @@ namespace oca
 
         void TcpServer::accepted(boost::shared_ptr<ITcpConnection> connection, const boost::system::error_code &error)
         {
+            handler(connection);
             if (!error)
             {
                 connection->Start();
@@ -97,7 +108,7 @@ namespace oca
 
         TcpServer::~TcpServer()
         {
-            
+
         }
     }
 }

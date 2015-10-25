@@ -34,6 +34,7 @@
 // GTK Headers
 
 #include <TcpServer.hxx>
+#include <ITcpConnection.hxx>
 
 #include "scaffold/MockTcpConnection.hxx"
 #include "scaffold/MockTcpConnectionFactory.hxx"
@@ -126,17 +127,32 @@ static void* serverRun(void* arg)
 	return NULL;
 }
 
+static int handlerFired;
+static void handler(boost::shared_ptr<oca::net::ITcpConnection> connection)
+{
+	handlerFired++;
+}
+
 
 
 TEST(Suite_TcpServer, TcpServer_AcceptsCorrectPort)
 {
+	handlerFired = 0;
 	boost::shared_ptr<boost::asio::io_service> svcp(new boost::asio::io_service);
 	boost::shared_ptr<oca::net::MockTcpConnectionFactory> cf(new oca::net::MockTcpConnectionFactory(svcp, 1));
-	oca::net::TcpServer srv(cf, svcp, 60000);
+	oca::net::TcpServer srv(
+		cf,
+		svcp,
+		60000,
+		boost::bind(
+			&handler,
+			_1
+		)
+	);
 
 	ThreadArgWrapper wrp(*svcp, *cf, srv);
 
-	
+
 	pthread_t s, t;
 	pthread_create(&s, NULL, &serverRun, &wrp);
 
@@ -147,15 +163,25 @@ TEST(Suite_TcpServer, TcpServer_AcceptsCorrectPort)
 	pthread_join(t, 0);
 	EXPECT_EQ(1, cf->connections.size());
 	EXPECT_EQ(true, cf->connections.at(0)->started);
+	EXPECT_EQ(1, handlerFired);
 
 	pthread_join(s, NULL);
 }
 
 TEST(Suite_TcpServer, TcpServer_RefusesOtherPorts)
 {
+	handlerFired = 0;
 	boost::shared_ptr<boost::asio::io_service> svcp(new boost::asio::io_service);
 	boost::shared_ptr<oca::net::MockTcpConnectionFactory> cf(new oca::net::MockTcpConnectionFactory(svcp, 1));
-	oca::net::TcpServer srv(cf, svcp, 60000);
+	oca::net::TcpServer srv(
+		cf,
+		svcp,
+		60000,
+		boost::bind(
+			&handler,
+			_1
+		)
+	);
 
 	ThreadArgWrapper wrp(*svcp, *cf, srv);
 
@@ -173,6 +199,7 @@ TEST(Suite_TcpServer, TcpServer_RefusesOtherPorts)
 	pthread_join(t, 0);
 	EXPECT_EQ(1, cf->connections.size());
 	EXPECT_EQ(true, cf->connections.at(0)->started);
+	EXPECT_EQ(1, handlerFired);
 
 	pthread_join(s, NULL);
 
@@ -181,9 +208,18 @@ TEST(Suite_TcpServer, TcpServer_RefusesOtherPorts)
 
 TEST(Suite_TcpServer, TcpServer_AcceptsMultiple)
 {
+	handlerFired = 0;
 	boost::shared_ptr<boost::asio::io_service> svcp(new boost::asio::io_service);
-	boost::shared_ptr<oca::net::MockTcpConnectionFactory> cf(new oca::net::MockTcpConnectionFactory(svcp, 2));
-	oca::net::TcpServer srv(cf, svcp, 60000);
+	boost::shared_ptr<oca::net::MockTcpConnectionFactory> cf(new oca::net::MockTcpConnectionFactory(svcp, 3));
+	oca::net::TcpServer srv(
+		cf,
+		svcp,
+		60000,
+		boost::bind(
+			&handler,
+			_1
+		)
+	);
 
 	ThreadArgWrapper wrp(*svcp, *cf, srv);
 
@@ -202,7 +238,11 @@ TEST(Suite_TcpServer, TcpServer_AcceptsMultiple)
 	pthread_create(&t, NULL, &clientRun, &a);
 	pthread_join(t, 0);
 
-	EXPECT_EQ(true, cf->connections.at(0)->started);
+	EXPECT_EQ(true, cf->connections.at(1)->started);
+	EXPECT_EQ(2, handlerFired);
+
+	pthread_create(&t, NULL, &clientRun, &a);
+	pthread_join(t, 0);
 
 	pthread_join(s, NULL);
 }

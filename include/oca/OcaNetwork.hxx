@@ -33,11 +33,17 @@
 
 // GTK Headers
 
+
+// Our headers
+
+
 namespace oca
 {
     namespace net
     {
         class TcpServer;
+        class OcpSessionFactory;
+        class ITcpConnection;
     }
 
     class OcaNetwork
@@ -53,6 +59,9 @@ namespace oca
         OcaNetwork(const OcaNetwork& rhs);
         OcaNetwork& operator=(const OcaNetwork& rhs);
 
+        void newConnectionCreated(boost::shared_ptr<oca::net::ITcpConnection> connection);
+
+        boost::shared_ptr<oca::net::OcpSessionFactory> sessionFactory;
         boost::shared_ptr<oca::net::TcpServer> tcpServer;
         bool isRunning;
     };

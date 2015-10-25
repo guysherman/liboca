@@ -16,8 +16,8 @@
   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 */
-#ifndef __TCPCONNECTIONFACTORY_HXX_
-#define __TCPCONNECTIONFACTORY_HXX_
+#ifndef __OCPSESSIONFACTORY_HXX__
+#define __OCPSESSIONFACTORY_HXX__
 
 // C++ Standard Headers
 
@@ -51,11 +51,11 @@ namespace oca
 			OcpSessionFactory();
 			virtual ~OcpSessionFactory();
 
-			virtual boost::shared_ptr<IOcpSession> CreateSession(boost::shared_ptr<ITcpConnection> tcpConnection);
+			virtual boost::shared_ptr<IOcpSession> CreateSession();
 
 		};
 	}
 }
 
 
-#endif // __TCPCONNECTIONFACTORY_HXX_
+#endif // __OCPSESSIONFACTORY_HXX__
