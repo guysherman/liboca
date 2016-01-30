@@ -72,6 +72,7 @@ namespace oca
                 port,
                 boost::bind(
                     &OcaNetwork::newConnectionCreated,
+                    this,
                     _1
                 )
             )
@@ -96,8 +97,8 @@ namespace oca
 
     void OcaNetwork::newConnectionCreated(boost::shared_ptr<oca::net::ITcpConnection> connection)
     {
-        // oca::net::IOcpSession::pointer session = sessionFactory->CreateSession();
-        // session->SetTcpConnection(connection);
+        oca::net::IOcpSession::pointer session = sessionFactory->CreateSession();
+        session->SetTcpConnection(connection);
 
     }
 

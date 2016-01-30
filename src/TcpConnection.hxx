@@ -69,7 +69,7 @@ namespace oca
 			// We make it non-constructible, and non-copyable so that the
 			// only way to get an instance is through the Create member function
 			// which forces the consumer to get a shared_ptr. Nice encapsulation!
-			TcpConnection(boost::asio::io_service& ioService);
+			explicit TcpConnection(boost::asio::io_service& ioService);
 			TcpConnection(const TcpConnection& rhs);
             TcpConnection& operator=(const TcpConnection& rhs);
 

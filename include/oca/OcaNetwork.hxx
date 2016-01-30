@@ -20,7 +20,7 @@
 #define __OCANETWORK_HXX__
 
 // C++ Standard Headers
-
+#include <map>
 
 // C Standard Headers
 #include <stdint.h>
@@ -49,7 +49,7 @@ namespace oca
     class OcaNetwork
     {
     public:
-        OcaNetwork(uint16_t port);
+        explicit OcaNetwork(uint16_t port);
         void Start();
         void Stop();
         virtual ~OcaNetwork();
@@ -59,7 +59,7 @@ namespace oca
         OcaNetwork(const OcaNetwork& rhs);
         OcaNetwork& operator=(const OcaNetwork& rhs);
 
-        static void newConnectionCreated(boost::shared_ptr<oca::net::ITcpConnection> connection);
+        void newConnectionCreated(boost::shared_ptr<oca::net::ITcpConnection> connection);
 
         boost::shared_ptr<oca::net::OcpSessionFactory> sessionFactory;
         boost::shared_ptr<oca::net::TcpServer> tcpServer;
