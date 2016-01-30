@@ -154,7 +154,7 @@ namespace oca
 
 		void OcpSession::sessionClosed()
 		{
-			for (std::vector<IOcpSession::SessionEventHandler>::iterator it; it != sessionClosedHandlers.end(); ++it)
+			for (std::vector<IOcpSession::SessionEventHandler>::iterator it = sessionClosedHandlers.begin(); it != sessionClosedHandlers.end(); ++it)
 			{
 				(*it)(shared_from_this());
 			}

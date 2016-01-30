@@ -24,7 +24,9 @@
 #include <pthread.h>
 
 // Boost Headers
-
+#include <boost/bind.hpp>
+#include <boost/shared_ptr.hpp>
+#include <boost/asio.hpp>
 
 // 3rd Party Headers
 #include <gtest/gtest.h>
@@ -47,6 +49,31 @@ static void* worker(void* arg)
 	return NULL;
 }
 
+static void* sendClient(void* arg)
+{
+	// Set up a basic client
+	boost::asio::io_service svc2;
+	boost::asio::ip::tcp::socket socket(svc2);
+	boost::asio::ip::tcp::endpoint endpoint(
+		boost::asio::ip::address::from_string("127.0.0.1"), 60000);
+	socket.connect(endpoint);
+
+	boost::system::error_code error;
+
+	// Data deliberately crafted to cause the other end to terminate
+	const uint8_t testData[16] = {0x04, 0x01, 0x00, 0x02, 0x00, 0x00, 0x00, 0x03, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x04 };
+	boost::asio::const_buffer buf(testData, 16);
+
+	// Write the data
+	boost::asio::write(socket, boost::asio::buffer(buf, 16), error);
+
+	if (error != boost::asio::error::eof && error != 0)
+		throw boost::system::system_error(error); // Some other error.
+
+	pthread_detach(pthread_self());
+	return NULL;
+
+}
 
 
 
@@ -55,8 +82,12 @@ TEST(Suite_OcaNetwork, StartStop)
 	oca::OcaNetwork network(60000);
 
 	pthread_t t;
+	pthread_t u;
 
 	pthread_create(&t, NULL, &worker, &network);
+	usleep(1000000);
+
+	pthread_create(&u, NULL, &sendClient, NULL);
 	usleep(1000000);
 
 	network.Stop();
