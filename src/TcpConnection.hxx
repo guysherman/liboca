@@ -20,7 +20,7 @@
 #define __TCPCONNECTION_HXX__
 
 // C++ Standard Headers
-
+#include <vector>
 
 // C Standard Headers
 
@@ -64,6 +64,8 @@ namespace oca
 			// The buffer contains the full data for the message, including the sync value and the
 			boost::system::error_code Send(boost::asio::const_buffer& buffer, size_t bytesToTransfer);
 
+
+
 			virtual ~TcpConnection();
 		private:
 			// We make it non-constructible, and non-copyable so that the
@@ -88,6 +90,7 @@ namespace oca
 			void readOcp1Data(uint32_t dataSize);
 			void ocp1DataRead(const boost::system::error_code& error, size_t bytesTransferred);
 
+			void connectionClosed();
 
 			boost::function<void(void)> readOcp1HeaderDelegate;
 			boost::function<void(uint32_t)> readOcp1DataDelegate;
@@ -96,6 +99,8 @@ namespace oca
 			boost::asio::ip::tcp::socket socket;
             boost::weak_ptr<IOcpSession> processor;
 			uint64_t identifier;
+
+			
 		};
 	}
 }

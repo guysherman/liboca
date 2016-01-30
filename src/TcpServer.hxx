@@ -49,13 +49,13 @@ namespace oca
 		class TcpServer
 		{
 		public:
-			typedef boost::function< void(boost::shared_ptr<ITcpConnection>) > ConnectionEventHandler;
+
 
             TcpServer(
                 boost::shared_ptr<oca::net::TcpConnectionFactory> connectionFactory,
                 boost::shared_ptr<boost::asio::io_service> ioService,
                 uint16_t port,
-                ConnectionEventHandler handler);
+                ITcpConnection::ConnectionEventHandler handler);
             void Start();
             void Stop();
 			virtual ~TcpServer();
@@ -71,7 +71,7 @@ namespace oca
             boost::shared_ptr<boost::asio::io_service> ioService;
             uint16_t port;
             bool isRunning;
-            ConnectionEventHandler handler;
+            ITcpConnection::ConnectionEventHandler handler;
 
 		};
 	}

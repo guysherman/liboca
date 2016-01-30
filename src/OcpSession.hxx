@@ -20,7 +20,7 @@
 #define __OCPSESSION_HXX__
 
 // C++ Standard Headers
-
+#include <vector>
 
 // C Standard Headers
 
@@ -51,7 +51,7 @@ namespace oca
 		class OcpSession : public IOcpSession, public boost::enable_shared_from_this<OcpSession>
 		{
 		public:
-			
+
 
 			OcpSession();
 			virtual ~OcpSession();
@@ -62,6 +62,9 @@ namespace oca
 			virtual void Ocp1HeaderReceived(uint8_t* bufferData, uint64_t connectionIdentifier, const boost::system::error_code& error, size_t bytesTransferred, boost::function<void(uint32_t)> getData);
             virtual void Ocp1DataReceived(uint8_t* bufferData, uint64_t connectionIdentifier, const boost::system::error_code& error, size_t bytesTransferred);
 
+			void AddSessionClosedHandler(SessionEventHandler handler);
+			int GetId();
+
 		private:
 
 
@@ -69,7 +72,13 @@ namespace oca
 			OcpSession(const OcpSession& rhs);
 			OcpSession& operator=(const OcpSession& rhs);
 
+			void sessionClosed();
+
 			boost::shared_ptr<oca::net::Ocp1Header> stashedHeader;
+
+			std::vector<IOcpSession::SessionEventHandler> sessionClosedHandlers;
+			static int nextId;
+			int id;
 
 		protected:
 			boost::shared_ptr<ITcpConnection> tcpConnection;

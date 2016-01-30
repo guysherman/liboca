@@ -48,7 +48,7 @@ namespace oca
 	{
 
 		OcpSession::OcpSession()
-			: stashedHeader(boost::shared_ptr<Ocp1Header>()), tcpConnection(ITcpConnection::pointer())
+			: stashedHeader(boost::shared_ptr<Ocp1Header>()), id(nextId++), tcpConnection(ITcpConnection::pointer())
 		{
 
 		}
@@ -72,6 +72,7 @@ namespace oca
 			if (error.value() != boost::system::errc::success)
 			{
 				// TODO: consider an exception here
+				sessionClosed();
 				return;
 			}
 
@@ -79,6 +80,7 @@ namespace oca
 			if (bytesTransferred != 1)
 			{
 				// TODO: consider an exception here
+				sessionClosed();
 				return;
 			}
 
@@ -91,6 +93,10 @@ namespace oca
 				if (bufferData[0] == 0x3B)
 				{
 					getHeader();
+				}
+				else
+				{
+					sessionClosed();
 				}
 			}
 		}
@@ -139,5 +145,30 @@ namespace oca
 			stashedHeader = boost::shared_ptr<oca::net::Ocp1Header>();
 			return;
 		}
+
+		void OcpSession::AddSessionClosedHandler(SessionEventHandler handler)
+		{
+			// TODO: think about finding some way to not add the same handler twice
+			sessionClosedHandlers.push_back(handler);
+		}
+
+		void OcpSession::sessionClosed()
+		{
+			for (std::vector<IOcpSession::SessionEventHandler>::iterator it; it != sessionClosedHandlers.end(); ++it)
+			{
+				(*it)(shared_from_this());
+			}
+
+			sessionClosedHandlers.clear();
+		}
+
+		int OcpSession::GetId()
+		{
+			return id;
+		}
+
+		int OcpSession::nextId = 0;
 	}
+
+
 }

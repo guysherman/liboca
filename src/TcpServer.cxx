@@ -47,7 +47,7 @@ namespace oca
             boost::shared_ptr<TcpConnectionFactory> connectionFactory,
             boost::shared_ptr<boost::asio::io_service> ioService,
             uint16_t port,
-            ConnectionEventHandler handler)
+            ITcpConnection::ConnectionEventHandler handler)
             : acceptor(*ioService, boost::asio::ip::tcp::endpoint(boost::asio::ip::tcp::v4(), port)),
             connectionFactory(connectionFactory),
             ioService(ioService),

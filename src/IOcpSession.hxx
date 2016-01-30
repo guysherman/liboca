@@ -52,6 +52,7 @@ namespace oca
 		{
 		public:
 			typedef boost::shared_ptr<IOcpSession> pointer;
+			typedef boost::function< void(boost::shared_ptr<IOcpSession>) > SessionEventHandler;
 
 			virtual void SetTcpConnection(boost::shared_ptr<ITcpConnection> connection) = 0;
 
@@ -59,6 +60,8 @@ namespace oca
 			virtual void Ocp1HeaderReceived(uint8_t* bufferData, uint64_t connectionIdentifier, const boost::system::error_code& error, size_t bytesTransferred, boost::function<void(uint32_t)> getData) = 0;
             virtual void Ocp1DataReceived(uint8_t* bufferData, uint64_t connectionIdentifier, const boost::system::error_code& error, size_t bytesTransferred) = 0;
 
+			virtual void AddSessionClosedHandler(SessionEventHandler handler) = 0;
+			virtual int GetId() = 0;
 		};
 	}
 }

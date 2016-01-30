@@ -26,6 +26,8 @@
 
 
 // Boost Headers
+#include <boost/function.hpp>
+#include <boost/bind.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/asio.hpp>
 
@@ -46,11 +48,14 @@ namespace oca
 		{
 		public:
 			typedef boost::shared_ptr<ITcpConnection> pointer;
-			
+			typedef boost::function< void(boost::shared_ptr<ITcpConnection>) > ConnectionEventHandler;
+
 			virtual void Start() = 0;
 			virtual void SetOcpSession(boost::shared_ptr<IOcpSession> session) = 0;
 			virtual boost::asio::ip::tcp::socket& GetSocket() = 0;
 			virtual boost::system::error_code Send(boost::asio::const_buffer& buffer, size_t bytesToTransfer) = 0;
+
+			
 		};
 	}
 }

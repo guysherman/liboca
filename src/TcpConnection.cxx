@@ -80,6 +80,11 @@ namespace oca
 			return error;
 		}
 
+		void TcpConnection::AddConnectionClosedListener(ITcpConnection::ConnectionEventHandler handler)
+		{
+			connectionClosedHandlers.push_back(handler);
+		}
+
 		void TcpConnection::readSyncValue()
 		{
 			boost::asio::async_read(socket, boost::asio::buffer(&dataBuffer[0], 1),

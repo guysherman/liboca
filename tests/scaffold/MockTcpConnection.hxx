@@ -78,6 +78,7 @@ namespace oca
 				return boost::asio::error::eof;
 			}
 
+			
 			virtual ~MockTcpConnection()
 			{
 

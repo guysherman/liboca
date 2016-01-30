@@ -99,7 +99,19 @@ namespace oca
     {
         oca::net::IOcpSession::pointer session = sessionFactory->CreateSession();
         session->SetTcpConnection(connection);
+        session->AddSessionClosedHandler(
+            boost::bind(
+                &OcaNetwork::sessionEnded,
+                this,
+                _1
+            )
+        );
+        sessions.insert(std::pair<int, oca::net::IOcpSession::pointer>(session->GetId(), session));
+    }
 
+    void OcaNetwork::sessionEnded(boost::shared_ptr<oca::net::IOcpSession> session)
+    {
+        sessions.erase(session->GetId());
     }
 
     OcaNetwork::~OcaNetwork()

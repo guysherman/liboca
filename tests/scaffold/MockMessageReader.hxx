@@ -116,6 +116,17 @@
 
           }
 
+
+          virtual void AddSessionClosedHandler(SessionEventHandler handler)
+          {
+
+          }
+
+          virtual int GetId()
+          {
+
+          }
+
 		  bool gotCorrectValue;
 
           uint32_t dataSize;

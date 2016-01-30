@@ -44,6 +44,7 @@ namespace oca
         class TcpServer;
         class OcpSessionFactory;
         class ITcpConnection;
+        class IOcpSession;
     }
 
     class OcaNetwork
@@ -60,10 +61,12 @@ namespace oca
         OcaNetwork& operator=(const OcaNetwork& rhs);
 
         void newConnectionCreated(boost::shared_ptr<oca::net::ITcpConnection> connection);
+        void sessionEnded(boost::shared_ptr<oca::net::IOcpSession> session);
 
         boost::shared_ptr<oca::net::OcpSessionFactory> sessionFactory;
         boost::shared_ptr<oca::net::TcpServer> tcpServer;
         bool isRunning;
+        std::map< int, boost::shared_ptr<oca::net::IOcpSession> > sessions;
     };
 }
 
