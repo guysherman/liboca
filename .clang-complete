@@ -1,1 +1,1 @@
--I../include -I. -I./include
+-I../include -I. -I./include -I./dep/wq/include

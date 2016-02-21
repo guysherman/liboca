@@ -1,0 +1,13 @@
+LLDB Machine Interface Driver (MI) All rights reserved
+Version: 1.0.0.9
+Version: GNU gdb (GDB) 7.4 
+(This is a MI stub on top of LLDB and not GDB)
+All rights reserved.
+
+Creation date 21/02/16 time 20:29:22
+File logger path: lldb-mi-log.txt
+F,21/02/16 20:29:22,.
+F,21/02/16 20:29:22,Application: /usr/bin/lldb-mi-3.6
+F,21/02/16 20:29:22,Command line args: 1:'-version' 
+F,21/02/16 20:29:22,Driver. Using driver 'LLDB driver' internally
+F,21/02/16 20:29:22,Program exited OK

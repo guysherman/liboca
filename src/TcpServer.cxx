@@ -35,8 +35,8 @@
 // GTK Headers
 
 #include "TcpServer.hxx"
-#include "TcpConnectionFactory.hxx"
-#include "ITcpConnection.hxx"
+#include "IOcpSession.hxx"
+#include "OcpSessionFactory.hxx"
 
 
 namespace oca
@@ -44,12 +44,12 @@ namespace oca
     namespace net
     {
         TcpServer::TcpServer(
-            boost::shared_ptr<TcpConnectionFactory> connectionFactory,
+            boost::shared_ptr<oca::net::OcpSessionFactory> sessionFactory,
             boost::shared_ptr<boost::asio::io_service> ioService,
             uint16_t port,
-            ITcpConnection::ConnectionEventHandler handler)
+            IOcpSession::SessionEventHandler handler)
             : acceptor(*ioService, boost::asio::ip::tcp::endpoint(boost::asio::ip::tcp::v4(), port)),
-            connectionFactory(connectionFactory),
+            sessionFactory(sessionFactory),
             ioService(ioService),
             port(port),
             isRunning(false),
@@ -60,7 +60,7 @@ namespace oca
 
         void TcpServer::accept()
         {
-            ITcpConnection::pointer connection = connectionFactory->CreateConnection();
+            IOcpSession::pointer connection = sessionFactory->CreateSession();
             if (connection == NULL)
             {
                 return;
@@ -77,7 +77,7 @@ namespace oca
             );
         }
 
-        void TcpServer::accepted(boost::shared_ptr<ITcpConnection> connection, const boost::system::error_code &error)
+        void TcpServer::accepted(boost::shared_ptr<IOcpSession> connection, const boost::system::error_code &error)
         {
             handler(connection);
             if (!error)

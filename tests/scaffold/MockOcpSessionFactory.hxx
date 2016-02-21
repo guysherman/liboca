@@ -16,8 +16,8 @@
   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 */
-#ifndef __MOCKTCPCONNECTIONFACTORY_HXX__
-#define __MOCKTCPCONNECTIONFACTORY_HXX__
+#ifndef __MockOcpSessionFactory_HXX__
+#define __MockOcpSessionFactory_HXX__
 
 
 // C++ Standard Headers
@@ -34,10 +34,10 @@
 
 
 // GTK Headers
-#include <ITcpConnection.hxx>
-#include <TcpConnectionFactory.hxx>
+#include <IOcpSession.hxx>
 #include <OcpSession.hxx>
-#include "MockTcpConnection.hxx"
+#include <OcpSessionFactory.hxx>
+#include "MockOcpConnection.hxx"
 
 namespace oca
 {
@@ -47,33 +47,33 @@ namespace oca
 	{
 		class TcpConnection;
 
-		class MockTcpConnectionFactory : public TcpConnectionFactory
+		class MockOcpSessionFactory : public OcpSessionFactory
 		{
 		public:
-			MockTcpConnectionFactory(boost::shared_ptr<boost::asio::io_service> ioService, int maxConns)
-                :   TcpConnectionFactory(ioService), countConns(0), maxConns(maxConns)
+			MockOcpSessionFactory(boost::shared_ptr<boost::asio::io_service> ioService, int maxConns)
+                :   OcpSessionFactory(ioService), countConns(0), maxConns(maxConns)
             {
 
             }
 
-			virtual ~MockTcpConnectionFactory()
+			virtual ~MockOcpSessionFactory()
             {
 
             }
 
-			virtual ITcpConnection::pointer CreateConnection()
+			virtual IOcpSession::pointer CreateSession()
             {
                 if (countConns++ == maxConns)
 				{
-					return boost::shared_ptr<ITcpConnection>();
+					return boost::shared_ptr<IOcpSession>();
 				}
-				boost::shared_ptr<MockTcpConnection> conn = MockTcpConnection::Create(*ioService);
+				boost::shared_ptr<MockOcpSession> conn = MockOcpSession::Create(*ioService);
 				connections.push_back(conn);
 				return conn;
 
             }
 
-			std::vector< boost::shared_ptr<MockTcpConnection> > connections;
+			std::vector< boost::shared_ptr<MockOcpSession> > connections;
 
 		private:
 			int countConns;
@@ -83,4 +83,4 @@ namespace oca
 }
 
 
-#endif // __MOCKTCPCONNECTIONFACTORY_HXX__
+#endif // __MockOcpSessionFactory_HXX__

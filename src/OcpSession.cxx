@@ -39,35 +39,63 @@
 #include "OcpSession.hxx"
 #include "Ocp1Header.hxx"
 #include "OcpMessageReader.hxx"
-#include "ITcpConnection.hxx"
 
 namespace oca
 {
 
 	namespace net
 	{
-
-		OcpSession::OcpSession()
-			: stashedHeader(boost::shared_ptr<Ocp1Header>()), id(nextId++), tcpConnection(ITcpConnection::pointer())
+		IOcpSession::pointer OcpSession::Create(boost::asio::io_service &ioService)
 		{
-
+			return pointer(new OcpSession(ioService));
 		}
+
+		OcpSession::OcpSession(boost::asio::io_service &ioService)
+			: stashedHeader(boost::shared_ptr<Ocp1Header>()), id(nextId++), socket(ioService), identifier((uint64_t)this)
+		{
+			memset(&dataBuffer[0], 0, OCP1_DATA_BUFFER_SIZE);
+		}
+
 
 		OcpSession::~OcpSession()
 		{
 
 		}
 
-		void OcpSession::SetTcpConnection(ITcpConnection::pointer connection)
+
+
+		void OcpSession::Start()
 		{
-			tcpConnection = connection;
-			tcpConnection->SetOcpSession(shared_from_this());
+			readSyncValue();
+
+		}
+
+		void OcpSession::readSyncValue()
+		{
+			boost::asio::async_read(socket, boost::asio::buffer(&dataBuffer[0], 1),
+				boost::bind(
+					&OcpSession::syncValueRead,
+					shared_from_this(),
+					boost::asio::placeholders::error,
+				 	boost::asio::placeholders::bytes_transferred
+				)
+			);
+		}
+
+		void OcpSession::syncValueRead(const boost::system::error_code& error, size_t bytesTransferred)
+		{
+
+			this->SyncValueReceived(&dataBuffer[0],
+				error,
+				bytesTransferred);
+
+
+
 		}
 
 		void OcpSession::SyncValueReceived(uint8_t* bufferData,
 			const boost::system::error_code& error,
-			size_t bytesTransferred,
-			boost::function<void(void)> getHeader )
+			size_t bytesTransferred)
 		{
 			if (error.value() != boost::system::errc::success)
 			{
@@ -92,7 +120,7 @@ namespace oca
 			{
 				if (bufferData[0] == 0x3B)
 				{
-					getHeader();
+					readOcp1Header();
 				}
 				else
 				{
@@ -101,11 +129,31 @@ namespace oca
 			}
 		}
 
+		void OcpSession::readOcp1Header()
+		{
+			boost::asio::async_read(socket, boost::asio::buffer(&dataBuffer[0], OCP1_HEADER_SIZE),
+				boost::bind(
+					&OcpSession::ocp1HeaderRead,
+					shared_from_this(),
+					boost::asio::placeholders::error,
+					boost::asio::placeholders::bytes_transferred
+				)
+			);
+		}
+
+		void OcpSession::ocp1HeaderRead(const boost::system::error_code& error, size_t bytesTransferred)
+		{
+			this->Ocp1HeaderReceived(
+				&dataBuffer[0],
+				identifier,
+				error,
+				bytesTransferred);
+		}
+
 		void OcpSession::Ocp1HeaderReceived(uint8_t* bufferData,
 			uint64_t connectionIdentifier,
 			const boost::system::error_code& error,
-			size_t bytesTransferred,
-			boost::function<void(uint32_t)> getData)
+			size_t bytesTransferred)
 		{
 			boost::asio::const_buffer headerBuffer(bufferData, bytesTransferred);
 
@@ -123,8 +171,29 @@ namespace oca
 
 			// The messageSize property includes the header, but we've
 			// already got it so we ask for fewer bytes.
-			getData(header.messageSize - OCP1_HEADER_SIZE);
+			readOcp1Data(header.messageSize - OCP1_HEADER_SIZE);
 
+		}
+
+		void OcpSession::readOcp1Data(uint32_t dataSize)
+		{
+			boost::asio::async_read(socket, boost::asio::buffer(&dataBuffer[0], (size_t)dataSize),
+				boost::bind(
+					&OcpSession::ocp1DataRead,
+					shared_from_this(),
+					boost::asio::placeholders::error,
+					boost::asio::placeholders::bytes_transferred
+				)
+			);
+		}
+
+		void OcpSession::ocp1DataRead(const boost::system::error_code& error, size_t bytesTransferred)
+		{
+			this->Ocp1DataReceived(&dataBuffer[0], identifier, error, bytesTransferred);
+
+			// Now that we've read all the way through the message, we go wait
+			// for the next one.
+			readSyncValue();
 		}
 
 		void OcpSession::Ocp1DataReceived(uint8_t* bufferData,
@@ -168,7 +237,21 @@ namespace oca
 		}
 
 		int OcpSession::nextId = 0;
+
+		boost::system::error_code OcpSession::Send(boost::asio::const_buffer& buffer, size_t bytesToTransfer)
+		{
+			boost::system::error_code error;
+			boost::asio::write(socket, boost::asio::buffer(buffer, bytesToTransfer), error);
+			return error;
+		}
+
+		boost::asio::ip::tcp::socket& OcpSession::GetSocket()
+		{
+			return socket;
+		}
+
 	}
+
 
 
 }

@@ -46,22 +46,22 @@ namespace oca
 {
 	namespace net
 	{
-		class ITcpConnection;
-
 		class IOcpSession
 		{
 		public:
 			typedef boost::shared_ptr<IOcpSession> pointer;
 			typedef boost::function< void(boost::shared_ptr<IOcpSession>) > SessionEventHandler;
 
-			virtual void SetTcpConnection(boost::shared_ptr<ITcpConnection> connection) = 0;
-
-			virtual void SyncValueReceived(uint8_t* bufferData, const boost::system::error_code& error, size_t bytesTransferred, boost::function<void(void)> getHeader) = 0;
-			virtual void Ocp1HeaderReceived(uint8_t* bufferData, uint64_t connectionIdentifier, const boost::system::error_code& error, size_t bytesTransferred, boost::function<void(uint32_t)> getData) = 0;
+			virtual void SyncValueReceived(uint8_t* bufferData, const boost::system::error_code& error, size_t bytesTransferred) = 0;
+			virtual void Ocp1HeaderReceived(uint8_t* bufferData, uint64_t connectionIdentifier, const boost::system::error_code& error, size_t bytesTransferred) = 0;
             virtual void Ocp1DataReceived(uint8_t* bufferData, uint64_t connectionIdentifier, const boost::system::error_code& error, size_t bytesTransferred) = 0;
 
 			virtual void AddSessionClosedHandler(SessionEventHandler handler) = 0;
 			virtual int GetId() = 0;
+
+			virtual void Start() = 0;
+			virtual boost::asio::ip::tcp::socket& GetSocket() = 0;
+			virtual boost::system::error_code Send(boost::asio::const_buffer& buffer, size_t bytesToTransfer) = 0;
 		};
 	}
 }

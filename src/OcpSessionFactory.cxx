@@ -37,20 +37,23 @@
 
 #include "OcpSessionFactory.hxx"
 #include "IOcpSession.hxx"
-#include "ITcpConnection.hxx"
 #include "OcpSession.hxx"
 
 namespace oca
 {
 	namespace net
 	{
-		OcpSessionFactory::OcpSessionFactory() {}
+		OcpSessionFactory::OcpSessionFactory(boost::shared_ptr<boost::asio::io_service> ioService)
+			:	ioService(ioService)
+		{
+
+		}
 
 		OcpSessionFactory::~OcpSessionFactory() {}
 
 		boost::shared_ptr<IOcpSession> OcpSessionFactory::CreateSession()
 		{
-			return boost::shared_ptr<IOcpSession>(new OcpSession());
+			return OcpSession::Create(*ioService);
 		}
 	}
 

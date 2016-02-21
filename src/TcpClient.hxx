@@ -16,8 +16,8 @@
       Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
     */
-  #ifndef __TCPSERVER_HXX__
-  #define __TCPSERVER_HXX__
+  #ifndef __TCPCLIENT_HXX__
+  #define __TCPCLIENT_HXX__
 
     // C++ Standard Headers
 
@@ -26,7 +26,7 @@
 
 
     // Boost Headers
-    #include <boost/function.hpp>
+	#include <boost/function.hpp>
     #include <boost/bind.hpp>
     #include <boost/shared_ptr.hpp>
 	#include <boost/asio.hpp>
@@ -36,45 +36,25 @@
 
     // GTK Headers
 
-// Our Headers
 
-#include "IOcpSession.hxx"
-#include "OcpSessionFactory.hxx"
+    // Our Headers
 
 namespace oca
 {
 	namespace net
 	{
-
-		class TcpServer
+		class TcpClient
 		{
-		public:
+			TcpClient();
+			virtual ~TcpClient();
 
+			void Connect(const char* address, uint16_t port);
+			void Disconnect();
 
-            TcpServer(
-                boost::shared_ptr<oca::net::OcpSessionFactory> sessionFactory,
-                boost::shared_ptr<boost::asio::io_service> ioService,
-                uint16_t port,
-                IOcpSession::SessionEventHandler handler);
-            void Start();
-            void Stop();
-			virtual ~TcpServer();
-
-
-		private:
-			void accept();
-			void accepted(boost::shared_ptr<oca::net::IOcpSession> connection, const boost::system::error_code& error);
-
-
-			boost::asio::ip::tcp::acceptor acceptor;
-            boost::shared_ptr<oca::net::OcpSessionFactory> sessionFactory;
-            boost::shared_ptr<boost::asio::io_service> ioService;
-            uint16_t port;
-            bool isRunning;
-            IOcpSession::SessionEventHandler handler;
-
+			
 		};
 	}
 }
 
-  #endif // __TCPSERVER_HXX__
+
+  #endif // __TCPCLIENT_HXX__

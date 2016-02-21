@@ -65,6 +65,7 @@ namespace oca
 				if (!isRunning)
 				{
 					pthread_create(&worker, NULL, &WorkQueue::run, this);
+					shouldContinueRunning = true;
 				}
 			}
 

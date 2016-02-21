@@ -37,9 +37,8 @@
 
   // GTK Headers
 
-#include <ITcpConnection.hxx>
 #include <IOcpSession.hxx>
-
+/*
 
   namespace oca_test
   {
@@ -147,5 +146,5 @@
 
 	  };
   }
-
+*/
 #endif // __MOCKMESSAGEREADER_HXX__

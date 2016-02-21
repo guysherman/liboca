@@ -43,16 +43,17 @@ namespace oca
 	namespace net
 	{
 		class IOcpSession;
-		class ITcpConnection;
 
 		class OcpSessionFactory
 		{
 		public:
-			OcpSessionFactory();
+			explicit OcpSessionFactory(boost::shared_ptr<boost::asio::io_service> ioService);
 			virtual ~OcpSessionFactory();
 
 			virtual boost::shared_ptr<IOcpSession> CreateSession();
 
+		protected:
+			boost::shared_ptr<boost::asio::io_service> ioService;
 		};
 	}
 }

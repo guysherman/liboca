@@ -38,7 +38,6 @@
 #include <oca/OcaNetwork.hxx>
 
 #include "OcpSessionFactory.hxx"
-#include "TcpConnectionFactory.hxx"
 #include "TcpServer.hxx"
 
 #include "IOcpSession.hxx"
@@ -62,12 +61,12 @@ namespace oca
             throw e;
         }
 
-        sessionFactory = boost::shared_ptr<oca::net::OcpSessionFactory>(new oca::net::OcpSessionFactory());
+
         boost::shared_ptr<boost::asio::io_service> ioService(new boost::asio::io_service());
-        boost::shared_ptr<oca::net::TcpConnectionFactory> factory(new oca::net::TcpConnectionFactory(ioService));
+        sessionFactory = boost::shared_ptr<oca::net::OcpSessionFactory>(new oca::net::OcpSessionFactory(ioService));
         tcpServer = boost::shared_ptr<oca::net::TcpServer>(
             new oca::net::TcpServer(
-                factory,
+                sessionFactory,
                 ioService,
                 port,
                 boost::bind(
@@ -95,10 +94,9 @@ namespace oca
         }
     }
 
-    void OcaNetwork::newConnectionCreated(boost::shared_ptr<oca::net::ITcpConnection> connection)
+    void OcaNetwork::newConnectionCreated(boost::shared_ptr<oca::net::IOcpSession> connection)
     {
-        oca::net::IOcpSession::pointer session = sessionFactory->CreateSession();
-        session->SetTcpConnection(connection);
+        oca::net::IOcpSession::pointer session = connection;
         session->AddSessionClosedHandler(
             boost::bind(
                 &OcaNetwork::sessionEnded,
