@@ -2,3 +2,4 @@
 -I.
 -I./include
 -I./dep/wq/include
+-I../src
