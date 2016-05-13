@@ -39,7 +39,9 @@ namespace oca
 {
 	namespace ocp
 	{
-		Server::Server(const char* listenAddress, const char* port) : listenSocketFileDescriptor(0)
+		Server::Server(const char* listenAddress, const char* port) :
+			listenSocketFileDescriptor(0),
+			continueAccepting(true)
 		{
 			int status;
 			int yes = 1;
@@ -102,14 +104,42 @@ namespace oca
 				throw std::exception();
 			}
 
+			pthread_create(&this->acceptThread, NULL, &Server::acceptWrapper, (void* )this);
+
 		}
 
 		// TODO: listen, spawn accept thread, spawn connection threads
+		void* Server::acceptWrapper(void *arg)
+		{
+			if (arg == NULL)
+			{
+				// TODO: return proper exit codes with pthread_exit
+				return NULL;
+			}
+
+			Server* me = static_cast<Server*>(arg);
+			me->acceptLoop(NULL);
+
+			// TODO: proper return values #correctness
+			return NULL;
+		}
+
+		void* Server::acceptLoop(void *arg)
+		{
+			while(continueAccepting)
+			{
+				pthread_yield();
+			}
+
+			return NULL;
+		}
 
 		// TODO: stop accept thread, stop connection threads, unbind, close
 
 		Server::~Server()
 		{
+			this->continueAccepting = false;
+			pthread_join(acceptThread, NULL);
 			if(this->listenSocketFileDescriptor != 0)
 			{
 				close(listenSocketFileDescriptor);

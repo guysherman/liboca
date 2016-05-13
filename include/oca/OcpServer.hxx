@@ -24,6 +24,7 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netdb.h>
+#include <pthread.h>
 
 // Boost Headers
 
@@ -45,7 +46,13 @@ namespace oca
 		private:
 			Server(const Server& rhs);
 			Server& operator=(const Server& rhs);
+
+			static void* acceptWrapper(void* arg);
+			void* acceptLoop(void* arg);
+
 			int listenSocketFileDescriptor;
+			pthread_t acceptThread;
+			bool continueAccepting;
 		};
 	}
 }
