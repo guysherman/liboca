@@ -24,6 +24,8 @@
 #include <string.h>
 #include <stdio.h>
 #include <unistd.h>
+#include <arpa/inet.h>
+#include <netinet/in.h>
 
 // Boost Headers
 
@@ -33,7 +35,16 @@
 
 // Our Headers
 #include <oca/OcpServer.hxx>
+#include "OcpConnectionEndpoint.hxx"
 
+void *get_in_addr(struct sockaddr *sa)
+{
+    if (sa->sa_family == AF_INET) {
+        return &(((struct sockaddr_in*)sa)->sin_addr);
+    }
+
+    return &(((struct sockaddr_in6*)sa)->sin6_addr);
+}
 
 namespace oca
 {
@@ -126,8 +137,29 @@ namespace oca
 
 		void* Server::acceptLoop(void *arg)
 		{
+
+
 			while(continueAccepting)
 			{
+				struct sockaddr_storage clientAddress; // connector's address information
+	    		socklen_t clientAddressSize = sizeof clientAddress;
+				char s[INET6_ADDRSTRLEN];
+				int newSocketFileDescriptor = accept(this->listenSocketFileDescriptor,
+												(struct sockaddr*)&clientAddress,
+												&clientAddressSize);
+				if (newSocketFileDescriptor == -1)
+				{
+					fprintf(stderr, "accept failed");
+					continue;
+				}
+
+				inet_ntop(clientAddress.ss_family,
+            				get_in_addr((struct sockaddr *)&clientAddress),
+            				s, sizeof s);
+        		printf("server: got connection from %s\n", s);
+				boost::shared_ptr<ConnectionEndpoint> endpoint(new ConnectionEndpoint(newSocketFileDescriptor));
+				this->endpoints.push_back(endpoint);
+
 				pthread_yield();
 			}
 

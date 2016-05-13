@@ -18,7 +18,7 @@
 */
 
 // C++ Standard Headers
-
+#include <vector>
 
 // C Standard Headers
 #include <sys/types.h>
@@ -27,7 +27,7 @@
 #include <pthread.h>
 
 // Boost Headers
-
+#include <boost/shared_ptr.hpp>
 
 // 3rd Party Headers
 
@@ -38,6 +38,8 @@ namespace oca
 {
 	namespace ocp
 	{
+		class ConnectionEndpoint;
+
 		class Server
 		{
 		public:
@@ -53,6 +55,8 @@ namespace oca
 			int listenSocketFileDescriptor;
 			pthread_t acceptThread;
 			bool continueAccepting;
+			std::vector< boost::shared_ptr<oca::ocp::ConnectionEndpoint> > endpoints;
+
 		};
 	}
 }
