@@ -44,12 +44,15 @@ namespace oca
 			virtual ~ConnectionEndpoint();
 
 		private:
-			static void* receiveLoop(void* arg);
-			static void* sendLoop(void* arg);
+			static void* receiveWrapper(void* arg);
+			static void* sendWrapper(void* arg);
+			void* receiveLoop(void* arg);
+			void* sendLoop(void* arg);
 
 			int socketFileDescriptor;
 			pthread_t receiveThread;
 			pthread_t sendThread;
+			bool shouldContinue;
 		};
 	}
 }

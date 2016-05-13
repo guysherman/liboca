@@ -36,16 +36,20 @@ namespace oca
 {
 	namespace ocp
 	{
-		ConnectionEndpoint::ConnectionEndpoint(int socketFileDescriptor) : socketFileDescriptor(socketFileDescriptor)
+		ConnectionEndpoint::ConnectionEndpoint(int socketFileDescriptor) :
+			socketFileDescriptor(socketFileDescriptor),
+			shouldContinue(false)
+
 		{
-			pthread_create(&this->receiveThread, NULL, &ConnectionEndpoint::receiveLoop, (void*)this);
+			shouldContinue = true;
+			pthread_create(&this->receiveThread, NULL, &ConnectionEndpoint::receiveWrapper, (void*)this);
 			//pthread_detach(this->receiveThread);
 
-			pthread_create(&this->sendThread, NULL, &ConnectionEndpoint::sendLoop, (void*)this);
+			pthread_create(&this->sendThread, NULL, &ConnectionEndpoint::sendWrapper, (void*)this);
 			//pthread_detach(this->sendThread);
 		}
 
-		void* ConnectionEndpoint::receiveLoop(void *arg)
+		void* ConnectionEndpoint::receiveWrapper(void *arg)
 		{
 			if (arg == NULL)
 			{
@@ -60,11 +64,24 @@ namespace oca
 				return NULL;
 			}
 
+			me->receiveLoop(NULL);
+
 			// TODO: return proper exit codes with pthread_exit #correctness
 			return NULL;
 		}
 
-		void* ConnectionEndpoint::sendLoop(void *arg)
+		void* ConnectionEndpoint::receiveLoop(void *arg)
+		{
+			while(shouldContinue)
+			{
+				
+				pthread_yield();
+			}
+
+			return NULL;
+		}
+
+		void* ConnectionEndpoint::sendWrapper(void *arg)
 		{
 			if (arg == NULL)
 			{
@@ -79,12 +96,25 @@ namespace oca
 				return NULL;
 			}
 
+			me->sendLoop(NULL);
+
 			// TODO: return proper exit codes with pthread_exit
+			return NULL;
+		}
+
+		void* ConnectionEndpoint::sendLoop(void *arg)
+		{
+			while(shouldContinue)
+			{
+				pthread_yield();
+			}
+
 			return NULL;
 		}
 
 		ConnectionEndpoint::~ConnectionEndpoint()
 		{
+			shouldContinue = false;
 			pthread_join(this->receiveThread, NULL);
 			pthread_join(this->sendThread, NULL);
 			socketFileDescriptor = 0;

@@ -45,7 +45,7 @@ namespace oca
 		private:
 			Server(const Server& rhs);
 			Server& operator=(const Server& rhs);
-			struct addrinfo* addressInfo;
+			int listenSocketFileDescriptor;
 		};
 	}
 }
