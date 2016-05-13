@@ -55,7 +55,7 @@ namespace oca
 			if (status != 0)
 			{
 				fprintf(stderr, "getaddrinfo error: %s\n", gai_strerror(status));
-				throw new std::exception();
+				throw std::exception();
 			}
 
 			for (currentCandidate = candidateAddresses;
@@ -77,7 +77,7 @@ namespace oca
 					fprintf(stderr, "setsockopt failed");
 					// TODO: use our exception here so we get useful info
 					freeaddrinfo(candidateAddresses);
-					throw new std::exception();
+					throw std::exception();
 				}
 
 				status = bind(socketFd, currentCandidate->ai_addr, currentCandidate->ai_addrlen);
@@ -99,7 +99,7 @@ namespace oca
 			{
 				// Shouldn't really get here, but just in case...
 				fprintf(stderr, "bind failed completely");
-				throw new std::exception();
+				throw std::exception();
 			}
 
 		}

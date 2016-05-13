@@ -26,7 +26,7 @@
 #include <netdb.h>
 
 // Boost Headers
-
+#include <boost/shared_ptr.hpp>
 
 // 3rd Party Headers
 
@@ -38,6 +38,8 @@ namespace oca
 {
 	namespace ocp
 	{
+		class ConnectionEndpoint;
+
 		class Client
 		{
 		public:
@@ -47,7 +49,8 @@ namespace oca
 		private:
 			Client(const Client& rhs);
 			Client& operator=(const Client& rhs);
-			struct addrinfo* addressInfo;
+			int clientSocketFileDescriptor;
+			boost::shared_ptr<ConnectionEndpoint> endpoint;
 		};
 	}
 }
