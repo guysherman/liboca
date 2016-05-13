@@ -75,54 +75,54 @@ namespace oca
 		header.messageType = static_cast<ocp::OcaMessageType>(* mt);
 
 		const uint8_t* mc = mt+sizeof(uint8_t);
-		header.messageCount = ntohs(* reinterpret_cast<const uint8_t*>(mc));
+		header.messageCount = ntohs(* reinterpret_cast<const uint16_t*>(mc));
 	}
 
-	void OcpMessageReader::ParametersFromBuffer(boost::asio::const_buffer& buffer, size_t remainingCommandBytes, net::Ocp1Parameters& parameters)
+	void OcpMessageReader::ParametersFromBuffer(const uint8_t* buffer, size_t remainingCommandBytes, net::Ocp1Parameters& parameters)
 	{
-		parameters.parameterCount = *(boost::asio::buffer_cast<const uint8_t*>(buffer));
+		parameters.parameterCount = *buffer;
 
 		size_t parameterBufferBytes = (remainingCommandBytes - sizeof(uint8_t));
-		boost::asio::const_buffer paramBuffer = buffer+sizeof(uint8_t);
+		const uint8_t* paramBuffer = buffer+sizeof(uint8_t);
 		//const uint8_t* params = boost::asio::buffer_cast<const uint8_t*>(paramBuffer);
 
-		OcaBasicTypeReader::BufferToUint8Vector(paramBuffer, parameterBufferBytes, parameters.parameters);
+		OcaBasicTypeReader::BufferToUint8Vector(&paramBuffer, parameterBufferBytes, parameters.parameters);
 
 	}
 
 
 
 	// TODO: move this to OcpBasicTypeReader and make it implicitly advance buffer #refactor
-	void OcpMessageReader::MethodIdFromBuffer(boost::asio::const_buffer& buffer, OcaMethodId& methodId)
+	void OcpMessageReader::MethodIdFromBuffer(const uint8_t* buffer, OcaMethodId& methodId)
 	{
-		methodId.treeLevel = ntohs(*(boost::asio::buffer_cast<const OcaUint16*>(buffer)));
+		methodId.treeLevel = ntohs(* reinterpret_cast<const OcaUint16*>(buffer));
 
-		boost::asio::const_buffer mi = buffer + sizeof(OcaUint16);
-		methodId.methodIndex = ntohs(*(boost::asio::buffer_cast<const OcaUint16*>(mi)));
+		const uint8_t* mi = buffer + sizeof(OcaUint16);
+		methodId.methodIndex = ntohs(* reinterpret_cast<const OcaUint16*>(mi));
 	}
 
-	void OcpMessageReader::CommandFromBuffer(boost::asio::const_buffer& buffer, net::Ocp1Command& cmd)
+	void OcpMessageReader::CommandFromBuffer(const uint8_t* buffer, net::Ocp1Command& cmd)
 	{
-		cmd.commandSize = ntohl(*(boost::asio::buffer_cast<const OcaUint32*>(buffer)));
+		cmd.commandSize = ntohl(* reinterpret_cast<const OcaUint32*>(buffer));
 
-		boost::asio::const_buffer handleBuf = buffer + sizeof(OcaUint32);
-		cmd.handle = ntohl(*(boost::asio::buffer_cast<const OcaUint32*>(handleBuf)));
+		const uint8_t* handleBuf = buffer + sizeof(OcaUint32);
+		cmd.handle = ntohl(* reinterpret_cast<const OcaUint32*>(handleBuf));
 
-		boost::asio::const_buffer targetONoBuffer = handleBuf + sizeof(OcaUint32);
-		cmd.targetONo = ntohl(*(boost::asio::buffer_cast<const OcaONo*>(targetONoBuffer)));
+		const uint8_t* targetONoBuffer = handleBuf + sizeof(OcaUint32);
+		cmd.targetONo = ntohl(* reinterpret_cast<const OcaONo*>(targetONoBuffer));
 
-		boost::asio::const_buffer methodIdBuffer = targetONoBuffer + sizeof(OcaONo);
+		const uint8_t* methodIdBuffer = targetONoBuffer + sizeof(OcaONo);
 		MethodIdFromBuffer(methodIdBuffer, cmd.methodId);
 
 		size_t remainingBytes = cmd.commandSize - (2*sizeof(OcaUint32) + sizeof(OcaONo) + sizeof(OcaMethodId));
-		boost::asio::const_buffer parametersBuffer = methodIdBuffer + sizeof(OcaMethodId);
+		const uint8_t* parametersBuffer = methodIdBuffer + sizeof(OcaMethodId);
 
 		ParametersFromBuffer(parametersBuffer, remainingBytes, cmd.parameters);
 	}
 
-	void OcpMessageReader::CommandListFromBuffer(boost::asio::const_buffer& buffer, ocp::Ocp1Header header, std::vector<net::Ocp1Command>& commands)
+	void OcpMessageReader::CommandListFromBuffer(const uint8_t* buffer, ocp::Ocp1Header header, std::vector<net::Ocp1Command>& commands)
 	{
-		boost::asio::const_buffer message = buffer;
+	 	const uint8_t* message = buffer;
 
 		for (uint16_t i = 0; i < header.messageCount; ++i )
 		{
@@ -133,9 +133,9 @@ namespace oca
 		}
 	}
 
-	void OcpMessageReader::ResponseListFromBuffer(boost::asio::const_buffer& buffer, ocp::Ocp1Header header, std::vector<net::Ocp1Response>& responses)
+	void OcpMessageReader::ResponseListFromBuffer(const uint8_t* buffer, ocp::Ocp1Header header, std::vector<net::Ocp1Response>& responses)
 	{
-		boost::asio::const_buffer message = buffer;
+		const uint8_t* message = buffer;
 		for (uint16_t i = 0; i < header.messageCount; ++i)
 		{
 			net::Ocp1Response resp;
@@ -145,70 +145,70 @@ namespace oca
 		}
 	}
 
-	void OcpMessageReader::ResponseFromBuffer(boost::asio::const_buffer& buffer, net::Ocp1Response& resp)
+	void OcpMessageReader::ResponseFromBuffer(const uint8_t* buffer, net::Ocp1Response& resp)
 	{
-		resp.responseSize = ntohl(*(boost::asio::buffer_cast<const OcaUint32*>(buffer)));
+		resp.responseSize = ntohl(* reinterpret_cast<const OcaUint32*>(buffer));;
 
-		boost::asio::const_buffer handleBuf = buffer + sizeof(OcaUint32);
-		resp.handle = ntohl(*(boost::asio::buffer_cast<const OcaUint32*>(handleBuf)));
+		const uint8_t* handleBuf =  buffer + sizeof(OcaUint32);
+		resp.handle = ntohl(* reinterpret_cast<const OcaUint32*>(handleBuf));;
 
-		boost::asio::const_buffer statusCodeBuf = handleBuf + sizeof(OcaUint32);
-		resp.statusCode = *(boost::asio::buffer_cast<const OcaStatus*>(statusCodeBuf));
+		const uint8_t* statusCodeBuf =  handleBuf + sizeof(OcaUint32);
+		resp.statusCode = (* reinterpret_cast<const OcaStatus*>(statusCodeBuf));
 
-		boost::asio::const_buffer paramsBuf = statusCodeBuf + sizeof(OcaStatus);
+		const uint8_t* paramsBuf =  statusCodeBuf + sizeof(OcaStatus);
 		size_t remainingBytes = resp.responseSize - (2*sizeof(OcaUint32) + sizeof(OcaStatus));
 		ParametersFromBuffer(paramsBuf, remainingBytes, resp.parameters);
 	}
 
-	void OcpMessageReader::EventIdFromBuffer(boost::asio::const_buffer& buffer, OcaEventId& eventId)
+	void OcpMessageReader::EventIdFromBuffer(const uint8_t* buffer, OcaEventId& eventId)
 	{
-		eventId.treeLevel = ntohs(*(boost::asio::buffer_cast<const OcaUint16*>(buffer)));
+		eventId.treeLevel = ntohs(* reinterpret_cast<const OcaUint16*>(buffer));;
 
-		boost::asio::const_buffer indexBuf = buffer + sizeof(OcaUint16);
-		eventId.eventIndex = ntohs(*(boost::asio::buffer_cast<const OcaUint16*>(indexBuf)));
+		const uint8_t* indexBuf =  buffer + sizeof(OcaUint16);
+		eventId.eventIndex = ntohs(* reinterpret_cast<const OcaUint16*>(indexBuf));;
 	}
 
-	void OcpMessageReader::EventFromBuffer(boost::asio::const_buffer& buffer, OcaEvent& event)
+	void OcpMessageReader::EventFromBuffer(const uint8_t* buffer, OcaEvent& event)
 	{
-		event.emitterONo = ntohl(*(boost::asio::buffer_cast<const OcaONo*>(buffer)));
+		event.emitterONo = ntohl(* reinterpret_cast<const OcaONo*>(buffer));;
 
-		boost::asio::const_buffer idBuffer = buffer + sizeof(OcaONo);
+		const uint8_t* idBuffer =  buffer + sizeof(OcaONo);
 		EventIdFromBuffer(idBuffer, event.eventId);
 	}
 
-	void OcpMessageReader::EventDataFromBuffer(boost::asio::const_buffer& buffer, size_t remainingBytes, oca::net::Ocp1EventData& data)
+	void OcpMessageReader::EventDataFromBuffer(const uint8_t* buffer, size_t remainingBytes, oca::net::Ocp1EventData& data)
 	{
 		EventFromBuffer(buffer, data.event);
 
-		boost::asio::const_buffer paramsBuffer = buffer + sizeof(OcaEvent);
+		const uint8_t* paramsBuffer =  buffer + sizeof(OcaEvent);
 		size_t parameterBytes = remainingBytes - sizeof(OcaEvent);
-		OcaBasicTypeReader::BufferToUint8Vector(paramsBuffer, parameterBytes, data.eventParameters);
+		OcaBasicTypeReader::BufferToUint8Vector(&paramsBuffer, parameterBytes, data.eventParameters);
 
 	}
 
-	void OcpMessageReader::NtfParamsFromBuffer(boost::asio::const_buffer& buffer, size_t remainingBytes, net::Ocp1NtfParams& params)
+	void OcpMessageReader::NtfParamsFromBuffer(const uint8_t* buffer, size_t remainingBytes, net::Ocp1NtfParams& params)
 	{
-		boost::asio::const_buffer temp = buffer;
-		params.parameterCount = OcaBasicTypeReader::Uint8FromBuffer(temp);
-		OcaBasicTypeReader::BlobFromBuffer(temp, params.context);
+		const uint8_t* temp =  buffer;
+		params.parameterCount = OcaBasicTypeReader::Uint8FromBuffer(&temp);
+		OcaBasicTypeReader::BlobFromBuffer(&temp, params.context);
 		size_t remainingEventDataBytes = remainingBytes - sizeof(OcaUint8) - (params.context.size() * sizeof(OcaUint8)) - sizeof(OcaUint16);
 		EventDataFromBuffer(temp, remainingEventDataBytes, params.eventData);
 	}
 
-	void OcpMessageReader::NotificationFromBuffer(boost::asio::const_buffer& buffer, net::Ocp1Notification& notification)
+	void OcpMessageReader::NotificationFromBuffer(const uint8_t* buffer, net::Ocp1Notification& notification)
 	{
-		boost::asio::const_buffer temp = buffer;
-		notification.notificationSize = oca::OcaBasicTypeReader::Uint32FromBuffer(temp);
-		notification.targetONo = oca::OcaBasicTypeReader::Uint32FromBuffer(temp);
+		const uint8_t* temp =  buffer;
+		notification.notificationSize = oca::OcaBasicTypeReader::Uint32FromBuffer(&temp);
+		notification.targetONo = oca::OcaBasicTypeReader::Uint32FromBuffer(&temp);
 		MethodIdFromBuffer(temp, notification.methodId);
 		temp = temp + sizeof(OcaMethodId);
 		size_t parameterChunkBytes = notification.notificationSize - sizeof(OcaUint32) - sizeof(OcaONo) - sizeof(OcaMethodId);
 		NtfParamsFromBuffer(temp, parameterChunkBytes, notification.parameters);
 	}
 
-	void OcpMessageReader::NotificationListFromBuffer(boost::asio::const_buffer& buffer, ocp::Ocp1Header header, net::NotificationList& notifications)
+	void OcpMessageReader::NotificationListFromBuffer(const uint8_t* buffer, ocp::Ocp1Header header, net::NotificationList& notifications)
 	{
-		boost::asio::const_buffer message = buffer;
+		const uint8_t* message =  buffer;
 		for (OcaUint16 i = 0; i < header.messageCount; ++i)
 		{
 			net::Ocp1Notification notification;

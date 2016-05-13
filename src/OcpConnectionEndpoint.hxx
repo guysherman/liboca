@@ -31,12 +31,15 @@
 
 
 // Our Headers
+#include <oca/OcaTypes.hxx>
 
 
 namespace oca
 {
 	namespace ocp
 	{
+		struct Ocp1Header;
+
 		class ConnectionEndpoint
 		{
 		public:
@@ -48,11 +51,20 @@ namespace oca
 			static void* sendWrapper(void* arg);
 			void* receiveLoop(void* arg);
 			void* sendLoop(void* arg);
+			void processKeepAlive(Ocp1Header& header);
+			static void* supervisorWrapper(void* arg);
+			void* supervisorLoop(void* arg);
+
 
 			int socketFileDescriptor;
 			pthread_t receiveThread;
 			pthread_t sendThread;
 			bool shouldContinue;
+			OcaUint16 heartbeatTime;
+			bool supervisorActivated;
+			pthread_t supervisorThread;
+			time_t lastMessageSentAt;
+			time_t lastMessageReceivedAt;
 		};
 	}
 }

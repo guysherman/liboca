@@ -43,12 +43,12 @@ namespace oca
 	{
 	public:
 
-		static void BlobFromBuffer(boost::asio::const_buffer& buffer, OcaBlob& blob);
-		static OcaUint8 Uint8FromBuffer(boost::asio::const_buffer& buffer);
-		static OcaUint16 Uint16FromBuffer(boost::asio::const_buffer& buffer);
-		static OcaUint32 Uint32FromBuffer(boost::asio::const_buffer& buffer);
+		static void BlobFromBuffer(const uint8_t** buffer, OcaBlob& blob);
+		static OcaUint8 Uint8FromBuffer(const uint8_t** buffer);
+		static OcaUint16 Uint16FromBuffer(const uint8_t** buffer);
+		static OcaUint32 Uint32FromBuffer(const uint8_t** buffer);
 
-		static void BufferToUint8Vector(boost::asio::const_buffer& buffer, size_t numBytes, std::vector<OcaUint8>& vec);
+		static void BufferToUint8Vector(const uint8_t** buffer, size_t numBytes, std::vector<OcaUint8>& vec);
 	};
 }
 

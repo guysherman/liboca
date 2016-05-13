@@ -40,7 +40,11 @@ namespace oca
 	{
 		ConnectionEndpoint::ConnectionEndpoint(int socketFileDescriptor) :
 			socketFileDescriptor(socketFileDescriptor),
-			shouldContinue(false)
+			shouldContinue(false),
+			heartbeatTime(0),
+			supervisorActivated(false),
+			lastMessageSentAt(0),
+			lastMessageReceivedAt(0)
 
 		{
 			shouldContinue = true;
@@ -103,10 +107,86 @@ namespace oca
 				Ocp1Header header;
 				OcpMessageReader::HeaderFromBuffer(&headerBuffer[0], header);
 
-				
+				this->lastMessageReceivedAt = time(NULL);
+
+				switch (header.messageType) {
+					case oca::ocp::OcaKeepAlive:
+						processKeepAlive(header);
+						break;
+					case oca::ocp::OcaCmd:
+					case oca::ocp::OcaCmdRrq:
+					case oca::ocp::OcaNtf:
+					case oca::ocp::OcaRsp:
+					default:
+						break;
+
+				}
+
 
 
 				pthread_yield();
+			}
+
+			return NULL;
+		}
+
+		void ConnectionEndpoint::processKeepAlive(oca::ocp::Ocp1Header &header)
+		{
+			uint8_t buffer[2];
+			memset(&buffer, 0, 2);
+			fprintf(stderr, "Received KeepAlive\n");
+			int bytesReceived = recv(this->socketFileDescriptor, &buffer[0], sizeof(OcaUint16), 0);
+			if (bytesReceived == 2)
+			{
+				this->heartbeatTime = ntohs(* reinterpret_cast<uint16_t*>(&buffer[0]));
+				if (!this->supervisorActivated)
+				{
+					this->supervisorActivated = false;
+					pthread_create(&this->supervisorThread, NULL, &ConnectionEndpoint::supervisorWrapper, (void*)this);
+				}
+
+			}
+
+		}
+
+		void* ConnectionEndpoint::supervisorWrapper(void* arg)
+		{
+			if (arg == NULL)
+			{
+				// TODO: return proper exit codes with pthread_exit #correctness
+				return NULL;
+			}
+
+			ConnectionEndpoint* me = static_cast<ConnectionEndpoint*>(arg);
+			me->supervisorLoop(NULL);
+
+			// TODO: return proper exit codes with pthread_exit #correctness
+			return NULL;
+		}
+
+		void* ConnectionEndpoint::supervisorLoop(void* arg)
+		{
+			time_t heartbeatPeriod = (time_t) this->heartbeatTime;
+			time_t timeoutPeriod = (time_t)(this->heartbeatTime * 3);
+
+			while(this->shouldContinue)
+			{
+				time_t now = time(NULL);
+				time_t receiveDiff = now - this->lastMessageReceivedAt;
+				time_t sendDiff = now - this->lastMessageSentAt;
+
+				if (sendDiff >= heartbeatPeriod)
+				{
+					// TODO: We seem to  be idle, send a message so the other
+					// side knows we're still here
+				}
+
+				if (receiveDiff >= timeoutPeriod)
+				{
+					this->shouldContinue = false;
+					fprintf(stderr, "Idled for too long, terminating.\n");
+					// TODO: tell somebody that we've stopped
+				}
 			}
 
 			return NULL;
