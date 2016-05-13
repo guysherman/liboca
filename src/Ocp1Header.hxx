@@ -37,7 +37,7 @@
 
 namespace oca
 {
-	namespace net
+	namespace ocp
 	{
 		enum OcaMessageType
 		{

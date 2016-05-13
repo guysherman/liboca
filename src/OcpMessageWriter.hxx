@@ -49,7 +49,7 @@ namespace oca
 		{
 		public:
 
-			static void WriteHeaderToBuffer(const net::Ocp1Header& header, boost::asio::mutable_buffer& buffer);
+			static void WriteHeaderToBuffer(const ocp::Ocp1Header& header, boost::asio::mutable_buffer& buffer);
 
 			static void WriteCommandListToBuffer(oca::net::CommandList const& commands, boost::asio::mutable_buffer& buffer);
 			static void WriteCommandToBuffer(const net::Ocp1Command& command, boost::asio::mutable_buffer& buffer);

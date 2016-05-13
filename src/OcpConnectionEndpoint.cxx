@@ -21,7 +21,7 @@
 
 
 // C Standard Headers
-
+#include <stdint.h>
 
 // Boost Headers
 
@@ -31,6 +31,8 @@
 
 // Our Headers
 #include "OcpConnectionEndpoint.hxx"
+#include "Ocp1Header.hxx"
+#include "OcpMessageReader.hxx"
 
 namespace oca
 {
@@ -74,7 +76,36 @@ namespace oca
 		{
 			while(shouldContinue)
 			{
+				uint8_t syncValue = (uint8_t)0;
+				int bytesReceived = recv(this->socketFileDescriptor, &syncValue, sizeof(uint8_t), 0);
+				if (bytesReceived == 0)
+				{
+					// TODO: return values #correctness
+					return NULL;
+				}
+
+				// TODO: move the magic number to a defs.h or something #smell
+				if (syncValue != 0x3B)
+				{
+					// TODO: return values #correctness
+					return NULL;
+				}
+
+				uint8_t headerBuffer[9];
+				memset(&headerBuffer, 0, 9);
+				bytesReceived = recv(this->socketFileDescriptor, &headerBuffer[0], 9 * sizeof(uint8_t), 0);
+				if (bytesReceived == 0)
+				{
+					// TODO: return values #correctness
+					return NULL;
+				}
+
+				Ocp1Header header;
+				OcpMessageReader::HeaderFromBuffer(&headerBuffer[0], header);
+
 				
+
+
 				pthread_yield();
 			}
 

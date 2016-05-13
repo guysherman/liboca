@@ -36,7 +36,7 @@
 
 namespace oca
 {
-	namespace net
+	namespace ocp
 	{
 		Ocp1Header::Ocp1Header()
 			:	protocolVersion(0), messageSize(0), messageType(OcaCmd), messageCount(0)

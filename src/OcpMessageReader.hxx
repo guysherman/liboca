@@ -56,15 +56,15 @@
             OcpMessageReader();
             virtual ~OcpMessageReader();
 
-            static const net::Ocp1Header HeaderFromBuffer(boost::asio::const_buffer& buffer);	// TODO: should the parameter be const? I don't think so, but I don't know for sure.
-			static void HeaderFromBuffer(boost::asio::const_buffer& buffer, net::Ocp1Header& header);
+            static const ocp::Ocp1Header HeaderFromBuffer(const uint8_t* buffer);	// TODO: should the parameter be const? I don't think so, but I don't know for sure.
+			static void HeaderFromBuffer(const uint8_t* buffer, ocp::Ocp1Header& header);
 
-            static void CommandListFromBuffer(boost::asio::const_buffer& buffer, net::Ocp1Header header, std::vector<net::Ocp1Command>& commands);
+            static void CommandListFromBuffer(boost::asio::const_buffer& buffer, ocp::Ocp1Header header, std::vector<net::Ocp1Command>& commands);
             static void CommandFromBuffer(boost::asio::const_buffer& buffer, net::Ocp1Command& cmd);
             static void MethodIdFromBuffer(boost::asio::const_buffer& buffer, OcaMethodId& methodId);
             static void ParametersFromBuffer(boost::asio::const_buffer& buffer, size_t remainingCommandBytes, net::Ocp1Parameters& parameters);
 
-            static void ResponseListFromBuffer(boost::asio::const_buffer& buffer, net::Ocp1Header header, std::vector<net::Ocp1Response>& responses);
+            static void ResponseListFromBuffer(boost::asio::const_buffer& buffer, ocp::Ocp1Header header, std::vector<net::Ocp1Response>& responses);
             static void ResponseFromBuffer(boost::asio::const_buffer& buffer, net::Ocp1Response& resp);
 
             static void EventIdFromBuffer(boost::asio::const_buffer& buffer, OcaEventId& eventId);
@@ -73,10 +73,10 @@
 
             static void NtfParamsFromBuffer(boost::asio::const_buffer& buffer, size_t remainingBytes, net::Ocp1NtfParams& params);
             static void NotificationFromBuffer(boost::asio::const_buffer& buffer, net::Ocp1Notification& notification);
-            static void NotificationListFromBuffer(boost::asio::const_buffer& buffer, net::Ocp1Header header, net::NotificationList& notifications);
+            static void NotificationListFromBuffer(boost::asio::const_buffer& buffer, ocp::Ocp1Header header, net::NotificationList& notifications);
 
         private:
-            
+
 		};
 	}
 

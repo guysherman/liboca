@@ -33,13 +33,13 @@
 
 
 // Our Headers
-#include <OcpMessageReader.hxx>
-#include <Ocp1Header.hxx>
-#include <Ocp1Parameters.hxx>
-#include <Ocp1Command.hxx>
-#include <Ocp1Response.hxx>
-#include <Ocp1EventData.hxx>
-#include <Ocp1NtfParams.hxx>
+#include "../src/OcpMessageReader.hxx"
+#include "../src/Ocp1Header.hxx"
+#include "../src/Ocp1Parameters.hxx"
+#include "../src/Ocp1Command.hxx"
+#include "../src/Ocp1Response.hxx"
+#include "../src/Ocp1EventData.hxx"
+#include "../src/Ocp1NtfParams.hxx"
 
 class CallbackCheck
 {
@@ -60,13 +60,12 @@ public:
 TEST(Suite_OcpMessageReader, HeaderFromBuffer)
 {
 	const uint8_t testData[16] = {0x00, 0x01, 0x00, 0x00, 0x00, 0x02, 0x01, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
-	boost::asio::const_buffer buf(testData, 16);
 
-	const oca::net::Ocp1Header header = oca::OcpMessageReader::HeaderFromBuffer(buf);
+	const oca::ocp::Ocp1Header header = oca::OcpMessageReader::HeaderFromBuffer(&testData[0]);
 
 	EXPECT_EQ(1, header.protocolVersion);
 	EXPECT_EQ(2, header.messageSize);
-	EXPECT_EQ(oca::net::OcaCmdRrq, (oca::net::OcaMessageType)header.messageType);
+	EXPECT_EQ(oca::ocp::OcaCmdRrq, (oca::ocp::OcaMessageType)header.messageType);
 	EXPECT_EQ(1, header.messageCount);
 
 
@@ -127,10 +126,10 @@ TEST(Suite_OcpMessageReader, CommandListFromBuffer)
 									0x04, 0x01, 0x00, 0x02, 0x00, 0x00, 0x00, 0x03, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x04 };
 	boost::asio::const_buffer buf(testData, 64);
 
-	oca::net::Ocp1Header header;
+	oca::ocp::Ocp1Header header;
 	header.protocolVersion = 1;
 	header.messageSize = 74;
-	header.messageType = oca::net::OcaCmdRrq;
+	header.messageType = oca::ocp::OcaCmdRrq;
 	header.messageCount = 2;
 
 	std::vector<oca::net::Ocp1Command> commands;
@@ -174,10 +173,10 @@ TEST(Suite_OcpMessageReader, ResponseListFromBuffer)
 									0x03, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x04, 0x1D, 0xBE, 0xEF, 0x01, 0x02, 0x03, 0x04  };
 	boost::asio::const_buffer buf(testData, 64);
 
-	oca::net::Ocp1Header header;
+	oca::ocp::Ocp1Header header;
 	header.protocolVersion = 1;
 	header.messageSize = 74;
-	header.messageType = oca::net::OcaRsp;
+	header.messageType = oca::ocp::OcaRsp;
 	header.messageCount = 2;
 
 	std::vector<oca::net::Ocp1Response> resps;
@@ -327,10 +326,10 @@ TEST(Suite_OcpMessageReader, NotificationListFromBuffer)
 									0x04,};
 	boost::asio::const_buffer buf(testData, 99);
 
-	oca::net::Ocp1Header header;
+	oca::ocp::Ocp1Header header;
 	header.protocolVersion = 1;
 	header.messageSize = 108;
-	header.messageType = oca::net::OcaNtf;
+	header.messageType = oca::ocp::OcaNtf;
 	header.messageCount = 3;
 
 

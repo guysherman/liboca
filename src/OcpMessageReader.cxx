@@ -51,31 +51,31 @@ namespace oca
 	}
 
 
-	const net::Ocp1Header OcpMessageReader::HeaderFromBuffer(boost::asio::const_buffer& buffer)
+	const ocp::Ocp1Header OcpMessageReader::HeaderFromBuffer(const uint8_t* buffer)
 	{
-		net::Ocp1Header header;
+		ocp::Ocp1Header header;
 
 		HeaderFromBuffer(buffer, header);
 
 		return header;
 	}
 
-	void OcpMessageReader::HeaderFromBuffer(boost::asio::const_buffer& buffer, net::Ocp1Header& header)
+	void OcpMessageReader::HeaderFromBuffer(const uint8_t* buffer, ocp::Ocp1Header& header)
 	{
 		// Cast the buffer to the type we want, and dereference the pointer
 		// so that we can read the data.
-		header.protocolVersion = ntohs(*(boost::asio::buffer_cast<const uint16_t*>(buffer)));
+		header.protocolVersion = ntohs(* reinterpret_cast<const uint16_t*>(buffer));
 
 		// Create a new buffer offset from the previous one so that we can
 		// do the same as above but for the next field
-		boost::asio::const_buffer ms = buffer+sizeof(uint16_t);
-		header.messageSize = ntohl(*(boost::asio::buffer_cast<const uint32_t*>(ms)));
+		const uint8_t* ms = buffer+sizeof(uint16_t);
+		header.messageSize = ntohl(* reinterpret_cast<const uint32_t*>(ms));
 
-		boost::asio::const_buffer mt = ms+sizeof(uint32_t);
-		header.messageType = (net::OcaMessageType) *(boost::asio::buffer_cast<const uint8_t*>(mt));
+		const uint8_t* mt = ms+sizeof(uint32_t);
+		header.messageType = static_cast<ocp::OcaMessageType>(* mt);
 
-		boost::asio::const_buffer mc = mt+sizeof(uint8_t);
-		header.messageCount = ntohs(*(boost::asio::buffer_cast<const uint16_t*>(mc)));
+		const uint8_t* mc = mt+sizeof(uint8_t);
+		header.messageCount = ntohs(* reinterpret_cast<const uint8_t*>(mc));
 	}
 
 	void OcpMessageReader::ParametersFromBuffer(boost::asio::const_buffer& buffer, size_t remainingCommandBytes, net::Ocp1Parameters& parameters)
@@ -120,7 +120,7 @@ namespace oca
 		ParametersFromBuffer(parametersBuffer, remainingBytes, cmd.parameters);
 	}
 
-	void OcpMessageReader::CommandListFromBuffer(boost::asio::const_buffer& buffer, net::Ocp1Header header, std::vector<net::Ocp1Command>& commands)
+	void OcpMessageReader::CommandListFromBuffer(boost::asio::const_buffer& buffer, ocp::Ocp1Header header, std::vector<net::Ocp1Command>& commands)
 	{
 		boost::asio::const_buffer message = buffer;
 
@@ -133,7 +133,7 @@ namespace oca
 		}
 	}
 
-	void OcpMessageReader::ResponseListFromBuffer(boost::asio::const_buffer& buffer, net::Ocp1Header header, std::vector<net::Ocp1Response>& responses)
+	void OcpMessageReader::ResponseListFromBuffer(boost::asio::const_buffer& buffer, ocp::Ocp1Header header, std::vector<net::Ocp1Response>& responses)
 	{
 		boost::asio::const_buffer message = buffer;
 		for (uint16_t i = 0; i < header.messageCount; ++i)
@@ -206,7 +206,7 @@ namespace oca
 		NtfParamsFromBuffer(temp, parameterChunkBytes, notification.parameters);
 	}
 
-	void OcpMessageReader::NotificationListFromBuffer(boost::asio::const_buffer& buffer, net::Ocp1Header header, net::NotificationList& notifications)
+	void OcpMessageReader::NotificationListFromBuffer(boost::asio::const_buffer& buffer, ocp::Ocp1Header header, net::NotificationList& notifications)
 	{
 		boost::asio::const_buffer message = buffer;
 		for (OcaUint16 i = 0; i < header.messageCount; ++i)

@@ -33,19 +33,19 @@
 
 
 #include <oca/OcaTypes.hxx>
-#include <OcpMessageWriter.hxx>
-#include <Ocp1Header.hxx>
-#include <Ocp1Parameters.hxx>
-#include <Ocp1Command.hxx>
-#include <Ocp1Response.hxx>
-#include <Ocp1EventData.hxx>
+#include "../src/OcpMessageWriter.hxx"
+#include "../src/Ocp1Header.hxx"
+#include "../src/Ocp1Command.hxx"
+#include "../src/Ocp1Parameters.hxx"
+#include "../src/Ocp1EventData.hxx"
+#include "../src/Ocp1Response.hxx"
 
 TEST(Suite_OcpMessageWriter, WriteHeaderToBuffer)
 {
-	oca::net::Ocp1Header header;
+	oca::ocp::Ocp1Header header;
 	header.protocolVersion = 1;
 	header.messageSize = 2;
-	header.messageType = oca::net::OcaCmdRrq;
+	header.messageType = oca::ocp::OcaCmdRrq;
 	header.messageCount = 1;
 
 	uint8_t testData[32];

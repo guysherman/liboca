@@ -45,7 +45,7 @@
 
 namespace oca
 {
-		void OcpMessageWriter::WriteHeaderToBuffer(const net::Ocp1Header& header, boost::asio::mutable_buffer& buffer)
+		void OcpMessageWriter::WriteHeaderToBuffer(const ocp::Ocp1Header& header, boost::asio::mutable_buffer& buffer)
 		{
 			// We cast the buffer to a pointer to the type we want, so that we
 			// can write our data there.
