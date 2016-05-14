@@ -11,10 +11,9 @@ If you know about OCA, are are keen to learn and help out, get in touch.
 
 Watch this space.
 
-## Dependencies
+## External Dependencies
 *	python >= 2.7.x
 *	libboost-system1.55.0, libboost-system1.55.0-dev
-*	gtest 1.7 (Google Test)
 
 Note that we assume that the dependencies can be found one of two ways:
 1.	For those that use `pkg-config`, you must have `pkg-config` installed.
@@ -54,7 +53,7 @@ Paul Davis here: http://ardour.org/styleguide.html. While you're there, check ou
 and why not donate to it :)
 
 ## Branching
-All development work will be integrated to the `develop` branch, with features on `feature_<name>` branches and bug fixes on `issue_<id>` branches. So, if you are working
+All development work will be integrated to the `develop` branch, with features on `feature/<name>` branches and bug fixes on `issue/<id>` branches. So, if you are working
 in a fork of this repository and want to contribute, it would be super helpful if you could do two things:
 1.	Don't commit anything to the `develop` branch in your fork, keep that as a way to bring changes in from upstream.
 2.	When it comes time to send changes back to us, pull the latest `develop` from us, into `develop` in your fork, and then rebase your changes onto that. Then send us a PR.
@@ -62,9 +61,9 @@ in a fork of this repository and want to contribute, it would be super helpful i
 This is how the git commands would look:
 	$ git checkout develop
 	$ git pull upstream develop		# assuming you've added us as a remote called upstream
-	$ git checkout feature_mine
+	$ git checkout feature/mine
 	$ git rebase develop
-	$ git push origin feature_mine
+	$ git push origin feature/mine
 
 What you end up with is your feature branch, fast-forwardable over our develop.
 
