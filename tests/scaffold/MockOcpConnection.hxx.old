@@ -35,8 +35,9 @@
 
 
 // GTK Headers
-#include <ITcpConnection.hxx>
+
 #include <IOcpSession.hxx>
+#include <OcpSession.hxx>
 
 
 namespace oca
@@ -46,16 +47,42 @@ namespace oca
   namespace net
 	{
 
-      class MockTcpConnection : public ITcpConnection
+      class MockOcpSession : public IOcpSession
 		{
 		public:
 
 
-			static boost::shared_ptr<MockTcpConnection> Create(boost::asio::io_service& ioService)
+			static boost::shared_ptr<MockOcpSession> Create(boost::asio::io_service& ioService)
 
 			{
-				return boost::shared_ptr<MockTcpConnection>(new MockTcpConnection(ioService));
+				return boost::shared_ptr<MockOcpSession>(new MockOcpSession(ioService));
 			}
+
+			void SyncValueReceived(uint8_t* bufferData, const boost::system::error_code& error, size_t bytesTransferred)
+			{
+
+			}
+
+			void Ocp1HeaderReceived(uint8_t* bufferData, uint64_t connectionIdentifier, const boost::system::error_code& error, size_t bytesTransferred)
+			{
+
+			}
+
+            void Ocp1DataReceived(uint8_t* bufferData, uint64_t connectionIdentifier, const boost::system::error_code& error, size_t bytesTransferred)
+			{
+
+			}
+
+			void AddSessionClosedHandler(SessionEventHandler handler)
+			{
+
+			}
+
+			int GetId()
+			{
+
+			}
+
 
 			boost::asio::ip::tcp::socket& GetSocket()
 			{
@@ -67,34 +94,28 @@ namespace oca
 				started = true;
 			}
 
-			void SetOcpSession(IOcpSession::pointer session)
-			{
-				this->session = session;
-				sessionSet = true;
-			}
-
 			boost::system::error_code Send(boost::asio::const_buffer& buffer, size_t bytesToTransfer)
 			{
 				return boost::asio::error::eof;
 			}
 
-			virtual ~MockTcpConnection()
+
+			virtual ~MockOcpSession()
 			{
 
 			}
 
 			bool started;
 			bool sessionSet;
-			IOcpSession::pointer session;
 
 		private:
 			// We make it non-constructible, and non-copyable so that the
 			// only way to get an instance is through the Create member function
 			// which forces the consumer to get a shared_ptr. Nice encapsulation!
-			MockTcpConnection(boost::asio::io_service& ioService)
+			MockOcpSession(boost::asio::io_service& ioService)
 				: started(false), sessionSet(false), socket(ioService) {}
-			MockTcpConnection(const MockTcpConnection& rhs);
-			MockTcpConnection& operator=(const MockTcpConnection& rhs);
+			MockOcpSession(const MockOcpSession& rhs);
+			MockOcpSession& operator=(const MockOcpSession& rhs);
 
 			boost::asio::ip::tcp::socket socket;
 		};

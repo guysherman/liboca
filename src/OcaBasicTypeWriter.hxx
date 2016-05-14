@@ -43,12 +43,12 @@ namespace oca
 	{
 	public:
 
-		static void WriteBlobToBuffer(const OcaBlob& blob, boost::asio::mutable_buffer& buffer);
-		static void WriteUint8ToBuffer(OcaUint8 value, boost::asio::mutable_buffer& buffer);
-		static void WriteUint16ToBuffer(OcaUint16 value, boost::asio::mutable_buffer& buffer);
-		static void WriteUint32ToBuffer(OcaUint32 value, boost::asio::mutable_buffer& buffer);
+		static void WriteBlobToBuffer(const OcaBlob& blob, uint8_t** buffer);
+		static void WriteUint8ToBuffer(OcaUint8 value, uint8_t** buffer);
+		static void WriteUint16ToBuffer(OcaUint16 value, uint8_t** buffer);
+		static void WriteUint32ToBuffer(OcaUint32 value, uint8_t** buffer);
 
-		static void WriteVectorUint8ToBuffer(const std::vector<OcaUint8>& vec, boost::asio::mutable_buffer& buffer);
+		static void WriteVectorUint8ToBuffer(const std::vector<OcaUint8>& vec, uint8_t** buffer);
 	};
 }
 

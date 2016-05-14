@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2015 Guy Sherman, Shermann Innovations Limited
+  Copyright (C) 2016 Guy Sherman
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -18,40 +18,45 @@
 */
 
 // C++ Standard Headers
-
+#include <vector>
 
 // C Standard Headers
-
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netdb.h>
+#include <pthread.h>
 
 // Boost Headers
-
+#include <boost/shared_ptr.hpp>
 
 // 3rd Party Headers
 
 
-// GTK Headers
-
-
 // Our Headers
-
-
-#include "OcpSessionFactory.hxx"
-#include "IOcpSession.hxx"
-#include "ITcpConnection.hxx"
-#include "OcpSession.hxx"
 
 namespace oca
 {
-	namespace net
+	namespace ocp
 	{
-		OcpSessionFactory::OcpSessionFactory() {}
+		class ConnectionEndpoint;
 
-		OcpSessionFactory::~OcpSessionFactory() {}
-
-		boost::shared_ptr<IOcpSession> OcpSessionFactory::CreateSession()
+		class Server
 		{
-			return boost::shared_ptr<IOcpSession>(new OcpSession());
-		}
-	}
+		public:
+			Server(const char* listenAddress, const char* port);
+			virtual ~Server();
+		private:
+			Server(const Server& rhs);
+			Server& operator=(const Server& rhs);
 
+			static void* acceptWrapper(void* arg);
+			void* acceptLoop(void* arg);
+
+			int listenSocketFileDescriptor;
+			pthread_t acceptThread;
+			bool continueAccepting;
+			std::vector< boost::shared_ptr<oca::ocp::ConnectionEndpoint> > endpoints;
+
+		};
+	}
 }

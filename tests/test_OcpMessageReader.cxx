@@ -33,13 +33,13 @@
 
 
 // Our Headers
-#include <OcpMessageReader.hxx>
-#include <Ocp1Header.hxx>
-#include <Ocp1Parameters.hxx>
-#include <Ocp1Command.hxx>
-#include <Ocp1Response.hxx>
-#include <Ocp1EventData.hxx>
-#include <Ocp1NtfParams.hxx>
+#include "../src/OcpMessageReader.hxx"
+#include "../src/Ocp1Header.hxx"
+#include "../src/Ocp1Parameters.hxx"
+#include "../src/Ocp1Command.hxx"
+#include "../src/Ocp1Response.hxx"
+#include "../src/Ocp1EventData.hxx"
+#include "../src/Ocp1NtfParams.hxx"
 
 class CallbackCheck
 {
@@ -60,13 +60,12 @@ public:
 TEST(Suite_OcpMessageReader, HeaderFromBuffer)
 {
 	const uint8_t testData[16] = {0x00, 0x01, 0x00, 0x00, 0x00, 0x02, 0x01, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
-	boost::asio::const_buffer buf(testData, 16);
 
-	const oca::net::Ocp1Header header = oca::OcpMessageReader::HeaderFromBuffer(buf);
+	const oca::ocp::Ocp1Header header = oca::OcpMessageReader::HeaderFromBuffer(&testData[0]);
 
 	EXPECT_EQ(1, header.protocolVersion);
 	EXPECT_EQ(2, header.messageSize);
-	EXPECT_EQ(oca::net::OcaCmdRrq, (oca::net::OcaMessageType)header.messageType);
+	EXPECT_EQ(oca::ocp::OcaCmdRrq, (oca::ocp::OcaMessageType)header.messageType);
 	EXPECT_EQ(1, header.messageCount);
 
 
@@ -75,7 +74,7 @@ TEST(Suite_OcpMessageReader, HeaderFromBuffer)
 TEST(Suite_OcpMessageReader, ParametersFromBuffer)
 {
 	const uint8_t testData[16] = {0x04, 0x01, 0x00, 0x02, 0x00, 0x00, 0x00, 0x03, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x04 };
-	boost::asio::const_buffer buf(testData, 16);
+	const uint8_t* buf = (const uint8_t*)testData;
 
 	oca::net::Ocp1Parameters params;
 	oca::OcpMessageReader::ParametersFromBuffer(buf, 16, params);
@@ -91,7 +90,7 @@ TEST(Suite_OcpMessageReader, ParametersFromBuffer)
 TEST(Suite_OcpMessageReader, MethodIdFromBuffer)
 {
 	const uint8_t testData[16] = {0x04, 0x01, 0x00, 0x02, 0x00, 0x00, 0x00, 0x03, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x04 };
-	boost::asio::const_buffer buf(testData, 16);
+	const uint8_t* buf = (const uint8_t*)testData;
 
 	oca::OcaMethodId id;
 	memset(&id, 0, sizeof(oca::OcaMethodId));
@@ -105,7 +104,7 @@ TEST(Suite_OcpMessageReader, CommandFromBuffer)
 {
 	const uint8_t testData[32] = {	0x00, 0x00, 0x00, 0x20, 0xDE, 0xAD, 0xF0, 0x0D, 0xC0, 0x1D, 0xBE, 0xEF, 0x01, 0x02, 0x03, 0x04,
 									0x04, 0x01, 0x00, 0x02, 0x00, 0x00, 0x00, 0x03, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x04 };
-	boost::asio::const_buffer buf(testData, 32);
+	const uint8_t* buf = (const uint8_t*)testData;
 
 	oca::net::Ocp1Command cmd;
 	oca::OcpMessageReader::CommandFromBuffer(buf, cmd);
@@ -125,12 +124,12 @@ TEST(Suite_OcpMessageReader, CommandListFromBuffer)
 									0x04, 0x01, 0x00, 0x02, 0x00, 0x00, 0x00, 0x03, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x04,
 									0x00, 0x00, 0x00, 0x20, 0xDE, 0xAD, 0xF0, 0x0D, 0xC0, 0x1D, 0xBE, 0xEF, 0x01, 0x02, 0x03, 0x04,
 									0x04, 0x01, 0x00, 0x02, 0x00, 0x00, 0x00, 0x03, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x04 };
-	boost::asio::const_buffer buf(testData, 64);
+	const uint8_t* buf = (const uint8_t*)testData;
 
-	oca::net::Ocp1Header header;
+	oca::ocp::Ocp1Header header;
 	header.protocolVersion = 1;
 	header.messageSize = 74;
-	header.messageType = oca::net::OcaCmdRrq;
+	header.messageType = oca::ocp::OcaCmdRrq;
 	header.messageCount = 2;
 
 	std::vector<oca::net::Ocp1Command> commands;
@@ -153,7 +152,7 @@ TEST(Suite_OcpMessageReader, ResponseFromBuffer)
 {
 	const uint8_t testData[32] = {	0x00, 0x00, 0x00, 0x20, 0xDE, 0xAD, 0xF0, 0x0D, 0xC0, 0x05, 0x01, 0x00, 0x02, 0x00, 0x00, 0x00,
 									0x03, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x04, 0x1D, 0xBE, 0xEF, 0x01, 0x02, 0x03, 0x04 };
-	boost::asio::const_buffer buf(testData, 32);
+	const uint8_t* buf = (const uint8_t*)testData;
 
 	oca::net::Ocp1Response resp;
 	oca::OcpMessageReader::ResponseFromBuffer(buf, resp);
@@ -172,12 +171,12 @@ TEST(Suite_OcpMessageReader, ResponseListFromBuffer)
 									0x03, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x04, 0x1D, 0xBE, 0xEF, 0x01, 0x02, 0x03, 0x04,
 									0x00, 0x00, 0x00, 0x20, 0xDE, 0xAD, 0xF0, 0x0D, 0xC0, 0x05, 0x01, 0x00, 0x02, 0x00, 0x00, 0x00,
 									0x03, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x04, 0x1D, 0xBE, 0xEF, 0x01, 0x02, 0x03, 0x04  };
-	boost::asio::const_buffer buf(testData, 64);
+	const uint8_t* buf = (const uint8_t*)testData;
 
-	oca::net::Ocp1Header header;
+	oca::ocp::Ocp1Header header;
 	header.protocolVersion = 1;
 	header.messageSize = 74;
-	header.messageType = oca::net::OcaRsp;
+	header.messageType = oca::ocp::OcaRsp;
 	header.messageCount = 2;
 
 	std::vector<oca::net::Ocp1Response> resps;
@@ -198,7 +197,7 @@ TEST(Suite_OcpMessageReader, ResponseListFromBuffer)
 TEST(Suite_OcpMessageReader, EventIdFromBuffer)
 {
 	const uint8_t testData[16] = {0x04, 0x01, 0x00, 0x02, 0x00, 0x00, 0x00, 0x03, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x04 };
-	boost::asio::const_buffer buf(testData, 16);
+	const uint8_t* buf = (const uint8_t*)testData;
 
 	oca::OcaEventId id;
 	memset(&id, 0, sizeof(oca::OcaEventId));
@@ -211,7 +210,7 @@ TEST(Suite_OcpMessageReader, EventIdFromBuffer)
 TEST(Suite_OcpMessageReader, EventFromBuffer)
 {
 	const uint8_t testData[16] = {0x04, 0x01, 0x00, 0x02, 0x00, 0x00, 0x00, 0x03, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x04 };
-	boost::asio::const_buffer buf(testData, 16);
+	const uint8_t* buf = (const uint8_t*)testData;
 
 	oca::OcaEvent event;
 	memset(&event, 0, sizeof(oca::OcaEvent));
@@ -226,7 +225,7 @@ TEST(Suite_OcpMessageReader, EventFromBuffer)
 TEST(Suite_OcpMessageReader, EventDataFromBuffer)
 {
 	const uint8_t testData[16] = {0x04, 0x01, 0x00, 0x02, 0x00, 0x00, 0x00, 0x03, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x04 };
-	boost::asio::const_buffer buf(testData, 16);
+	const uint8_t* buf = (const uint8_t*)testData;
 
 	oca::net::Ocp1EventData edata;
 	oca::OcpMessageReader::EventDataFromBuffer(buf, 16, edata);
@@ -246,7 +245,7 @@ TEST(Suite_OcpMessageReader, Ocp1NtfParamsFromBuffer)
 									0x03, 0x00, 0x00, 0x00,
 									0x00, 0x00, 0x00, 0x00,
 									0x04 };
-	boost::asio::const_buffer buf(testData, 21);
+	const uint8_t* buf = (const uint8_t*)testData;
 
 	oca::net::Ocp1NtfParams ntfParams;
 	oca::OcpMessageReader::NtfParamsFromBuffer(buf, 21, ntfParams);
@@ -275,7 +274,7 @@ TEST(Suite_OcpMessageReader, NotificationFromBuffer)
 									0x03, 0x00, 0x00, 0x00,
 									0x00, 0x00, 0x00, 0x00,
 									0x04 };
-	boost::asio::const_buffer buf(testData, 33);
+	const uint8_t* buf = (const uint8_t*)testData;
 
 	oca::net::Ocp1Notification notification;
 	oca::OcpMessageReader::NotificationFromBuffer(buf, notification);
@@ -325,12 +324,12 @@ TEST(Suite_OcpMessageReader, NotificationListFromBuffer)
 									0x03, 0x00, 0x00, 0x00,
 									0x00, 0x00, 0x00, 0x00,
 									0x04,};
-	boost::asio::const_buffer buf(testData, 99);
+	const uint8_t* buf = (const uint8_t*)testData;
 
-	oca::net::Ocp1Header header;
+	oca::ocp::Ocp1Header header;
 	header.protocolVersion = 1;
 	header.messageSize = 108;
-	header.messageType = oca::net::OcaNtf;
+	header.messageType = oca::ocp::OcaNtf;
 	header.messageCount = 3;
 
 

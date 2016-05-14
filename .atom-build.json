@@ -1,26 +1,27 @@
 {
-	"cmd": "./waf",
+	"cmd": "{PROJECT_PATH}/waf",
 	"name": "Build",
 	"sh": "true",
+	"cwd": "{PROJECT_PATH}",
 	"targets": {
 		"Clean" : {
-			"cmd": "./waf clean",
+			"cmd": "{PROJECT_PATH}/waf clean",
 			"sh": "true"
 		},
 		"Configure": {
-			"cmd": "./waf configure",
+			"cmd": "{PROJECT_PATH}/waf configure",
 			"sh": "true"
 		},
 		"Test": {
-			"cmd": "./waf test",
+			"cmd": "{PROJECT_PATH}/waf test",
 			"sh": "true"
 		},
 		"Build & Test": {
-			"cmd": "./waf build test --cppcheck  --cppcheck-bin-enable=all --cppcheck-lib-enable=all",
+			"cmd": "{PROJECT_PATH}/waf build test --cppcheck  --cppcheck-bin-enable=all --cppcheck-lib-enable=all",
 			"sh": "true"
 		},
 		"Full Verify": {
-			"cmd": "./waf clean build verify --cppcheck --cppcheck-bin-enable=all --cppcheck-lib-enable=all",
+			"cmd": "{PROJECT_PATH}/waf clean build verify --cppcheck --cppcheck-bin-enable=all --cppcheck-lib-enable=all",
 			"sh": "true"
 		}
 	}

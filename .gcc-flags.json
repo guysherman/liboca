@@ -3,6 +3,6 @@
   "gccDefaultCFlags": "-Wall",
   "gccDefaultCppFlags": "-Wall -ansi -Werror -pedantic-errors",
   "gccErrorLimit": 15,
-  "gccIncludePaths": ".,./include,../include,./path",
+  "gccIncludePaths": ".,./include,../include,./path,./dep/wq/include",
   "gccSuppressWarnings": false
 }

@@ -12,6 +12,6 @@ echo "--------------------------------------------------------------------------
 echo "Running tests under valgrind to make sure everything is clean up in there"
 echo ""
 mkdir -p reports/valgrind
-valgrind --log-file=reports/valgrind/tests-all.log --xml=yes --xml-file=reports/valgrind/tests-all.xml --leak-check=full build/tests/all
+valgrind --log-file=reports/valgrind/tests-all.log --xml=yes --xml-file=reports/valgrind/tests-all.xml --leak-check=full --leak-check-heuristics=none build/tests/all
 util/inspect_reports.py reports/cppcheck || exit $?
 util/inspect_reports.py reports/valgrind || exit $?

@@ -1,0 +1,7 @@
+-I../include
+-I.
+-I./include
+-I./dep/wq/include
+-I../src
+-I../../include
+-I../../dep/wq/include

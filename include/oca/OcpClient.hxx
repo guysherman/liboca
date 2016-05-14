@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2015 Guy Sherman, Shermann Innovations Limited
+  Copyright (C) 2016 Guy Sherman
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -21,44 +21,36 @@
 
 
 // C Standard Headers
-
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netdb.h>
 
 // Boost Headers
 #include <boost/shared_ptr.hpp>
-#include <boost/asio.hpp>
 
 // 3rd Party Headers
 
 
-// GTK Headers
-
-
-
 // Our Headers
-#include "TcpConnectionFactory.hxx"
-#include "ITcpConnection.hxx"
-#include "TcpConnection.hxx"
 
-#include "OcpSession.hxx"
 
 namespace oca
 {
-	namespace net
+	namespace ocp
 	{
-		TcpConnectionFactory::TcpConnectionFactory(boost::shared_ptr<boost::asio::io_service> ioService)
-			:	ioService(ioService)
+		class ConnectionEndpoint;
+
+		class Client
 		{
+		public:
+			Client(const char* hostAddress, const char* port);
+			virtual ~Client();
 
-		}
-
-		TcpConnectionFactory::~TcpConnectionFactory()
-		{
-
-		}
-
-		boost::shared_ptr<ITcpConnection> TcpConnectionFactory::CreateConnection()
-		{
-			return TcpConnection::Create(*ioService);
-		}
+		private:
+			Client(const Client& rhs);
+			Client& operator=(const Client& rhs);
+			int clientSocketFileDescriptor;
+			boost::shared_ptr<ConnectionEndpoint> endpoint;
+		};
 	}
 }

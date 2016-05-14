@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2015 Guy Sherman, Shermann Innovations Limited
+  Copyright (C) 2016 Guy Sherman
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -16,8 +16,6 @@
   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 */
-#ifndef __TCPCONNECTIONFACTORY_HXX_
-#define __TCPCONNECTIONFACTORY_HXX_
 
 // C++ Standard Headers
 
@@ -26,37 +24,53 @@
 
 
 // Boost Headers
-#include <boost/shared_ptr.hpp>
-#include <boost/asio.hpp>
+
 
 // 3rd Party Headers
-
-
-// GTK Headers
+#include <gtest/gtest.h>
 
 // Our Headers
+#include <oca/OcpServer.hxx>
+#include <oca/OcpClient.hxx>
+#include "../src/OcpConnectionEndpoint.hxx"
 
-namespace oca
+
+TEST(GrindConstructors, OcaOcpServer)
 {
-
-	namespace net
+	try
 	{
-		class ITcpConnection;
-
-		class TcpConnectionFactory
-		{
-		public:
-			TcpConnectionFactory(boost::shared_ptr<boost::asio::io_service> ioService);
-			virtual ~TcpConnectionFactory();
-
-			virtual boost::shared_ptr<ITcpConnection> CreateConnection();
-
-
-		protected:
-			boost::shared_ptr<boost::asio::io_service> ioService;
-		};
+		oca::ocp::Server* server = new oca::ocp::Server(NULL, "49152");
+		delete server;
 	}
+	catch (std::exception e)
+	{
+
+	}
+
 }
 
+TEST(GrindConstructors, OcaOcpClient)
+{
+		try
+		{
+			oca::ocp::Client* client = new oca::ocp::Client("localhost", "49152");
+			delete client;
+		}
+		catch (std::exception e)
+		{
 
-#endif // __TCPCONNECTIONFACTORY_HXX_
+		}
+}
+
+TEST(GrindConstructors, OcpConnectionEndpoint)
+{
+		try
+		{
+			oca::ocp::ConnectionEndpoint* endpoint = new oca::ocp::ConnectionEndpoint(0);
+			delete endpoint;
+		}
+		catch (std::exception e)
+		{
+
+		}
+}

@@ -44,7 +44,7 @@ namespace oca
 		class ScopedLock
 		{
 		public:
-			ScopedLock(pthread_mutex_t* mutex);
+			explicit ScopedLock(pthread_mutex_t* mutex);
 			virtual ~ScopedLock();
 
 		private:

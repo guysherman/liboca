@@ -33,25 +33,25 @@
 
 
 #include <oca/OcaTypes.hxx>
-#include <OcpMessageWriter.hxx>
-#include <Ocp1Header.hxx>
-#include <Ocp1Parameters.hxx>
-#include <Ocp1Command.hxx>
-#include <Ocp1Response.hxx>
-#include <Ocp1EventData.hxx>
+#include "../src/OcpMessageWriter.hxx"
+#include "../src/Ocp1Header.hxx"
+#include "../src/Ocp1Command.hxx"
+#include "../src/Ocp1Parameters.hxx"
+#include "../src/Ocp1EventData.hxx"
+#include "../src/Ocp1Response.hxx"
 
 TEST(Suite_OcpMessageWriter, WriteHeaderToBuffer)
 {
-	oca::net::Ocp1Header header;
+	oca::ocp::Ocp1Header header;
 	header.protocolVersion = 1;
 	header.messageSize = 2;
-	header.messageType = oca::net::OcaCmdRrq;
+	header.messageType = oca::ocp::OcaCmdRrq;
 	header.messageCount = 1;
 
 	uint8_t testData[32];
 	memset(&testData[0], 0, 32);
 
-	boost::asio::mutable_buffer buf(testData, 32);
+	uint8_t* buf = &testData[0];
 
 	oca::OcpMessageWriter::WriteHeaderToBuffer(header, buf);
 
@@ -72,7 +72,7 @@ TEST(Suite_OcpMessageWriter, WriteParametersToBuffer)
 	uint8_t testData[64];
 	memset(&testData[0], 0, 64);
 
-	boost::asio::mutable_buffer buf(testData, 32);
+	uint8_t* buf = &testData[0];
 
 	oca::OcpMessageWriter::WriteParametersToBuffer(params, buf);
 
@@ -92,7 +92,7 @@ TEST(Suite_OcpMessageWriter, WriteMethodIdToBuffer)
 	uint8_t testData[64];
 	memset(&testData[0], 0, 64);
 
-	boost::asio::mutable_buffer buf(testData, 64);
+	uint8_t* buf = &testData[0];
 
 	oca::OcpMessageWriter::WriteMethodIdToBuffer(id, buf);
 
@@ -118,7 +118,7 @@ TEST(Suite_OcpMessageWriter, WriteCommandToBuffer)
 	uint8_t testData[1024];
 	memset(&testData[0], 0, 1024);
 
-	boost::asio::mutable_buffer buf(testData, 1024);
+	uint8_t* buf = &testData[0];
 
 	oca::net::Ocp1Command cmd;
 	cmd.commandSize = 20;
@@ -153,8 +153,6 @@ TEST(Suite_OcpMessageWriter, ComputeCommandDataSize)
 	uint8_t testData[1024];
 	memset(&testData[0], 0, 1024);
 
-	boost::asio::mutable_buffer buf(testData, 1024);
-
 	oca::net::Ocp1Command cmd;
 	cmd.commandSize = 0;
 	cmd.handle = 0xDEADF00D;
@@ -185,8 +183,6 @@ TEST(Suite_OcpMessageWriter, ComputeCommandListDataSize)
 
 	uint8_t testData[1024];
 	memset(&testData[0], 0, 1024);
-
-	boost::asio::mutable_buffer buf(testData, 1024);
 
 	oca::net::Ocp1Command cmd;
 	cmd.commandSize = 0;
@@ -222,7 +218,7 @@ TEST(Suite_OcpMessageWriter, WriteCommandListToBuffer)
 	uint8_t testData[1024];
 	memset(&testData[0], 0, 1024);
 
-	boost::asio::mutable_buffer buf(testData, 1024);
+	uint8_t* buf = &testData[0];
 
 	oca::net::Ocp1Command cmd;
 	cmd.commandSize = 20;
@@ -262,7 +258,7 @@ TEST(Suite_OcpMessageWriter, WriteResponseToBuffer)
 	uint8_t testData[1024];
 	memset(&testData[0], 0, 1024);
 
-	boost::asio::mutable_buffer buf(testData, 1024);
+	uint8_t* buf = &testData[0];
 
 	oca::net::Ocp1Response resp;
 	resp.responseSize = 13;
@@ -291,8 +287,6 @@ TEST(Suite_OcpMessageWriter, ComputeResponseDataSize)
 	uint8_t testData[1024];
 	memset(&testData[0], 0, 1024);
 
-	boost::asio::mutable_buffer buf(testData, 1024);
-
 	oca::net::Ocp1Response resp;
 	resp.responseSize = 13;
 	resp.handle = 0xDEADF00D;
@@ -317,8 +311,6 @@ TEST(Suite_OcpMessageWriter, ComputeResponseListDataSize)
 
 	uint8_t testData[1024];
 	memset(&testData[0], 0, 1024);
-
-	boost::asio::mutable_buffer buf(testData, 1024);
 
 	oca::net::Ocp1Response resp;
 	resp.responseSize = 13;
@@ -348,7 +340,7 @@ TEST(Suite_OcpMessageWriter, WriteResponseListToBuffer)
 	uint8_t testData[1024];
 	memset(&testData[0], 0, 1024);
 
-	boost::asio::mutable_buffer buf(testData, 1024);
+	uint8_t* buf = &testData[0];
 
 	oca::net::Ocp1Response resp;
 	resp.responseSize = 13;
@@ -387,7 +379,7 @@ TEST(Suite_OcpMessageWriter, WriteEventIdToBuffer)
 	uint8_t testData[64];
 	memset(&testData[0], 0, 64);
 
-	boost::asio::mutable_buffer buf(testData, 64);
+	uint8_t* buf = &testData[0];
 
 	oca::OcpMessageWriter::WriteEventIdToBuffer(id, buf);
 
@@ -408,7 +400,7 @@ TEST(Suite_OcpMessageWriter, WriteEventToBuffer)
 	uint8_t testData[64];
 	memset(&testData[0], 0, 64);
 
-	boost::asio::mutable_buffer buf(testData, 64);
+	uint8_t* buf = &testData[0];
 
 	oca::OcpMessageWriter::WriteEventToBuffer(event, buf);
 
@@ -445,7 +437,7 @@ TEST(Suite_OcpMessageWriter, WriteEventDataToBuffer)
 	uint8_t testData[64];
 	memset(&testData[0], 0, 64);
 
-	boost::asio::mutable_buffer buf(testData, 64);
+	uint8_t* buf = &testData[0];
 
 	oca::OcpMessageWriter::WriteEventDataToBuffer(edata, buf);
 
@@ -464,7 +456,7 @@ TEST(Suite_OcpMessageWriter, WriteNtf1ParamsToBuffer)
 {
 	uint8_t testData[64];
 	memset(&testData[0], 0, 64);
-	boost::asio::mutable_buffer buf(testData, 64);
+	uint8_t* buf = &testData[0];
 
 	oca::net::Ocp1NtfParams ntfParams;
 	ntfParams.parameterCount = 1;
@@ -529,7 +521,7 @@ TEST(Suite_OcpMessageWriter, WriteNotificationToBuffer)
 {
 	uint8_t testData[64];
 	memset(&testData[0], 0, 64);
-	boost::asio::mutable_buffer buf(testData, 64);
+	uint8_t* buf = &testData[0];
 
 
 	oca::net::Ocp1Notification notification;
@@ -624,8 +616,6 @@ TEST(Suite_OcpMessageWriter, ComputeNotificationSize)
 {
 	uint8_t testData[1024];
 	memset(&testData[0], 0, 1024);
-	boost::asio::mutable_buffer buf(testData, 1024);
-
 
 	oca::net::Ocp1Notification notification;
 	notification.notificationSize = 0;
@@ -669,8 +659,6 @@ TEST(Suite_OcpMessageWriter, ComputeNotificationListSize)
 {
 	uint8_t testData[1024];
 	memset(&testData[0], 0, 1024);
-	boost::asio::mutable_buffer buf(testData, 1024);
-
 
 	oca::net::Ocp1Notification notification;
 	notification.notificationSize = 0;
@@ -718,7 +706,7 @@ TEST(Suite_OcpMessageWriter, WriteNotificationListToBuffer)
 {
 	uint8_t testData[1024];
 	memset(&testData[0], 0, 1024);
-	boost::asio::mutable_buffer buf(testData, 1024);
+	uint8_t* buf = &testData[0];
 
 
 	oca::net::Ocp1Notification notification;

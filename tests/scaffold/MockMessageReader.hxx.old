@@ -37,9 +37,8 @@
 
   // GTK Headers
 
-#include <ITcpConnection.hxx>
 #include <IOcpSession.hxx>
-
+/*
 
   namespace oca_test
   {
@@ -116,6 +115,17 @@
 
           }
 
+
+          virtual void AddSessionClosedHandler(SessionEventHandler handler)
+          {
+
+          }
+
+          virtual int GetId()
+          {
+
+          }
+
 		  bool gotCorrectValue;
 
           uint32_t dataSize;
@@ -136,5 +146,5 @@
 
 	  };
   }
-
+*/
 #endif // __MOCKMESSAGEREADER_HXX__

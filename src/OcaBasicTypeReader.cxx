@@ -39,39 +39,39 @@
 
 namespace oca
 {
-	void OcaBasicTypeReader::BlobFromBuffer(boost::asio::const_buffer& buffer, OcaBlob& blob)
+	void OcaBasicTypeReader::BlobFromBuffer(const uint8_t** buffer, OcaBlob& blob)
 	{
 		OcaUint16 blobSize = Uint16FromBuffer(buffer);
 		BufferToUint8Vector(buffer, blobSize, blob);
 
 	}
 
-	OcaUint8 OcaBasicTypeReader::Uint8FromBuffer(boost::asio::const_buffer& buffer)
+	OcaUint8 OcaBasicTypeReader::Uint8FromBuffer(const uint8_t** buffer)
 	{
-		OcaUint8 result = *(boost::asio::buffer_cast<const OcaUint16*>(buffer));
-		buffer = buffer + sizeof(OcaUint8);
+		OcaUint8 result = *(*buffer);
+		*buffer = *buffer + sizeof(OcaUint8);
 		return result;
 	}
 
-	OcaUint16 OcaBasicTypeReader::Uint16FromBuffer(boost::asio::const_buffer& buffer)
+	OcaUint16 OcaBasicTypeReader::Uint16FromBuffer(const uint8_t** buffer)
 	{
-		OcaUint16 result = ntohs(*(boost::asio::buffer_cast<const OcaUint16*>(buffer)));
-		buffer = buffer + sizeof(OcaUint16);
+		OcaUint16 result = ntohs(* reinterpret_cast<const uint16_t*>(*buffer));
+		*buffer = *buffer + sizeof(OcaUint16);
 		return result;
 	}
 
-	OcaUint32 OcaBasicTypeReader::Uint32FromBuffer(boost::asio::const_buffer& buffer)
+	OcaUint32 OcaBasicTypeReader::Uint32FromBuffer(const uint8_t** buffer)
 	{
-		OcaUint32 result = ntohl(*(boost::asio::buffer_cast<const OcaUint32*>(buffer)));
-		buffer = buffer + sizeof(OcaUint32);
+		OcaUint32 result = ntohl(* reinterpret_cast<const uint32_t*>(*buffer));
+		*buffer = *buffer + sizeof(OcaUint32);
 		return result;
 	}
 
-	void OcaBasicTypeReader::BufferToUint8Vector(boost::asio::const_buffer& buffer, size_t numBytes, std::vector<OcaUint8>& vec)
+	void OcaBasicTypeReader::BufferToUint8Vector(const uint8_t** buffer, size_t numBytes, std::vector<OcaUint8>& vec)
 	{
 		assert (vec.size() == 0);
 
-		const OcaUint8* bytes = boost::asio::buffer_cast<const OcaUint8*>(buffer);
+		const OcaUint8* bytes = *buffer;
 
 		// We ask the vector to grow in one hit, so we can memcpy straight after into it
 		// We reserve then resize, rather than just resizing, so that we only get one
@@ -83,6 +83,6 @@ namespace oca
 		// TODO: security issue: we trust that the buffer actually has the right number of bytes #security
 		memcpy(&vec[0], bytes, numBytes);
 
-		buffer = buffer + (numBytes * sizeof(OcaUint8));
+		*buffer = *buffer + (numBytes * sizeof(OcaUint8));
 	}
 }

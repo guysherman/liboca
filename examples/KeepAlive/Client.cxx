@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2015 Guy Sherman, Shermann Innovations Limited
+  Copyright (C) 2016 Guy Sherman
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -16,46 +16,30 @@
   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 */
-#ifndef __OCPSESSIONFACTORY_HXX__
-#define __OCPSESSIONFACTORY_HXX__
 
 // C++ Standard Headers
 
 
 // C Standard Headers
-
+#include <stdio.h>
 
 // Boost Headers
-#include <boost/shared_ptr.hpp>
-#include <boost/asio.hpp>
+
 
 // 3rd Party Headers
 
 
-// GTK Headers
-
 // Our Headers
-#include "OcpSession.hxx"
+#include <oca/OcpClient.hxx>
 
-namespace oca
+
+int main(int argc, char** argv)
 {
+	oca::ocp::Client* c = new oca::ocp::Client("localhost", "41925");
 
-	namespace net
-	{
-		class IOcpSession;
-		class ITcpConnection;
+	getchar();
 
-		class OcpSessionFactory
-		{
-		public:
-			OcpSessionFactory();
-			virtual ~OcpSessionFactory();
+	delete c;
 
-			virtual boost::shared_ptr<IOcpSession> CreateSession();
-
-		};
-	}
+	return 0;
 }
-
-
-#endif // __OCPSESSIONFACTORY_HXX__
