@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2015 Guy Sherman, Shermann Innovations Limited
+  Copyright (C) 2016 Guy Sherman
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -16,14 +16,12 @@
   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 */
-#ifndef __SCOPEDLOCK_HXX__
-#define __SCOPEDLOCK_HXX__
 
 // C++ Standard Headers
 
 
 // C Standard Headers
-#include <pthread.h>
+#include <stdio.h>
 
 // Boost Headers
 
@@ -31,30 +29,17 @@
 // 3rd Party Headers
 
 
-// GTK Headers
-
-
 // Our Headers
+#include <oca/OcpServer.hxx>
 
 
-namespace oca
+int main(int argc, char** argv)
 {
-	namespace util
-	{
-		class ScopedLock
-		{
-		public:
-			explicit ScopedLock(pthread_mutex_t* mutex);
-			virtual ~ScopedLock();
+	oca::ocp::Server* s = new oca::ocp::Server(NULL, "41925");
 
-		private:
-			ScopedLock(const ScopedLock& rhs);
-			ScopedLock& operator=(const ScopedLock& rhs);
+	getchar();
 
-			pthread_mutex_t* mutex;
+	delete s;
 
-		};
-	}
+	return 0;
 }
-
-#endif // __SCOPEDLOCK_HXX__

@@ -12,7 +12,7 @@ def configure(conf):
 def build(bld):
 	bld.stlib(
 	source = bld.path.ant_glob('src/*.cxx'),
-	cxxflags=['-Werror', '-pedantic-errors'],
+	cxxflags=['-fPIC', '-Werror', '-pedantic-errors'],
 	target="wq",
 	includes = ['./include'],
 	export_includes=['./include'],

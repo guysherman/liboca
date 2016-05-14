@@ -18,21 +18,21 @@
 */
 
 // C++ Standard Headers
-
+#include <deque>
 
 // C Standard Headers
 #include <sys/socket.h>
 #include <pthread.h>
 
 // Boost Headers
-
+#include <boost/shared_ptr.hpp>
 
 // 3rd Party Headers
 
 
 // Our Headers
 #include <oca/OcaTypes.hxx>
-
+#include <wq/WorkQueue.hxx>
 
 namespace oca
 {
@@ -40,11 +40,21 @@ namespace oca
 	{
 		struct Ocp1Header;
 
+		struct Message
+		{
+			boost::shared_ptr<const uint8_t> buffer;
+			size_t bufferLength;
+
+			Message() : bufferLength(0) {}
+		};
+
 		class ConnectionEndpoint
 		{
 		public:
 			explicit ConnectionEndpoint(int socketFileDescriptor);
 			virtual ~ConnectionEndpoint();
+
+			void StartSupervision(OcaUint16 hearbeatTime);
 
 		private:
 			static void* receiveWrapper(void* arg);
@@ -54,6 +64,8 @@ namespace oca
 			void processKeepAlive(Ocp1Header& header);
 			static void* supervisorWrapper(void* arg);
 			void* supervisorLoop(void* arg);
+			void queueMessageForSend(Message message);
+			void sendHeartbeat();
 
 
 			int socketFileDescriptor;
@@ -65,6 +77,8 @@ namespace oca
 			pthread_t supervisorThread;
 			time_t lastMessageSentAt;
 			time_t lastMessageReceivedAt;
+			pthread_mutex_t mutex;
+			std::deque< Message > messageQueue;
 		};
 	}
 }

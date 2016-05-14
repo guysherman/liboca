@@ -73,7 +73,7 @@ namespace oca
 				if (status == -1)
 				{
 					close(socketFd);
-					fprintf(stderr, "connect failed");
+					fprintf(stderr, "connect failed.\n");
 					continue;
 				}
 
@@ -87,11 +87,12 @@ namespace oca
 			if (currentCandidate == NULL)
 			{
 				// Shouldn't really get here, but just in case...
-				fprintf(stderr, "client connect failed completely");
+				fprintf(stderr, "client connect failed completely.\n");
 				throw std::exception();
 			}
 
 			this->endpoint = boost::shared_ptr<oca::ocp::ConnectionEndpoint>(new oca::ocp::ConnectionEndpoint(this->clientSocketFileDescriptor));
+			this->endpoint->StartSupervision(2);
 
 		}
 

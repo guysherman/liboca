@@ -30,9 +30,12 @@
 
 
 // Our Headers
+#include <wq/ScopedLock.hxx>
 #include "OcpConnectionEndpoint.hxx"
 #include "Ocp1Header.hxx"
 #include "OcpMessageReader.hxx"
+#include "OcpMessageWriter.hxx"
+#include "OcaBasicTypeWriter.hxx"
 
 namespace oca
 {
@@ -41,13 +44,16 @@ namespace oca
 		ConnectionEndpoint::ConnectionEndpoint(int socketFileDescriptor) :
 			socketFileDescriptor(socketFileDescriptor),
 			shouldContinue(false),
-			heartbeatTime(0),
+			heartbeatTime(2),
 			supervisorActivated(false),
 			lastMessageSentAt(0),
 			lastMessageReceivedAt(0)
 
 		{
 			shouldContinue = true;
+			lastMessageReceivedAt = time(NULL);
+			lastMessageSentAt = time(NULL);
+			memset(&mutex, 0, sizeof(pthread_mutex_t));
 			pthread_create(&this->receiveThread, NULL, &ConnectionEndpoint::receiveWrapper, (void*)this);
 			//pthread_detach(this->receiveThread);
 
@@ -134,14 +140,15 @@ namespace oca
 		{
 			uint8_t buffer[2];
 			memset(&buffer, 0, 2);
-			fprintf(stderr, "Received KeepAlive\n");
+			fprintf(stderr, "Received KeepAlive.\n");
 			int bytesReceived = recv(this->socketFileDescriptor, &buffer[0], sizeof(OcaUint16), 0);
 			if (bytesReceived == 2)
 			{
 				this->heartbeatTime = ntohs(* reinterpret_cast<uint16_t*>(&buffer[0]));
 				if (!this->supervisorActivated)
 				{
-					this->supervisorActivated = false;
+					fprintf(stderr, "Activating supervisor thread.\n");
+					this->supervisorActivated = true;
 					pthread_create(&this->supervisorThread, NULL, &ConnectionEndpoint::supervisorWrapper, (void*)this);
 				}
 
@@ -179,6 +186,8 @@ namespace oca
 				{
 					// TODO: We seem to  be idle, send a message so the other
 					// side knows we're still here
+					sendHeartbeat();
+
 				}
 
 				if (receiveDiff >= timeoutPeriod)
@@ -187,9 +196,50 @@ namespace oca
 					fprintf(stderr, "Idled for too long, terminating.\n");
 					// TODO: tell somebody that we've stopped
 				}
+
+				sleep(this->heartbeatTime / 2);
 			}
 
 			return NULL;
+		}
+
+		void ConnectionEndpoint::sendHeartbeat()
+		{
+			Ocp1Header h;
+			h.messageCount = 1;
+			h.messageSize = 11;
+			h.messageType = ocp::OcaKeepAlive;
+			h.protocolVersion = 0x0103;
+
+			uint8_t* buffer = reinterpret_cast<uint8_t*>(malloc(12 * sizeof(uint8_t)));
+			buffer[0] = 0x3B;
+			OcpMessageWriter::WriteHeaderToBuffer(h, &buffer[1]);
+
+			uint8_t* temp = &buffer[10];
+			OcaBasicTypeWriter::WriteUint16ToBuffer(this->heartbeatTime, &temp);
+
+			boost::shared_ptr<const uint8_t> bufferOwner(buffer);
+
+			Message m;
+			m.buffer = bufferOwner;
+			m.bufferLength = 12;
+
+			queueMessageForSend(m);
+			fprintf(stderr, "Queued heartbeat.\n");
+		}
+
+		void ConnectionEndpoint::queueMessageForSend(oca::ocp::Message message)
+		{
+			if (shouldContinue)
+			{
+				util::ScopedLock(&this->mutex);
+				if (shouldContinue)
+				{
+					this->messageQueue.push_back(message);
+				}
+
+			}
+
 		}
 
 		void* ConnectionEndpoint::sendWrapper(void *arg)
@@ -217,10 +267,41 @@ namespace oca
 		{
 			while(shouldContinue)
 			{
+				Message m;
+				if (this->messageQueue.begin() != this->messageQueue.end())
+				{
+					util::ScopedLock lock(&this->mutex);
+					if (this->messageQueue.begin() != this->messageQueue.end())
+					{
+						m = this->messageQueue.front();
+					}
+				}
+
+				if (m.bufferLength > 0 && m.buffer != NULL)
+				{
+					int bytesSent = 0;
+					bytesSent = send(this->socketFileDescriptor, m.buffer.get(), m.bufferLength, 0);
+					if (bytesSent != m.bufferLength)
+					{
+						fprintf(stderr, "Didn't send whole buffer, only sent %d bytes of %d.\n", bytesSent, static_cast<int>(m.bufferLength));
+					}
+					{
+						util::ScopedLock(&this->mutex);
+						this->messageQueue.pop_front();
+					}
+					this->lastMessageSentAt = time(NULL);
+				}
+
 				pthread_yield();
 			}
 
 			return NULL;
+		}
+
+		void ConnectionEndpoint::StartSupervision(OcaUint16 heartbeatTime)
+		{
+			this->heartbeatTime = heartbeatTime;
+			sendHeartbeat();
 		}
 
 		ConnectionEndpoint::~ConnectionEndpoint()

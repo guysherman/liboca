@@ -26,6 +26,7 @@
 #include <unistd.h>
 #include <arpa/inet.h>
 #include <netinet/in.h>
+#include <errno.h>
 
 // Boost Headers
 
@@ -87,7 +88,7 @@ namespace oca
 				status = setsockopt(socketFd, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(int));
 				if (status == -1)
 				{
-					fprintf(stderr, "setsockopt failed");
+					fprintf(stderr, "setsockopt failed.\n");
 					// TODO: use our exception here so we get useful info
 					freeaddrinfo(candidateAddresses);
 					throw std::exception();
@@ -97,9 +98,18 @@ namespace oca
 				if (status == -1)
 				{
 					close(socketFd);
-					fprintf(stderr, "bind failed");
+					fprintf(stderr, "bind failed.\n");
 					continue;
 				}
+
+				status = listen(socketFd, 10);  // TODO: magic number #smell
+				if (status == -1)
+				{
+					close(socketFd);
+					fprintf(stderr, "listen failed.\n");
+					throw std::exception();
+				}
+
 
 				// If we've got this far then we have a socket, and it is bound,
 				// so let's store the socket away
@@ -111,7 +121,7 @@ namespace oca
 			if (currentCandidate == NULL)
 			{
 				// Shouldn't really get here, but just in case...
-				fprintf(stderr, "bind failed completely");
+				fprintf(stderr, "bind failed completely.\n");
 				throw std::exception();
 			}
 
@@ -149,7 +159,8 @@ namespace oca
 												&clientAddressSize);
 				if (newSocketFileDescriptor == -1)
 				{
-					fprintf(stderr, "accept failed");
+					fprintf(stderr, "accept failed with errno=%d {%d, %d}.\n", errno, this->listenSocketFileDescriptor, clientAddressSize);
+					pthread_yield();
 					continue;
 				}
 
