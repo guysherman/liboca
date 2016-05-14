@@ -49,23 +49,23 @@ namespace oca
 		{
 		public:
 
-			static void WriteHeaderToBuffer(const ocp::Ocp1Header& header, boost::asio::mutable_buffer& buffer);
+			static void WriteHeaderToBuffer(const ocp::Ocp1Header& header, uint8_t* buffer);
 
-			static void WriteCommandListToBuffer(oca::net::CommandList const& commands, boost::asio::mutable_buffer& buffer);
-			static void WriteCommandToBuffer(const net::Ocp1Command& command, boost::asio::mutable_buffer& buffer);
-			static void WriteMethodIdToBuffer(const OcaMethodId& id, boost::asio::mutable_buffer& buffer);
-			static void WriteParametersToBuffer(const net::Ocp1Parameters& parameters, boost::asio::mutable_buffer& buffer);
+			static void WriteCommandListToBuffer(oca::net::CommandList const& commands, uint8_t* buffer);
+			static void WriteCommandToBuffer(const net::Ocp1Command& command, uint8_t* buffer);
+			static void WriteMethodIdToBuffer(const OcaMethodId& id, uint8_t* buffer);
+			static void WriteParametersToBuffer(const net::Ocp1Parameters& parameters, uint8_t* buffer);
 
-			static void WriteResponseListToBuffer(oca::net::ResponseList const& responses, boost::asio::mutable_buffer& buffer);
-			static void WriteResponseToBuffer(const net::Ocp1Response& response, boost::asio::mutable_buffer& buffer);
+			static void WriteResponseListToBuffer(oca::net::ResponseList const& responses, uint8_t* buffer);
+			static void WriteResponseToBuffer(const net::Ocp1Response& response, uint8_t* buffer);
 
-			static void WriteEventIdToBuffer(const OcaEventId& id, boost::asio::mutable_buffer& buffer);
-			static void WriteEventToBuffer(const OcaEvent& event, boost::asio::mutable_buffer& buffer);
-			static void WriteEventDataToBuffer(const net::Ocp1EventData& data, boost::asio::mutable_buffer& buffer);
+			static void WriteEventIdToBuffer(const OcaEventId& id, uint8_t* buffer);
+			static void WriteEventToBuffer(const OcaEvent& event, uint8_t* buffer);
+			static void WriteEventDataToBuffer(const net::Ocp1EventData& data, uint8_t* buffer);
 
-			static void WriteNtfParamsToBuffer(const net::Ocp1NtfParams& params, boost::asio::mutable_buffer& buffer);
-			static void WriteNotificationToBuffer(const net::Ocp1Notification& notification, boost::asio::mutable_buffer& buffer);
-			static void WriteNotificationListToBuffer(const net::NotificationList& notifications, boost::asio::mutable_buffer& buffer);
+			static void WriteNtfParamsToBuffer(const net::Ocp1NtfParams& params, uint8_t* buffer);
+			static void WriteNotificationToBuffer(const net::Ocp1Notification& notification, uint8_t* buffer);
+			static void WriteNotificationListToBuffer(const net::NotificationList& notifications, uint8_t* buffer);
 
 			static OcaUint32 ComputeCommandDataSize(net::Ocp1Command& command);
 			static OcaUint32 ComputeCommandListDataSize(net::CommandList& commands);

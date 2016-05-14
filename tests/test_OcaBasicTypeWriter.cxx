@@ -34,7 +34,7 @@
 
 // Our Headers
 #include <oca/OcaTypes.hxx>
-#include <OcaBasicTypeWriter.hxx>
+#include "../src/OcaBasicTypeWriter.hxx"
 
 TEST(Suite_OcaBasicTypeWriter, WriteUint8ToBuffer)
 {
@@ -43,14 +43,12 @@ TEST(Suite_OcaBasicTypeWriter, WriteUint8ToBuffer)
 	uint8_t testData[64];
 	memset(&testData[0], 0, 64);
 
-	boost::asio::mutable_buffer buf(testData, 64);
+	uint8_t* buf = &testData[0];
 
-	oca::OcaBasicTypeWriter::WriteUint8ToBuffer(value, buf);
-
-	const uint8_t* bufferLocation = boost::asio::buffer_cast<const uint8_t*>(buf);
+	oca::OcaBasicTypeWriter::WriteUint8ToBuffer(value, &buf);
 
 	EXPECT_EQ(testData[0], 0xBA);
-	EXPECT_EQ(&testData[1], bufferLocation);
+	EXPECT_EQ(&testData[1], buf);
 }
 
 TEST(Suite_OcaBasicTypeWriter, WriteUint16ToBuffer)
@@ -60,15 +58,13 @@ TEST(Suite_OcaBasicTypeWriter, WriteUint16ToBuffer)
 	uint8_t testData[64];
 	memset(&testData[0], 0, 64);
 
-	boost::asio::mutable_buffer buf(testData, 64);
+	uint8_t* buf = &testData[0];
 
-	oca::OcaBasicTypeWriter::WriteUint16ToBuffer(value, buf);
-
-	const uint8_t* bufferLocation = boost::asio::buffer_cast<const uint8_t*>(buf);
+	oca::OcaBasicTypeWriter::WriteUint16ToBuffer(value, &buf);
 
 	EXPECT_EQ(testData[0], 0xBA);
 	EXPECT_EQ(testData[1], 0xBE);
-	EXPECT_EQ(&testData[2], bufferLocation);
+	EXPECT_EQ(&testData[2], buf);
 }
 
 TEST(Suite_OcaBasicTypeWriter, WriteUint32ToBuffer)
@@ -78,17 +74,15 @@ TEST(Suite_OcaBasicTypeWriter, WriteUint32ToBuffer)
 	uint8_t testData[64];
 	memset(&testData[0], 0, 64);
 
-	boost::asio::mutable_buffer buf(testData, 64);
+	uint8_t* buf = &testData[0];
 
-	oca::OcaBasicTypeWriter::WriteUint32ToBuffer(value, buf);
-
-	const uint8_t* bufferLocation = boost::asio::buffer_cast<const uint8_t*>(buf);
+	oca::OcaBasicTypeWriter::WriteUint32ToBuffer(value, &buf);
 
 	EXPECT_EQ(testData[0], 0xBA);
 	EXPECT_EQ(testData[1], 0xBE);
 	EXPECT_EQ(testData[2], 0xCA);
 	EXPECT_EQ(testData[3], 0xFE);
-	EXPECT_EQ(&testData[4], bufferLocation);
+	EXPECT_EQ(&testData[4], buf);
 }
 
 
@@ -109,10 +103,9 @@ TEST(Suite_OcaBasicTypeWriter, WriteBlobToBuffer)
 	uint8_t testData[64];
 	memset(&testData[0], 0, 64);
 
-	boost::asio::mutable_buffer buf(testData, 64);
+	uint8_t* buf = &testData[0];
 
-	oca::OcaBasicTypeWriter::WriteBlobToBuffer(blob, buf);
-	const uint8_t* bufferLocation = boost::asio::buffer_cast<const uint8_t*>(buf);
+	oca::OcaBasicTypeWriter::WriteBlobToBuffer(blob, &buf);
 
 	EXPECT_EQ(0x00, testData[0]);
 	EXPECT_EQ(0x08, testData[1]);
@@ -125,5 +118,5 @@ TEST(Suite_OcaBasicTypeWriter, WriteBlobToBuffer)
 	EXPECT_EQ(0xEF, testData[8]);
 	EXPECT_EQ(0xFE, testData[9]);
 
-	EXPECT_EQ(&testData[10], bufferLocation);
+	EXPECT_EQ(&testData[10], buf);
 }
