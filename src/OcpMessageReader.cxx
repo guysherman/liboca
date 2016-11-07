@@ -153,10 +153,10 @@ namespace oca
 		resp.handle = ntohl(* reinterpret_cast<const OcaUint32*>(handleBuf));;
 
 		const uint8_t* statusCodeBuf =  handleBuf + sizeof(OcaUint32);
-		resp.statusCode = (* reinterpret_cast<const OcaStatus*>(statusCodeBuf));
+		resp.statusCode = (OcaStatus)(* reinterpret_cast<const OcaUint8*>(statusCodeBuf));
 
-		const uint8_t* paramsBuf =  statusCodeBuf + sizeof(OcaStatus);
-		size_t remainingBytes = resp.responseSize - (2*sizeof(OcaUint32) + sizeof(OcaStatus));
+		const uint8_t* paramsBuf =  statusCodeBuf + sizeof(OcaUint8);
+		size_t remainingBytes = resp.responseSize - (2*sizeof(OcaUint32) + sizeof(OcaUint8));
 		ParametersFromBuffer(paramsBuf, remainingBytes, resp.parameters);
 	}
 

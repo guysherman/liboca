@@ -40,7 +40,7 @@ namespace oca
 	namespace net
 	{
 		Ocp1Response::Ocp1Response()
-			: responseSize(0), handle(0), statusCode(0)
+			: responseSize(0), handle(0), statusCode(OK)
 		{
 
 		}
@@ -64,7 +64,7 @@ namespace oca
 
 		Ocp1Response::~Ocp1Response()
 		{
-			
+
 		}
 	}
 }

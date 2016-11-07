@@ -54,6 +54,8 @@ namespace oca
 			lastMessageReceivedAt = time(NULL);
 			lastMessageSentAt = time(NULL);
 			memset(&mutex, 0, sizeof(pthread_mutex_t));
+			pthread_condattr_init(&this->emptyAttr);
+			pthread_cond_init(&this->emptyCond, &this->emptyAttr);
 			pthread_create(&this->receiveThread, NULL, &ConnectionEndpoint::receiveWrapper, (void*)this);
 			//pthread_detach(this->receiveThread);
 
@@ -232,12 +234,14 @@ namespace oca
 		{
 			if (shouldContinue)
 			{
-				util::ScopedLock(&this->mutex);
+				//util::ScopedLock(&this->mutex);
+				pthread_mutex_lock(&this->mutex);
 				if (shouldContinue)
 				{
 					this->messageQueue.push_back(message);
 				}
-
+				pthread_cond_signal(&this->emptyCond);
+				pthread_mutex_unlock(&this->mutex);
 			}
 
 		}
@@ -290,6 +294,15 @@ namespace oca
 						this->messageQueue.pop_front();
 					}
 					this->lastMessageSentAt = time(NULL);
+				}
+
+				if (this->messageQueue.begin() == this->messageQueue.end())
+				{
+					//util::ScopedLock(&this->mutex);
+					pthread_mutex_lock(&this->mutex);
+					pthread_cond_wait(&this->emptyCond, &this->mutex);
+					pthread_mutex_unlock(&this->mutex);
+
 				}
 
 				pthread_yield();

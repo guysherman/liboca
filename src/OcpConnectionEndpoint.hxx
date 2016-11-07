@@ -78,6 +78,9 @@ namespace oca
 			time_t lastMessageSentAt;
 			time_t lastMessageReceivedAt;
 			pthread_mutex_t mutex;
+			pthread_condattr_t emptyAttr;
+			pthread_cond_t emptyCond;
+
 			std::deque< Message > messageQueue;
 		};
 	}

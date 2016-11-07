@@ -170,7 +170,7 @@ namespace oca
 			// TODO: there's a bit of a security issue here: we trust that the buffer has enough space #security
 			uint8_t* statusCodeBuf = handleBuf + sizeof(OcaUint32);
 			OcaUint8* statusCode = reinterpret_cast<OcaUint8*>(statusCodeBuf);
-			*statusCode = response.statusCode;
+			*statusCode = (OcaUint8) response.statusCode;
 
 			// TODO: there's a bit of a security issue here: we trust that the buffer has enough space #security
 			uint8_t* paramsBuf = statusCodeBuf + sizeof(OcaUint8);
@@ -180,7 +180,7 @@ namespace oca
 		OcaUint32 OcpMessageWriter::ComputeResponseDataSize(net::Ocp1Response& response)
 		{
 			OcaUint32 paramsSizeBytes = response.parameters.parameters.size() + sizeof(OcaUint8);
-			OcaUint32 responseSize = paramsSizeBytes + (2*sizeof(OcaUint32) + sizeof(OcaStatus));
+			OcaUint32 responseSize = paramsSizeBytes + (2*sizeof(OcaUint32) + sizeof(OcaUint8));
 			response.responseSize = responseSize;
 			return responseSize;
 		}

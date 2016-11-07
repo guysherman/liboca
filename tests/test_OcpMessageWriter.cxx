@@ -263,14 +263,14 @@ TEST(Suite_OcpMessageWriter, WriteResponseToBuffer)
 	oca::net::Ocp1Response resp;
 	resp.responseSize = 13;
 	resp.handle = 0xDEADF00D;
-	resp.statusCode = 0xDE;
+	resp.statusCode = oca::BufferOverflow;
 	resp.parameters = params;
 
 	oca::OcpMessageWriter::WriteResponseToBuffer(resp, buf);
 
 	EXPECT_EQ(0x0D, testData[3]);
 	EXPECT_EQ(0x0D, testData[7]);
-	EXPECT_EQ(0xDE, testData[8]);
+	EXPECT_EQ(0x0E, testData[8]);
 	EXPECT_EQ(0x03, testData[9]);
 	EXPECT_EQ(0x02, testData[12]);
 
@@ -290,7 +290,7 @@ TEST(Suite_OcpMessageWriter, ComputeResponseDataSize)
 	oca::net::Ocp1Response resp;
 	resp.responseSize = 13;
 	resp.handle = 0xDEADF00D;
-	resp.statusCode = 0xDE;
+	resp.statusCode = oca::BufferOverflow;
 	resp.parameters = params;
 
 
@@ -315,7 +315,7 @@ TEST(Suite_OcpMessageWriter, ComputeResponseListDataSize)
 	oca::net::Ocp1Response resp;
 	resp.responseSize = 13;
 	resp.handle = 0xDEADF00D;
-	resp.statusCode = 0xDE;
+	resp.statusCode = oca::BufferOverflow;
 	resp.parameters = params;
 
 
@@ -345,7 +345,7 @@ TEST(Suite_OcpMessageWriter, WriteResponseListToBuffer)
 	oca::net::Ocp1Response resp;
 	resp.responseSize = 13;
 	resp.handle = 0xDEADF00D;
-	resp.statusCode = 0xDE;
+	resp.statusCode = oca::BufferOverflow;
 	resp.parameters = params;
 
 
@@ -357,13 +357,13 @@ TEST(Suite_OcpMessageWriter, WriteResponseListToBuffer)
 
 	EXPECT_EQ(0x0D, testData[3]);
 	EXPECT_EQ(0x0D, testData[7]);
-	EXPECT_EQ(0xDE, testData[8]);
+	EXPECT_EQ(0x0E, testData[8]);
 	EXPECT_EQ(0x03, testData[9]);
 	EXPECT_EQ(0x02, testData[12]);
 
 	EXPECT_EQ(0x0D, testData[16]);
 	EXPECT_EQ(0x0D, testData[20]);
-	EXPECT_EQ(0xDE, testData[21]);
+	EXPECT_EQ(0x0E, testData[21]);
 	EXPECT_EQ(0x03, testData[22]);
 	EXPECT_EQ(0x02, testData[25]);
 

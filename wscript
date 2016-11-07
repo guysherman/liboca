@@ -36,15 +36,15 @@ def configure(conf):
 	conf.setenv('liboca', env)
 	conf.load('compiler_cxx')
 	conf.load('cppcheck')
-	conf.env.CXXFLAGS = ['-Wall', '-ansi', '-ggdb']
+	conf.env.CXXFLAGS = ['-Wall', '-ansi', '-ggdb', '-Wno-c99-extensions']
 
 
 def buildLibShared(bld):
-	bld.shlib(source = bld.path.ant_glob('src/*.cxx'), target="oca", includes = ['./include'], cxxflags=['-Werror', '-pedantic-errors'], install_path='${LIBDIR}', lib=libs, defines=defines, use=['wq'])
+	bld.shlib(source = bld.path.ant_glob('src/*.cxx'), target="oca", includes = ['./include'], cxxflags=['-Werror', '-pedantic-errors', '-Wno-c99-extensions'], install_path='${LIBDIR}', lib=libs, defines=defines, use=['wq'])
 
 
 def buildLibStatic(bld):
-	bld.stlib(source = bld.path.ant_glob('src/*.cxx'), target="oca", includes = ['./include'], cxxflags=['-Werror', '-pedantic-errors'], install_path='${LIBDIR}', lib=libs, defines=defines, use=['wq'])
+	bld.stlib(source = bld.path.ant_glob('src/*.cxx'), target="oca", includes = ['./include'], cxxflags=['-Werror', '-pedantic-errors', '-Wno-c99-extensions'], install_path='${LIBDIR}', lib=libs, defines=defines, use=['wq'])
 
 
 def build(bld):
@@ -59,7 +59,7 @@ def build(bld):
 
 	bld.program(source = bld.path.ant_glob('examples/hello/*.cxx'),
 				includes = ['./include'],
-				cxxflags=['-Werror', '-pedantic-errors'],
+				cxxflags=['-Werror', '-pedantic-errors', '-Wno-c99-extensions'],
 				lib = libs,
 				target = 'examples/example-hello',
 				install_path = '${BINDIR}',
@@ -67,7 +67,7 @@ def build(bld):
 
 	bld.program(source = bld.path.ant_glob('examples/KeepAlive/Server.cxx'),
 				includes = ['./include'],
-				cxxflags=['-Werror', '-pedantic-errors'],
+				cxxflags=['-Werror', '-pedantic-errors', '-Wno-c99-extensions'],
 				lib = libs,
 				target = 'examples/keep-alive-server',
 				install_path = '${BINDIR}',
@@ -76,7 +76,7 @@ def build(bld):
 
 	bld.program(source = bld.path.ant_glob('examples/KeepAlive/Client.cxx'),
 				includes = ['./include'],
-				cxxflags=['-Werror', '-pedantic-errors'],
+				cxxflags=['-Werror', '-pedantic-errors', '-Wno-c99-extensions'],
 				lib = libs,
 				target = 'examples/keep-alive-client',
 				install_path = '${BINDIR}',
@@ -86,7 +86,7 @@ def build(bld):
 
 	bld.program(source = bld.path.ant_glob('tests/**/*.cxx'),
 				includes = ['./include', './src', './dep/wq/include'],
-				cxxflags=['-w'],
+				cxxflags=['-w', '-Wno-c99-extensions'],
 				lib = ['pthread', 'boost_system'],
 				target = 'tests/all',
 				install_path = '${BINDIR}',
